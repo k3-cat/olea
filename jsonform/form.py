@@ -12,19 +12,15 @@ class JsonForm(ABC):
             if not isinstance(obj, UnboundField):
                 continue
             self.fields.append(name)
-            setattr(self, f'_{name}_', obj.bind())
+            field = obj.bind()
+            setattr(self, f'_{name}_', field)
+            setattr(self, name, lambda: field.data)
 
         if data:
             self.process(data)
 
     def __getitem__(self, key):
         return getattr(self, key).data
-
-    def __getattribute__(self, name):
-        try:
-            return super().__getattribute__(f'_{name}_').data
-        except AttributeError:
-            return super().__getattribute__(name)
 
     def test_empty(self, name):
         if name in self.fields:

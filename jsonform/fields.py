@@ -211,3 +211,4 @@ class SubForm(Field):
             if e_.f_errors:
                 e['f_errors'] = e_.f_errors
             raise e
+        self._data = {name: self.form[name] for name in self.form.fields}

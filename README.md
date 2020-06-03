@@ -1,4 +1,4 @@
-#jsonform
+# JsonForm
 
 
 with flask
@@ -10,8 +10,9 @@ To integrate jsonfrom with flask, use this workaround and inherit from `BaseForm
     from flask import abort, request
     from flask_json import json_response
 
-    from jsonform import FormError, JsonForm
+    from jsonform import FieldError, FormError, JsonForm
 
+    __all__ = ['BaseForm', 'FieldError', 'FormError', 'JsonForm']
 
     class BaseForm(JsonForm):
         def __init__(self, data=None):
