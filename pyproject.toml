@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "jsonform"
+version = "0.1.0"
+description = ""
+authors = ["Pix-00 <15878537+Pix-00@users.noreply.github.com>"]
+license = "Apache-2.0"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.dev-dependencies]
+yapf = "^0.30.0"
+isort = "^4.3.21"
+pre-commit = "^2.4.0"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
