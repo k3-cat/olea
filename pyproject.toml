@@ -20,6 +20,7 @@ lxml = "^4.5.0"
 msal = "^1.2.0"
 sentry-sdk = {extras = ["flask", "sqlalchemy", "redis"], version = "^0.14.3"}
 flask-json = "^0.3.4"
+ip2location = "^8.4.1"
 
 [tool.poetry.dev-dependencies]
 isort = {extras = ["pyproject"], version = "^4.3.21"}
@@ -30,7 +31,7 @@ pre-commit = "^2.3.0"
 
 [tool.isort]
 line_length = 100
-known_third_party = ["bs4", "click", "flask", "flask_apscheduler", "flask_json", "flask_jsonform", "flask_jsonfrom", "flask_redis", "flask_sqlalchemy", "jsonform", "mailgun", "msal", "onedrive", "passlib", "pypat", "requests", "sentry_sdk", "sqlalchemy", "sqlalchemy_", "werkzeug"]
+known_third_party = ["IP2Location", "bs4", "click", "cryptography", "flask", "flask_apscheduler", "flask_json", "flask_jsonform", "flask_jsonfrom", "flask_redis", "flask_sqlalchemy", "jsonform", "mailgun", "msal", "onedrive", "passlib", "pypat", "requests", "sentry_sdk", "sqlalchemy", "sqlalchemy_", "werkzeug"]
 
 [tool.pylint.messages_control]
 disable = """,

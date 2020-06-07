@@ -17,7 +17,7 @@ def login():
 @bp.route('/refresh', methods=['POST'])
 def refresh():
     form = Refresh()
-    token, exp = AuthMgr(form.id).granted_access_token(key=form.key)
+    token, exp = AuthMgr(form.id).granted_access_token(key=form.key, device_id=form.device_id)
     return jsonify({'token': token, 'exp': exp})
 
 

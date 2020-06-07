@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from models import ProjType
-from olea.errors import InvalidSource, WebNotExist
+from olea.errors import InvalidSource
 from olea.exts import redis
 
 CN_SITE_URL = 'http://scp-wiki-cn.wikidot.com'
@@ -15,7 +15,7 @@ def fetch_web(url):
     if not web_page_t:
         web_page = requests.get(f'{CN_SITE_URL}/{url}')
         if web_page.status_code == 404:
-            raise WebNotExist(url=url)
+            raise InvalidSource(rsn=InvalidSource.Rsn.web, url=url)
         web_page_t = web_page.text
     redis[url] = web_page_t
     redis.pexpire(url, ex=60 * 3)
@@ -25,7 +25,7 @@ def fetch_web(url):
 
 def fetch_title_by_url(url):
     if not re.match(r'^/[a-z]+(?:(?:-[a-z]+)+)?$', url):
-        raise InvalidSource()
+        raise InvalidSource(rsn=InvalidSource.Rsn.inp)
 
     web = fetch_web(url)
     title_e = web.find('div', {'id': 'page-title'})
@@ -49,11 +49,11 @@ def fetch_title_by_id(id_):
     elif re.match(r'^[0-9]{3,4}-jp(?:-j)?$', id_):
         url = 'scp-international/'
     else:
-        raise InvalidSource()
+        raise InvalidSource(rsn=InvalidSource.Rsn.inp)
     web = fetch_web(url)
     title_e = web.find_all(name='a', text=f'SCP-{id_}', limit=1)[0]
     if not title_e:
-        raise InvalidSource()
+        raise InvalidSource(rsn=InvalidSource.Rsn.non)
     return str(title_e.parent)
 
 

@@ -22,9 +22,16 @@ class RolesLocked(BadOpt):
 class InvalidSource(BadOpt):
     code = '4JZE'
 
-    invalid_input = lambda: InvalidSource(rsn='invalid input')
-    not_found = lambda: InvalidSource(rsn='not found')
-    web_not_exist = lambda url: InvalidSource(rsn='web page does not exist', url=url)
+    class Rsn(enum.Enum):
+        inp = 'invalid input'
+        non = 'not found'
+        web = 'web page not found'
+
+    def __init__(self, rsn: 'InvalidSource.Rsn', url=''):
+        if rsn == InvalidSource.Rsn.web:
+            super().__init__(rsn=rsn.name, url=url)
+        else:
+            super().__init__(rsn=rsn.name)
 
 
 class RoleIsTaken(BadOpt):
@@ -44,11 +51,18 @@ class NotQualifiedToPick(BadOpt):
 # ------------------- pink ---------------------
 
 
-class PwdTooWeek(BadOpt):
+class WeekPwd(BadOpt):
     code = ''
 
-    low_strength = lambda strength: PwdTooWeek(rsn='low strength', strength=strength)
-    common_pwd = lambda: PwdTooWeek(rsn='common password')
+    class Rsn(enum.Enum):
+        common = 'common pwd'
+        strength = 'low strength'
+
+    def __init__(self, rsn: 'WeekPwd.Rsn', strength=0.0):
+        if rsn == WeekPwd.Rsn.strength:
+            super().__init__(rsn=rsn.name, strength=strength)
+        else:
+            super().__init__(rsn=rsn.name)
 
 
 # ------------------- pit ---------------------

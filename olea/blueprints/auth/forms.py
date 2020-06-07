@@ -11,3 +11,4 @@ class Login(BaseForm):
 class Refresh(BaseForm):
     id = StringField()
     key = StringField()
+    device_id = StringField()

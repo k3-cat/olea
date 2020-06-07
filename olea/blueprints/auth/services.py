@@ -2,6 +2,7 @@ import datetime
 import os
 from base64 import b85encode
 
+import IP2Location
 from flask import current_app, g, request
 
 from models import Lemon, Pink
@@ -9,10 +10,14 @@ from olea.errors import AccountDeactivated, InvalidCredential, InvalidRefreshTok
 from olea.exts import db, redis
 
 from ..base_mgr import BaseMgr
+from .ip import ip2loc
 
 
 class AuthMgr(BaseMgr):
     model = Lemon
+
+    a_life = current_app.config['ACCESS_TOKEN_LIFE']
+    r_life = current_app.config['REFRESH_TOKEN_LIFE']
 
     def __init__(self, obj_or_id):
         try:
@@ -45,17 +50,22 @@ class AuthMgr(BaseMgr):
         db.session.commit()
         return lemon
 
-    def granted_access_token(self, key):
-        if (exp := self.o.last_access + datetime.timedelta(days=90)) < g.now:
+    def granted_access_token(self, key, device_id):
+        if (exp := self.o.last_access + self.r_life) < g.now:
             self.revoke()
             raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.exp, at=exp)
-        if self.o.key != key:
+        if self.o.key != key or self.o.device_id != device_id:
             raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.key)
+        if self.o.ip != request.remote_addr \
+            and ip2loc.get_city(self.o.ip) != ip2loc.get_city(request.remote_addr):
+            raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.ip)
+        self.o.last_access = g.now
+        db.session.add(self.o)
+
         token = b85encode(os.urandom(128 // 8))
-        ex = current_app.config['ACCESS_TOKEN_EXP']
         redis[token] = g.pink_id
-        redis.pexpire(token, ex=ex)
-        return token, g.now + datetime.timedelta(seconds=ex)
+        redis.pexpire(token, ex=a_life.seconds)
+        return token, g.now + a_life
 
     def revoke(self):
         db.session.delete(self.o)

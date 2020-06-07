@@ -37,6 +37,7 @@ class InvalidRefreshToken(AuthFail):
         exp = 'expired'
         key = 'invalid key'
         non = 'non exist'
+        ip = 'location change'
 
     def __init__(self, rsn: 'InvalidRefreshToken.Rsn', at=None):
         if rsn == InvalidRefreshToken.Rsn.exp:

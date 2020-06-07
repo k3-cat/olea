@@ -6,7 +6,7 @@ from math import log2
 from pathlib import Path
 from typing import Set
 
-from ...errors import CommonPwd, PwdTooWeek
+from olea.errors import WeekPwd
 
 PWD_CHARS = string.digits + string.ascii_letters + string.punctuation
 with (Path(__file__).parent / 'common-passwords').open('rb') as f:
@@ -67,7 +67,7 @@ def measure_strength(pwd: str) -> float:
 
 def check_pwd(pwd):
     if is_common_pwd(pwd):
-        raise CommonPwd()
+        raise WeekPwd(rsn=WeekPwd.Rsn.common)
     strength = measure_strength(pwd)
     if strength < WEAK_MAX:
-        raise PwdTooWeek(strength=strength)
+        raise WeekPwd(rsn=WeekPwd.Rsn.strength, strength=strength)
