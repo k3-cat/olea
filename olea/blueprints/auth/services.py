@@ -1,6 +1,4 @@
 import datetime
-import os
-from base64 import b85encode
 
 import IP2Location
 from flask import current_app, g, request
@@ -8,6 +6,7 @@ from flask import current_app, g, request
 from models import Lemon, Pink
 from olea.errors import AccountDeactivated, InvalidCredential, InvalidRefreshToken, RecordNotFound
 from olea.exts import db, redis
+from olea.utils import random_b85
 
 from ..base_mgr import BaseMgr
 from .ip import ip2loc
@@ -39,7 +38,7 @@ class AuthMgr(BaseMgr):
             db.session.delete(pink.lemons.first())
 
         lemon = cls.model(id=cls.gen_id(),
-                          key=b85encode(os.urandom(256 // 8)),
+                          key=random_b85(256 // 8),
                           pink=pink,
                           device_id=device_id,
                           ip=request.remote_addr,
@@ -62,9 +61,8 @@ class AuthMgr(BaseMgr):
         self.o.last_access = g.now
         db.session.add(self.o)
 
-        token = b85encode(os.urandom(128 // 8))
-        redis[token] = g.pink_id
-        redis.pexpire(token, ex=a_life.seconds)
+        token = random_b85(128 // 8)
+        redis.pexpire(token, g.pink_id, ex=a_life.seconds)
         return token, g.now + a_life
 
     def revoke(self):

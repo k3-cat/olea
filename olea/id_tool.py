@@ -6,13 +6,11 @@ ALPHABET = '0123456789aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ_-()!'
 
 class IdTool():
     def __init__(self):
-
         self.ALPHABET = [char for char in ALPHABET]
         self.ANTI_ALPHABET = {char: i for i, char in enumerate(ALPHABET)}
         self.WEIGHT = [(11**i) % 67 for i in range(66)]
 
     def generate(self, length: int) -> str:
-        random.seed(os.urandom(128))
         pre_id = [random.randint(0, 66) for _ in range(length)]
         result = 0
         for i, a in enumerate(pre_id):

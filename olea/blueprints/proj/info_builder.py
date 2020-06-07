@@ -2,12 +2,14 @@ import re
 
 import requests
 from bs4 import BeautifulSoup
+from flask import current_app
 
 from models import ProjType
 from olea.errors import InvalidSource
 from olea.exts import redis
 
 CN_SITE_URL = 'http://scp-wiki-cn.wikidot.com'
+WEB_EXP = current_app.config['WEB_EXP']
 
 
 def fetch_web(url):
@@ -17,8 +19,7 @@ def fetch_web(url):
         if web_page.status_code == 404:
             raise InvalidSource(rsn=InvalidSource.Rsn.web, url=url)
         web_page_t = web_page.text
-    redis[url] = web_page_t
-    redis.pexpire(url, ex=60 * 3)
+    redis.set(url, web_page_t, ex=WEB_EXP)
     soup = BeautifulSoup(web_page_t, 'lxml')
     return soup.find('div', {'id': 'main-content'})
 

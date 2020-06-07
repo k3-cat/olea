@@ -9,8 +9,7 @@ from .text_tools import measure_width
 
 
 class UpdateInfo(BaseForm):
-    qq = IntegerField(optional=True,
-                      condition=InRange(min_val=100_000_000, max_val=10_000_000_000))
+    qq = IntegerField(optional=True, condition=InRange(min_val=100_000_000, max_val=10_000_000_000))
     other = ListField(StringField(), optional=True)
     email = StringField(optional=True, condition=Email())
 
@@ -21,8 +20,7 @@ class UpdateInfo(BaseForm):
 
 class Create(BaseForm):
     name = StringField()
-    qq = IntegerField(optional=True,
-                      condition=InRange(min_val=100_000_000, max_val=10_000_000_000))
+    qq = IntegerField(optional=True, condition=InRange(min_val=100_000_000, max_val=10_000_000_000))
     other = ListField(StringField(), optional=True)
     email = StringField(condition=Email())
     deps = ListField(EnumField(Dep))
@@ -34,6 +32,16 @@ class Create(BaseForm):
     def check(self):
         if self.test_empty('qq') and self.test_empty('other'):
             raise FormError('must provide at least one contact method')
+
+
+class ResetPwdI(BaseForm):
+    name = StringField()
+    email = StringField()
+
+
+class ResetPwdF(BaseForm):
+    token = StringField()
+    pwd = StringField()
 
 
 class SetPwd(BaseForm):

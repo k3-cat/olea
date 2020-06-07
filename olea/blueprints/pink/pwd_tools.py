@@ -1,4 +1,3 @@
-import os
 import pickle
 import random
 import string
@@ -6,15 +5,16 @@ from math import log2
 from pathlib import Path
 from typing import Set
 
+from flask import current_app
+
 from olea.errors import WeekPwd
 
 PWD_CHARS = string.digits + string.ascii_letters + string.punctuation
-with (Path(__file__).parent / 'common-passwords').open('rb') as f:
+with current_app.config['PWDDB_PATH'].open('rb') as f:
     COMMON_PWD: Set[str] = pickle.load(f)
 
 
 def generate_pwd() -> str:
-    random.seed(os.urandom(64))
     return ''.join(random.choices(PWD_CHARS, k=20))
 
 

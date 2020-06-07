@@ -3,7 +3,7 @@ from flask import g, jsonify
 from olea.auth import login_required, permission_required
 
 from . import bp
-from .forms import Create, SetPwd, UpdateInfo
+from .forms import Create, ResetPwdF, ResetPwdI, SetPwd, UpdateInfo
 from .services import PinkMgr
 
 
@@ -27,6 +27,35 @@ def update_info():
     return 'True'
 
 
+@bp.route('/set_pwd', methods=['POST'])
+@login_required
+def set_pwd():
+    form = SetPwd()
+    PinkMgr(g.pink_id).set_pwd(form.pwd)
+    return jsonify({})
+
+
+@bp.route('/reset_pwd_init', methods=['POST'])
+def reset_pwd_i():
+    form = ResetPwdI()
+    PinkMgr.reset_pwd_init(name=form.name, email=form.email)
+    return jsonify({})
+
+
+@bp.route('/reset_pwd_fin', methods=['POST'])
+def reset_pwd_f():
+    form = ResetPwdF()
+    PinkMgr.reset_pwd_fin(token=form.token, pwd=form.pwd)
+    return jsonify({})
+
+
+@bp.route('/reset_pwd_fin', methods=['POST'])
+def reset_pwd():
+    form = ResetPwdI()
+    PinkMgr.reset_pwd_init(name=form.name, email=form.email)
+    return jsonify({})
+
+
 @bp.route('/create', methods=['POST'])
 @permission_required(perm='pink.create')
 def create():
@@ -39,21 +68,6 @@ def create():
         deps=form.deps,
     )
     return jsonify({'id': pink.id})
-
-
-@bp.route('/reset_pwd', methods=['POST'])
-@permission_required(perm='pink.reset_pwd')
-def reset_pwd():
-    PinkMgr(g.pink_id).reset_pwd()
-    return jsonify({})
-
-
-@bp.route('/set_pwd', methods=['POST'])
-@login_required
-def set_pwd():
-    form = SetPwd()
-    PinkMgr(g.pink_id).set_pwd(form.pwd)
-    return jsonify({})
 
 
 @bp.route('/<id_>/deactive', methods=['POST'])
