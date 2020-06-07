@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jsonform"
-version = "0.1.1"
+version = "0.1.2"
 description = ""
 authors = ["Pix-00 <15878537+Pix-00@users.noreply.github.com>"]
 license = "Apache-2.0"
@@ -9,9 +9,13 @@ license = "Apache-2.0"
 python = "^3.8"
 
 [tool.poetry.dev-dependencies]
+isort = {extras = ["pyproject"], version = "^4.3.21"}
 yapf = "^0.30.0"
-isort = "^4.3.21"
 pre-commit = "^2.4.0"
+
+[tool.isort]
+line_length = 100
+known_third_party = []
 
 [build-system]
 requires = ["poetry>=0.12"]

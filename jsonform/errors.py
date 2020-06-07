@@ -2,7 +2,7 @@ import re
 from abc import ABC
 
 
-class FieldError(Exception):
+class FieldError(BaseException):
     def __init__(self, e=None):
         if e:
             if isinstance(e, str):
@@ -43,7 +43,7 @@ class FieldError(Exception):
             self.error = self.error.pop()
 
 
-class FormError(Exception):
+class FormError(BaseException):
     def __init__(self, error=None):
         self.error = error
         self.f_errors = dict()
