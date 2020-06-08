@@ -1,7 +1,7 @@
 from flask import current_app
 
 from models import Lemon, Pink
-from olea.errors import AccessDenied
+from olea.errors import AccessDenied, InvalidCredential
 from olea.exts import db, mailgun, redis
 from olea.utils import random_b85
 
@@ -53,7 +53,7 @@ class PinkMgr(BaseMgr):
     @classmethod
     def reset_pwd_fin(cls, token, pwd):
         if not (pink_id := redis.get(token)):
-            pass
+            raise InvalidCredential(type=InvalidCredential.T.rst)
         PinkMgr(pink_id).set_pwd(pwd)
         redis.delete(token)
 

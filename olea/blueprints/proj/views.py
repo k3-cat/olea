@@ -1,6 +1,6 @@
 from flask import g, jsonify
 
-from olea.auth import login_required, permission_required
+from olea.auth import login_req, permission_required
 
 from . import bp
 from .forms import Create, ModifyRoles, SimpleCreate

@@ -83,10 +83,10 @@ def count_chars(source, type_):
         page_content = web.find('div', {'id': 'page-content'})
 
         # TODO: fix text
-        text = re.sub(r'ancd' 'x', page_content.text.lower())
+        text = page_content.text.lower().replace('aaaa', 'x')
         text = re.sub(r'x  (x  )*x', 'xx', re.sub(r'[0-9a-z-]', ' x ', text))
         text = re.sub(r'(?![\u4e00-\u9fa5]|[0-9a-z-]).', ' ', text)
-        str_list = re.sub(r'\s+', ' ', text).split(' ')
+        str_list = re.sub(r'\s+', ' ', text).split()
         count = 0
         for elem in str_list:
             if 'x' in elem:
@@ -100,6 +100,3 @@ def build_info(base, type_):
     title, source = fetch_title(base, type_)
     words_count = count_chars(source, type_)
     return title, source, words_count
-
-
-fetch_title_by_id('9009')

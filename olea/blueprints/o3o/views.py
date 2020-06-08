@@ -1,6 +1,6 @@
 from flask import jsonify
 
-from olea.auth import login_required
+from olea.auth import login_req
 from olea.exts import pat
 
 from . import bp

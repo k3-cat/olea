@@ -10,7 +10,7 @@ class BaseError(BaseException, ABC):
     code = ''
 
     def __init_subclass__(cls):
-        cls.pre = re.sub('(?!^)([A-Z])', ' \\1', cls.__name__) + ' - '
+        cls.pre = re.sub(r'(?!^)([A-Z])', r' \1', cls.__name__) + ' - '
         return super().__init_subclass__()
 
     @abstractmethod
@@ -21,7 +21,7 @@ class BaseError(BaseException, ABC):
     def __json__(self):
         d = {
             'code': self.code,
-            'msg': re.sub('(?!^)([A-Z])', ' \\1', self.__class__.__name__),
+            'msg': re.sub(r'(?!^)([A-Z])', r' \1', self.__class__.__name__),
             'parms': self.parms
         }
 

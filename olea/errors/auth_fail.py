@@ -1,6 +1,8 @@
 import enum
 from abc import ABC
 
+from flask import g
+
 from .base_error import BaseError
 
 
@@ -18,6 +20,16 @@ class AccessDenied(AuthFail):
         super().__init__(cls=obj.__class__.__name__, id=obj.id)
 
 
+class PermissionDenied(AuthFail):
+    code = 'abcd'
+
+    def __init__(self, scope: set = None):
+        if scope:
+            super().__init__(node=g.node, scope=scope)
+        else:
+            super().__init__(node=g.node)
+
+
 class AccountDeactivated(AuthFail):
     code = 'ssss'
 
@@ -25,9 +37,13 @@ class AccountDeactivated(AuthFail):
 class InvalidCredential(AuthFail):
     code = '516O'
 
+    class T(enum.Enum):
+        pwd = 'pwd'
+        acc = 'access token'
+        rst = 'reset token'
 
-class InvalidAccessToken(AuthFail):
-    code = '516O'
+    def __init__(self, type: 'InvalidCredential.T'):
+        super().__init__(type=type)
 
 
 class InvalidRefreshToken(AuthFail):
@@ -43,4 +59,4 @@ class InvalidRefreshToken(AuthFail):
         if rsn == InvalidRefreshToken.Rsn.exp:
             super().__init__(rsn=rsn.name, at=at)
         else:
-            super().__init__(rsn=rsn.name, at=at)
+            super().__init__(rsn=rsn.name)

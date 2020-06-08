@@ -1,6 +1,6 @@
 import inspect
 import json
-import os
+import re
 import sys
 from pathlib import Path
 
@@ -13,15 +13,13 @@ sys.path.append(str(DIR))
 
 
 def split_file(path):
-    flag = False
-    content = ''
     with path.open('r') as f:
-        while line := f.readline():
-            if not flag and ('def ' in line or 'class ' in line):
-                flag = True
-            if flag:
-                content += line
-    return content
+        c = f.read()
+    c = re.sub(r'^(?:from .*? )?import \(.*?\)$', '', c, flags=re.DOTALL | re.M)
+    c = re.sub(r'^(?:from .*? )?import .*?$', '', c, flags=re.M)
+    c = re.sub(r'__all__ = \[.*?\]$', '', c, flags=re.DOTALL | re.M)
+
+    return c
 
 
 def build_import_statement(module):

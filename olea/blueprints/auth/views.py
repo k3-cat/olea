@@ -1,6 +1,6 @@
 from flask import jsonify
 
-from olea.auth import login_required
+from olea.auth import login_req
 
 from . import bp
 from .forms import Login, Refresh

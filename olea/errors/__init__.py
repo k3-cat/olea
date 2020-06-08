@@ -1,5 +1,5 @@
-from .auth_fail import (AccessDenied, AccountDeactivated, InvalidAccessToken, InvalidCredential,
-                        InvalidRefreshToken)
+from .auth_fail import (AccessDenied, AccountDeactivated, InvalidCredential, InvalidRefreshToken,
+                        PermissionDenied)
 from .bad_opt import (DoesNotMeetRequirements, InvalidSource, NotQualifiedToPick, RoleIsTaken,
                       RolesLocked, StateLocked, UnallowedType)
 from .base_error import BaseError
@@ -7,9 +7,9 @@ from .data_conflict import DuplicatedRecord, FileExist, RecordNotFound
 
 __all__ = [
     'AccessDenied', 'AccountDeactivated', 'BaseError', 'DoesNotMeetRequirements',
-    'DuplicatedRecord', 'FileExist', 'InvalidAccessToken', 'InvalidCredential',
-    'InvalidRefreshToken', 'InvalidSource', 'NotQualifiedToPick', 'RecordNotFound', 'RoleIsTaken',
-    'RolesLocked', 'StateLocked', 'UnallowedType'
+    'DuplicatedRecord', 'FileExist', 'InvalidCredential', 'InvalidRefreshToken', 'InvalidSource',
+    'NotQualifiedToPick', 'PermissionDenied', 'RecordNotFound', 'RoleIsTaken', 'RolesLocked',
+    'StateLocked', 'UnallowedType'
 ]
 
 

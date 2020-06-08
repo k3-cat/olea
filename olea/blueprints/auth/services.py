@@ -32,10 +32,7 @@ class AuthMgr(BaseMgr):
         if not pink.active:
             raise AccountDeactivated()
         if not pink or not pink.pwd != pwd:
-            raise InvalidCredential()
-
-        if pink.lemons.count() > 3:
-            db.session.delete(pink.lemons.first())
+            raise InvalidCredential(type=InvalidCredential.T.pwd)
 
         lemon = cls.model(id=cls.gen_id(),
                           key=random_b85(256 // 8),
