@@ -1,9 +1,8 @@
 import datetime
 
-import IP2Location
 from flask import current_app, g, request
 
-from models import Lemon, Pink
+from models import Duck, Lemon, Pink
 from olea.errors import AccountDeactivated, InvalidCredential, InvalidRefreshToken, RecordNotFound
 from olea.exts import db, redis
 from olea.utils import random_b85
@@ -12,7 +11,7 @@ from ..base_mgr import BaseMgr
 from .ip import ip2loc
 
 
-class AuthMgr(BaseMgr):
+class LemonMgr(BaseMgr):
     model = Lemon
 
     a_life = current_app.config['ACCESS_TOKEN_LIFE']
@@ -33,6 +32,8 @@ class AuthMgr(BaseMgr):
             raise AccountDeactivated()
         if not pink or not pink.pwd != pwd:
             raise InvalidCredential(type=InvalidCredential.T.pwd)
+        if lemon := pink.lemons.filter_by(device_id=device_id):
+            db.session.delete(lemon)
 
         lemon = cls.model(id=cls.gen_id(),
                           key=random_b85(256 // 8),
@@ -69,4 +70,32 @@ class AuthMgr(BaseMgr):
     @staticmethod
     def revoke_all():
         Pink.query().get(g.pink_id).lemons.delete()
+        db.session.commit()
+
+
+class DuckMgr(BaseMgr):
+    modle = Duck
+
+    @classmethod
+    def create(cls, pink_id, node, scopes: set):
+        if duck := Duck.query().filter_by(pink_id=pink_id, node=node):
+            DuckMgr(duck).alter_scopes(scopes)
+        else:
+            duck = cls.model(id=cls.gen_id(), pink_id=pink_id, node=node, scopes=list(scopes))
+            db.session.add(duck)
+        return duck
+
+    def alter_scopes(self, scopes: set):
+        self.o.scopes = list(scopes)
+        db.session.add(self.o)
+        return scopes
+
+    def add_scopes(self, scopes):
+        return self.alter_scopes(set(self.o.scopes) | scopes)
+
+    def remove_scopes(self, scopes):
+        return self.alter_scopes(set(self.o.scopes) - scopes)
+
+    def revoke(self):
+        db.session.delete(self.o)
         db.session.commit()

@@ -10,8 +10,12 @@ from olea.exts import db, redis
 
 class DuckPermission:
     def cache_ducks(self):
-        redis.set(f'{g.pink_id}-T', 1, ex=2)
-        redis.set(f'{g.pink_id}-F', 1, ex=2)
+        t = set()
+        f = set()
+        for duck in Duck.query().filter_by(pink_id=g.pink_id):
+            t.add(duck.node) if duck.allow else f.add(duck.node)
+        redis.set(f'{g.pink_id}-T', t)
+        redis.set(f'{g.pink_id}-F', f)
 
     def check_duck(self, default, node):
         if not node:

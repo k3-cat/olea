@@ -42,15 +42,9 @@ class Pink(BaseModel):
     ability = Column(JSONB)
     metainfo = Column(JSONB)
 
-    pits = relationship('Pit',
-                        back_populates='pink',
-                        lazy='dynamic',
-                        passive_deletes=True)
-
-    lemons = relationship('Lemon',
-                          back_populates='pink',
-                          lazy='dynamic',
-                          passive_deletes=True)
+    pits = relationship('Pit', back_populates='pink', lazy='dynamic', passive_deletes=True)
+    ducks = relationship('Duck', back_populates='pink', lazy='dynamic', passive_deletes=True)
+    lemons = relationship('Lemon', back_populates='pink', lazy='dynamic', passive_deletes=True)
     __id_len__ = 9
 
     @hybrid_property
