@@ -1,31 +1,39 @@
 from flask import g, jsonify
 
-from olea.auth import login_req, permission_required
+from olea.auth import login, perm
 
 from . import bp
-from .forms import Create, ModifyRoles, SimpleCreate
+from .forms import Create, FullCreate, ModifyRoles
 from .services import ProjMgr
 
 
-@bp.route('/<id_>/modify_roles', methods=['POST'])
-@login_required
+@bp.route('/<id_>/modify-roles', methods=['POST'])
+@login
 def modify_roles(id_: str):
     form = ModifyRoles()
-    ProjMgr(id_).modify_roles(add=form.add, remove=form.remove)
-    return jsonify({})
+    roles = ProjMgr(id_).modify_roles(add=form.add, remove=form.remove)
+    return jsonify({role.id: role.name for role in roles})
 
 
-@bp.route('/s_create', methods=['POST'])
-@login_required
-def simple_create():
-    form = SimpleCreate()
+@bp.route('/<id_>/f-modify-roles', methods=['POST'])
+@perm
+def force_modify_roles(id_: str):
+    form = ModifyRoles()
+    roles = ProjMgr(id_).force_modify_roles(add=form.add, remove=form.remove)
+    return jsonify({role.id: role.name for role in roles})
+
+
+@bp.route('/create', methods=['POST'])
+@login
+def create():
+    form = Create()
     proj = ProjMgr.create(base=form.base, type_=form.type, suff='', leader_id=g.pink_id)
     return jsonify({'id': proj.id})
 
 
-@bp.route('/create', methods=['POST'])
-@permission_required
-def create():
-    form = Create()
+@bp.route('/f-create', methods=['POST'])
+@perm
+def full_create():
+    form = FullCreate()
     proj = ProjMgr.create(base=form.base, type_=form.type, suff=form.suff, leader_id=form.leader)
     return jsonify({'id': proj.id})

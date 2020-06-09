@@ -18,11 +18,11 @@ _ALLOWED_DEPS = {
 class PitMgr(BaseMgr):
     model = Pit
 
-    def check_download(self):
+    def checker_download(self):
         check_state(self.o.state, (PitState.auditing, ))
-        self.download()
+        self.force_download()
 
-    def simple_download(self):
+    def download(self):
         check_state(self.o.state, (PitState.fin, ))
         roles = Role.query.join(Pit) \
             .filter(Pit.pink_id == g.pink_id) \
@@ -30,9 +30,9 @@ class PitMgr(BaseMgr):
             .filter(Pit.state.in_((PitState.pending, PitState.working, PitState.auditing))).all()
         if self._ALLOWED_DEPS[self.o.role.dep] & {role.dep for role in roles}:
             raise AccessDenied(obj=self.o.mango)
-        self.download()
+        self.force_download()
 
-    def download(self):
+    def force_download(self):
         return onerive.share(self.o.mango.id)
 
     def check_pass(self):

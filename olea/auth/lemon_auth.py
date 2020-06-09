@@ -8,7 +8,7 @@ from olea.errors import InvalidCredential
 from olea.exts import db, redis
 
 
-class LemonAuth:
+class LemonAuth():
     def __init__(self, scheme='Bearer'):
         self.scheme = scheme.upper()
 

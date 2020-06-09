@@ -8,7 +8,10 @@ from olea.errors import PermissionDenied
 from olea.exts import db, redis
 
 
-class DuckPermission:
+class DuckPermission():
+    def __init__(self, login):
+        self.login = login
+
     def cache_ducks(self):
         t = set()
         f = set()
@@ -47,6 +50,6 @@ class DuckPermission:
                 self.check_scopes(default)
                 return result
 
-            return wrapper
+            return self.login(wrapper)
 
         return decorate

@@ -1,6 +1,6 @@
 from flask import jsonify
 
-from olea.auth import login_req
+from olea.auth import login, perm
 
 from . import bp
 from .forms import AlterScopes, GrantedDuck, Login, Refresh
@@ -21,30 +21,30 @@ def refresh():
     return jsonify({'token': token, 'exp': exp})
 
 
-@bp.route('/<id_>/revork_l', methods=['POST'])
-@login_required
-def revork_l(id_):
+@bp.route('/<id_>/revoke-lemon', methods=['POST'])
+@login
+def revoke_lemon(id_):
     LemonMgr(id_).revoke()
     return jsonify({})
 
 
-@bp.route('/revork_all_l', methods=['POST'])
-@login_required
-def revork_all():
+@bp.route('/revoke-all-lemons', methods=['POST'])
+@login
+def revoke_all_lemons():
     LemonMgr.revoke_all()
     return jsonify({})
 
 
-@bp.route('/granted_duck', methods=['POST'])
-@login_required
+@bp.route('/granted-duck', methods=['POST'])
+@perm(node='auth.duck')
 def granted_duck():
     form = GrantedDuck()
     duck = DuckMgr.create(pink_id=form.pink_id, node=form.node, scopes=form.scopes)
     return jsonify({'id': duck.id})
 
 
-@bp.route('/<id_>/alter_scopes', methods=['POST'])
-@login_required
+@bp.route('/<id_>/alter-scopes', methods=['POST'])
+@perm(node='auth.duck')
 def alter_scopes(id_):
     form = AlterScopes()
     duck = DuckMgr(id_)
@@ -56,8 +56,8 @@ def alter_scopes(id_):
     return jsonify({'new_scopes': final})
 
 
-@bp.route('/<id_>/revork_d', methods=['POST'])
-@login_required
-def revork_d(id_):
+@bp.route('/<id_>/revoke-duck', methods=['POST'])
+@perm(node='auth.duck')
+def revoke_d(id_):
     DuckMgr(id_).revoke()
     return jsonify({})

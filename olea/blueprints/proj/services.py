@@ -32,12 +32,12 @@ class ProjMgr(BaseMgr):
         db.session.add(proj)
         return proj
 
-    def simple_modify_roles(self, add: dict, remove: list):
+    def modify_roles(self, add: dict, remove: list):
         if g.pink_id != self.o.leader_id:
             raise AccessDenied(obj=self.o)
-        self.modify_roles(add, remove)
+        return self.force_modify_roles(add, remove)
 
-    def modify_roles(self, add: dict, remove: list):
+    def force_modify_roles(self, add: dict, remove: list):
         if self.o.state != ProjState.pre:
             raise RolesLocked(state=self.o.state)
 
@@ -50,7 +50,7 @@ class ProjMgr(BaseMgr):
             RoleMgr(role_id).remove()
 
         db.session.commit()
-        return True
+        return self.o.roles
 
 
 class RoleMgr(BaseMgr):

@@ -15,7 +15,7 @@ from .utils import check_file_meta
 class RoleMgr(BaseMgr):
     model = Role
 
-    def pick(self, pink_id):
+    def full_pick(self, pink_id):
         if self.o.taken:
             raise RoleIsTaken(by=self.o.pit)
         self.o.taken = True
@@ -24,11 +24,11 @@ class RoleMgr(BaseMgr):
             pit.add_track(info=Pit.Trace.pick_f, now=g.now, by=g.pink_id)
         return pit
 
-    def simple_pick(self):
+    def pick(self):
         pink = Pink.query().get(g.pink_id)
         if self.o.dep not in pink.deps:
             raise NotQualifiedToPick(dep=self.o.dep)
-        return self.pick(pink.id)
+        return self.full_pick(pink.id)
 
     def drop(self):
         self.o.taken = False
