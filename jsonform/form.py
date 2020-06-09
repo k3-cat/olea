@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from .errors import FieldError, FormError
 from .fields import UnboundField
 
+LAMBDA = lambda:0
 
 class JsonForm(ABC):
     def __init__(self, data: dict = None):
@@ -21,6 +22,11 @@ class JsonForm(ABC):
 
     def __getitem__(self, key):
         return getattr(self, key).data
+
+    def __getattribute__(self, name):
+        if isinstance(name, type(LAMBDA)) and name.__name__ == LAMBDA.__name__:
+            return super().__getattribute__(name)()
+        return super().__getattribute__(name)
 
     def test_empty(self, name):
         if name in self.fields:
