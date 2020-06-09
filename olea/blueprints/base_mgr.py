@@ -21,3 +21,7 @@ class BaseMgr(ABC):
     @classmethod
     def gen_id(cls):
         return id_tool.generate(length=cls.model.__id_len__)
+
+    @property
+    def query(self):
+        return self.model.query

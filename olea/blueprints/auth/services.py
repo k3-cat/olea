@@ -3,6 +3,7 @@ import datetime
 from flask import current_app, g, request
 
 from models import Duck, Lemon, Pink
+from olea.auth import duck_permission
 from olea.errors import AccountDeactivated, InvalidCredential, InvalidRefreshToken, RecordNotFound
 from olea.exts import db, redis
 from olea.utils import random_b85
@@ -88,6 +89,7 @@ class DuckMgr(BaseMgr):
     def alter_scopes(self, scopes: set):
         self.o.scopes = list(scopes)
         db.session.add(self.o)
+        duck_permission.clean_cache()
         return scopes
 
     def add_scopes(self, scopes):
@@ -97,5 +99,5 @@ class DuckMgr(BaseMgr):
         return self.alter_scopes(set(self.o.scopes) - scopes)
 
     def revoke(self):
+        duck_permission.clean_cache()
         db.session.delete(self.o)
-        db.session.commit()

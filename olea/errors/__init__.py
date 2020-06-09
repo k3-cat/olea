@@ -3,14 +3,15 @@ from .auth_fail import (AccessDenied, AccountDeactivated, InvalidCredential, Inv
 from .bad_opt import (DoesNotMeetRequirements, InvalidSource, NotQualifiedToPick, RoleIsTaken,
                       RolesLocked, StateLocked, UnallowedType)
 from .base_error import BaseError
-from .data_conflict import DuplicatedRecord, FileExist, RecordNotFound
+from .data_conflict import DuplicatedRecord, FileExist, FileVerConflict, RecordNotFound
 
 __all__ = [
     'AccessDenied', 'AccountDeactivated', 'BaseError', 'DoesNotMeetRequirements',
-    'DuplicatedRecord', 'FileExist', 'InvalidCredential', 'InvalidRefreshToken', 'InvalidSource',
-    'NotQualifiedToPick', 'PermissionDenied', 'RecordNotFound', 'RoleIsTaken', 'RolesLocked',
-    'StateLocked', 'UnallowedType'
+    'DuplicatedRecord', 'FileExist', 'FileVerConflict', 'InvalidCredential', 'InvalidRefreshToken',
+    'InvalidSource', 'NotQualifiedToPick', 'PermissionDenied', 'RecordNotFound', 'RoleIsTaken',
+    'RolesLocked', 'StateLocked', 'UnallowedType'
 ]
+
 
 
 def register_error_handlers(app):

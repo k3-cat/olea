@@ -1,8 +1,9 @@
 from flask import current_app
 
 from models import Lemon, Pink
+from olea import email_mgr
 from olea.errors import AccessDenied, InvalidCredential
-from olea.exts import db, mailgun, redis
+from olea.exts import db, redis
 from olea.utils import random_b85
 
 from ..base_mgr import BaseMgr
@@ -27,31 +28,20 @@ class PinkMgr(BaseMgr):
         )
         pink.pwd = pwd
         db.session.add(pink)
-        db.session.commit()
-
-        mailgun.send(subject='初次见面, 这里是olea',
-                     to=(pink.email, ),
-                     template='new_pink',
-                     values={
-                         'name': pink.name,
-                         'pwd': pwd
-                     })
+        email_mgr.new_pink(email=pink.email, name=pink.name, pwd=pwd)
         return pink
 
     @classmethod
     def reset_pwd_init(cls, name, email):
-        pink = cls.model.query().filter_by(name=name).first()
+        pink = cls.query().filter_by(name=name).first()
         if pink and pink.email != email:
             return
         token = random_b85(128 // 8)
         redis.set(token, pink.id, ex=cls.t_life)
-        mailgun.send(subject='你的密码重置令牌',
-                     to=(pink.email, ),
-                     template='reset_pwd',
-                     values={'token': token})
+        email_mgr.reset_pwd(email=pink.email, token=token)
 
-    @classmethod
-    def reset_pwd_fin(cls, token, pwd):
+    @staticmethod
+    def reset_pwd_fin(token, pwd):
         if not (pink_id := redis.get(token)):
             raise InvalidCredential(type=InvalidCredential.T.rst)
         PinkMgr(pink_id).set_pwd(pwd)

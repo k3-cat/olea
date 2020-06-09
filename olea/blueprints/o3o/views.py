@@ -49,8 +49,5 @@ def submit(id_):
 @perm
 def force_submit():
     form = ForceSubmit()
-    head, payload = pat.decode_with_head(form.token)
-    pit = PitMgr(head['p'], europaea=True).force_submit(t=head['t'],
-                                                        share_id=payload['id'],
-                                                        sha1=payload['sha1'])
+    pit = PitMgr.force_submit(token=form.token)
     return jsonify({'id': pit.id})

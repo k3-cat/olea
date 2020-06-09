@@ -14,7 +14,7 @@ class ProjMgr(BaseMgr):
     @classmethod
     def create(cls, base: str, type_, suff, leader_id):
         title, source, words_count = build_info(base=base, type_=type_)
-        if proj := cls.model.query().filter_by(source=source, type=type_, suff=suff):
+        if proj := cls.query().filter_by(source=source, type=type_, suff=suff):
             if proj.state == ProjState.freezed:
                 proj.state = ProjState.pre
                 proj.leader_id = leader_id
