@@ -7,7 +7,7 @@ from .errors import FieldError, FormError
 
 __all__ = [
     'Field', 'StringField', 'IntegerField', 'FloatField', 'BooleanField',
-    'DateTimeField', 'DateField', 'TimeField', 'ListField', 'EnumField', 'BytesField'
+    'DateTimeField', 'DateField', 'TimeField', 'ListField','SetField', 'EnumField', 'BytesField'
 ]
 
 
@@ -190,6 +190,35 @@ class ListField(Field):
             except FieldError as e_:
                 e[i] = e_.error
             self._data.append(field)
+        if e:
+            raise e
+        super().process_data(value)
+
+class SetField(Field):
+    def __init__(self, field, default=set, **kwargs):
+        self.field = field
+        self.data_ = None
+        super().__init__(default=default, **kwargs)
+
+    @property
+    def data(self):
+        if not self.data_:
+            self.data_ = {field.data for field in self._data}
+        return self.data_
+
+    def process_data(self, value):
+        if not isinstance(value, list):
+            raise FieldError('invalid list')
+
+        self._data = set()
+        e = FieldError()
+        for i, val in enumerate(set(value)):
+            field = self.field.bind()
+            try:
+                field.process_data(val)
+            except FieldError as e_:
+                e[i] = e_.error
+            self._data.add(field)
         if e:
             raise e
         super().process_data(value)
