@@ -1,17 +1,17 @@
 import datetime
-import random
-from base64 import _b85alphabet
 
 from sentry_sdk import configure_scope
+
+from olea.utils import random_b85
 
 
 def hook_hooks(app):
     from flask import g, request
 
     @app.before_request
-    def add_timestamp():
+    def add_track():
         g.now = datetime.datetime.utcnow()
-        g.ref = ''.join(random.choices(_b85alphabet, k=20))
+        g.ref = random_b85(k=20)
         with configure_scope() as scope:
             scope.set_tag('ref', g.ref)
 

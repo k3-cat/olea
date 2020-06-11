@@ -2,12 +2,12 @@ import datetime
 
 from flask import g
 
-from models import Dep, Mango, Pink, Pit, PitState, Role
+from models import Dep, Mango, Pink, Pit, Role
+from olea.base import BaseMgr
 from olea.errors import (AccessDenied, DoesNotMeetRequirements, DuplicatedRecord, FileVerConflict,
                          NotQualifiedToPick, RoleIsTaken, UnallowedType)
 from olea.exts import db, onerive, pat
 
-from ..base_mgr import BaseMgr
 from ..pit.utils import check_state
 from .quality_control import CheckFailed, check_file_meta
 
@@ -25,7 +25,7 @@ class RoleMgr(BaseMgr):
         return pit
 
     def pick(self):
-        pink = Pink.query().get(g.pink_id)
+        pink = Pink.query.get(g.pink_id)
         if self.o.dep not in pink.deps:
             raise NotQualifiedToPick(dep=self.o.dep)
         return self.full_pick(pink.id)
@@ -53,25 +53,25 @@ class PitMgr(BaseMgr):
         return True
 
     def drop(self):
-        if self.o.state == PitState.init:
+        if self.o.state == Pit.State.init:
             self.delete()
             return True
 
-        check_state(self.o.state, (PitState.working, ))
-        self.o.state = PitState.droped
+        check_state(self.o.state, (Pit.State.working, ))
+        self.o.state = Pit.State.droped
         self.o.add_track(info=Pit.Trace.drop, now=g.now)
         RoleMgr(self.o.role).drop()
         return True
 
     def force_drop(self):
-        self.o.state = PitState.droped_f
+        self.o.state = Pit.State.droped_f
         self.o.add_track(info=Pit.Trace.drop_f, now=g.now, by=g.pink_id)
         RoleMgr(self.o.role).drop()
         return True
 
     def submit(self, share_id):
-        check_state(self.o.state, (PitState.working, PitState.delayed))
-        self.o.state = PitState.auditing
+        check_state(self.o.state, (Pit.State.working, Pit.State.delayed))
+        self.o.state = Pit.State.auditing
         self.o.add_track(info=Pit.Trace.submit, now=g.now)
         mango = MangoMgr.create(self.o, share_id)
         return mango
@@ -79,9 +79,9 @@ class PitMgr(BaseMgr):
     @classmethod
     def force_submit(cls, token):
         head, payload = pat.decode_with_head(token)
-        pit = cls.query(head['p'])
-        check_state(pit.state, (PitState.working, PitState.delayed, PitState.droped_f))
-        pit.state = PitState.auditing
+        pit = cls.query.get(head['p'])
+        check_state(pit.state, (Pit.State.working, Pit.State.delayed, Pit.State.droped_f))
+        pit.state = Pit.State.auditing
         pit.add_track(info=Pit.Trace.submit_f,
                       now=datetime.datetime.fromtimestamp(payload['t']),
                       by=g.pink_id)
@@ -89,8 +89,8 @@ class PitMgr(BaseMgr):
         return mango
 
     def redo(self):
-        check_state(self.o.state, (PitState.auditing, ))
-        self.o.state = PitState.working
+        check_state(self.o.state, (Pit.State.auditing, ))
+        self.o.state = Pit.State.working
         self.o.add_track(info=Pit.Trace.redo, now=g.now)
 
 
@@ -127,7 +127,7 @@ class MangoMgr(BaseMgr):
 
     @classmethod
     def _create(cls, pit, i):
-        if mango := cls.query().filter_by(sha1=i['sha1']):
+        if mango := cls.query.filter_by(sha1=i['sha1']):
             raise DuplicatedRecord(obj=mango)
 
         if last := pit.mango:

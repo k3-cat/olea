@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 from flask import current_app
 
-from models import ProjType
+from models import Proj
 from olea.errors import InvalidSource
 from olea.exts import redis
 
@@ -59,11 +59,11 @@ def fetch_title_by_id(id_):
 
 
 def fetch_title(base, type_):
-    if type_ == ProjType.doc:
+    if type_ == Proj.Type.doc:
         base = re.match(r'^(?:scp-)?(.*)$', base.lower()).group(1)
         source = f'/scp-{base}'
         title = f"SCP-{base.upper()}{re.match('^<li><a.*/a>(.*)</li>$', fetch_title_by_id(base)).group(1)}"
-    elif type_ == ProjType.sub:
+    elif type_ == Proj.Type.sub:
         if base[0] != '/':
             base = f'/{base}'
         source = base.lower()
@@ -72,11 +72,11 @@ def fetch_title(base, type_):
         base_ = base.split('\n')
         title = base_[0]
         source = base_[1]
-    return title, source
+    return (title, source)
 
 
 def count_chars(source, type_):
-    if type_ not in (ProjType.doc, ProjType.sub):
+    if type_ not in (Proj.Type.doc, Proj.Type.sub):
         count = 0
     else:
         web = fetch_web(source)
@@ -99,4 +99,4 @@ def count_chars(source, type_):
 def build_info(base, type_):
     title, source = fetch_title(base, type_)
     words_count = count_chars(source, type_)
-    return title, source, words_count
+    return (title, source, words_count)

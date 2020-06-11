@@ -1,10 +1,25 @@
-from flask import g, jsonify
+from flask import g, jsonify, request
 
-from olea.auth import login, perm
+from olea.auth import login, opt_perm, perm
 
 from . import bp
-from .forms import Create, FullCreate, ModifyRoles
-from .services import ProjMgr
+from .forms import Create, FullCreate, ModifyRoles, Search
+from .services import ProjMgr, ProjQuery
+
+
+@bp.route('/<id_>', methods=['GET'])
+@opt_perm
+def single(id_):
+    proj = ProjQuery.single(id_)
+    return jsonify({'id': proj.id})
+
+
+@bp.route('/', methods=['GET'])
+@opt_perm
+def search():
+    form = Search(request.args)
+    projs = ProjQuery.search(states=form.states, types=form.types)
+    return jsonify({})
 
 
 @bp.route('/<id_>/modify-roles', methods=['POST'])

@@ -16,8 +16,11 @@ class AuthFail(BaseError, ABC):
 class AccessDenied(AuthFail):
     code = 'UJCB'
 
-    def __init__(self, obj: object):
-        super().__init__(cls=obj.__class__.__name__, id=obj.id)
+    def __init__(self, obj: object, cls: object):
+        if obj:
+            super().__init__(cls=obj.__class__.__name__, id=obj.id)
+        else:
+            super().__init__(cls=cls.__name__)
 
 
 class PermissionDenied(AuthFail):

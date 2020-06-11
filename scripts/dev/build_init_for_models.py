@@ -5,10 +5,6 @@ from pathlib import Path
 from werkzeug.utils import find_modules, import_string
 
 MODULE = 'models'
-DIR = (Path(__file__).parents[1])
-PATH = DIR / MODULE / '__init__.py'
-sys.path.append(str(DIR))
-sys.path.append(str(DIR / 'site-packages'))
 
 
 def build_import_statement(module):
@@ -22,10 +18,16 @@ def build_import_statement(module):
             f'from {module_name.replace(module, "")} import {", ".join(all_in_module)}\n')
     all_list.sort()
 
-    return imports, all_list
+    return (imports, all_list)
 
 
 if __name__ == "__main__":
+    DIR = (Path(__file__).parents[2])
+    PATH = DIR / MODULE / '__init__.py'
+    sys.path.append(str(DIR))
+    # able to import sqlalchemy_
+    sys.path.append(str(DIR / 'site-packages'))
+
     ALT_PATH = PATH.parent / 'backup'
     PATH.replace(ALT_PATH)
     try:

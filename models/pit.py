@@ -4,27 +4,26 @@ from sqlalchemy_ import (BaseModel, Column, ForeignKey, UniqueConstraint, hybrid
                          relationship)
 from sqlalchemy_.types import ARRAY, DateTime, Enum, String
 
-__all__ = ['Pit', 'PitState']
-
-
-class PitState(enum.Enum):
-    init = 'initialized'
-    pending = 'pending'
-    working = 'working'
-    auditing = 'auditing'
-    delayed = 'working (delayed)'
-    fin = 'finished'
-    droped = 'droped'
-    droped_f = 'forced droped'
+__all__ = ['Pit']
 
 
 class Pit(BaseModel):
     __tablename__ = 'pit'
 
+    class State(enum.Enum):
+        init = 'initialized'
+        pending = 'pending'
+        working = 'working'
+        auditing = 'auditing'
+        delayed = 'working (delayed)'
+        fin = 'finished'
+        droped = 'droped'
+        droped_f = 'forced droped'
+
     id = Column(String, primary_key=True)
     role_id = Column(String, ForeignKey('role.id'))
     pink_id = Column(String, ForeignKey('pink.id'))
-    state = Column(Enum(PitState), default=PitState.init)
+    state = Column(Enum(State), default=State.init, index=True)
     track = Column(ARRAY(String), default=list())
     start_at = Column(DateTime)
     due = Column(DateTime)
@@ -53,10 +52,9 @@ class Pit(BaseModel):
 
     def add_track(self, info: 'Pit.Trace', now: float, by=''):
         base = f'{info.name} - {now}'
-        if info in (Pit.Trace.drop_f, Pit.Trace.pick_f, Pit.Trace.submit_f, Pit.Trace.check_fail,
-                    Pit.Trace.check_pass):
+        if info in (Trace.drop_f, Trace.pick_f, Trace.submit_f, Trace.check_fail, Trace.check_pass):
             self.track.append(f'{base} by:{by}')
-        elif info == Pit.Trace.extend:
+        elif info == Trace.extend:
             self.track.append(f'{base} from:{self.due}')
         else:
             self.track.append(base)

@@ -6,12 +6,20 @@ from pathlib import Path
 from typing import Set
 
 from flask import current_app
+from passlib.context import LazyCryptContext
 
 from olea.errors import WeekPwd
 
 PWD_CHARS = string.digits + string.ascii_letters + string.punctuation
 with current_app.config['PWDDB_PATH'].open('rb') as f:
     COMMON_PWD: Set[str] = pickle.load(f)
+
+pwd_context = LazyCryptContext(
+    schemes=['argon2'],
+    argon2__time_cost=current_app.config['ARGON2_TIME_COST'],
+    argon2__memory_cost=current_app.config['ARGON2_MEMORY_COST'],
+    argon2__parallelism=current_app.config['ARGON2_PARALLELISM'],
+)
 
 
 def generate_pwd() -> str:

@@ -4,31 +4,29 @@ from sqlalchemy_ import (BaseModel, Column, ForeignKey, UniqueConstraint, hybrid
                          relationship)
 from sqlalchemy_.types import JSONB, DateTime, Enum, Integer, String
 
-__all__ = ['Proj', 'ProjState', 'ProjType']
-
-
-class ProjState(enum.Enum):
-    pre = 'pre-process'
-    freezed = 'freezed'
-    working = 'working'
-    fin = 'finished'
-
-
-class ProjType(enum.Enum):
-    doc = 'documentary'
-    sub = 'sub-content'
-    ani = 'animation'
+__all__ = ['Proj']
 
 
 class Proj(BaseModel):
     __tablename__ = 'proj'
 
+    class State(enum.Enum):
+        pre = 'pre-process'
+        freezed = 'freezed'
+        working = 'working'
+        fin = 'finished'
+
+    class Type(enum.Enum):
+        doc = 'documentary'
+        sub = 'sub-content'
+        ani = 'animation'
+
     id = Column(String, primary_key=True)
     title = Column(String, index=True)
     source = Column(String)
-    type = Column(Enum(ProjType))
+    type = Column(Enum(Type))
     suff = Column(String)
-    state = Column(Enum(ProjState))
+    state = Column(Enum(State))
     leader_id = Column(String, ForeignKey('pink.id'))
     chat = Column(JSONB)
     word_count = Column(Integer)
@@ -57,14 +55,3 @@ class Proj(BaseModel):
     @hybrid_property
     def display_title(self):
         return f'{self.title}({self.suff})' if self.suff else self.title
-
-
-'''
-    def to_dict(self, lv: int) -> Dict[str, Union[str, List[str]]]:
-        result = {
-            'id': self.id,
-            'title': self.display_title,
-            'type': self.type.name,
-            'source': self.source,
-        }
-'''

@@ -18,6 +18,7 @@ class DuplicatedRecord(DataConflict):
     code = 'JQ9I'
 
     def __init__(self, obj):
+        self.obj = obj
         super().__init__(cls=obj.__class__.__name__, id=obj.id)
 
 

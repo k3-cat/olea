@@ -1,11 +1,17 @@
 from flask_jsonform import BaseForm, FieldError, FormError
 from jsonform.conditions import InRange
-from jsonform.fields import EnumField, IntegerField, ListField, StringField
+from jsonform.fields import EnumField, IntegerField, ListField, SetField, StringField
 
 from models import Dep
 
 from .custom_conditions import Email
 from .text_tools import measure_width
+
+
+class Search(BaseForm):
+    deps = SetField(EnumField(Dep), optional=True)
+    name = StringField(optional=True)
+    qq = IntegerField(optional=True)
 
 
 class UpdateInfo(BaseForm):
@@ -32,17 +38,3 @@ class Create(BaseForm):
     def check(self):
         if self.test_empty('qq') and self.test_empty('other'):
             raise FormError('must provide at least one contact method')
-
-
-class ResetPwdI(BaseForm):
-    name = StringField()
-    email = StringField()
-
-
-class ResetPwdF(BaseForm):
-    token = StringField()
-    pwd = StringField()
-
-
-class SetPwd(BaseForm):
-    pwd = StringField()

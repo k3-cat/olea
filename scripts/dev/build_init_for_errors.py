@@ -7,9 +7,6 @@ from pathlib import Path
 from werkzeug.utils import find_modules, import_string
 
 MODULE = 'errors'
-DIR = (Path(__file__).parents[1] / 'olea')
-PATH = DIR / MODULE / '__init__.py'
-sys.path.append(str(DIR))
 
 
 def split_file(path):
@@ -38,10 +35,14 @@ def build_import_statement(module):
             f'from {module_name.replace(module, "")} import {", ".join(all_in_module)}\n')
     all_list.sort()
 
-    return imports, all_list
+    return (imports, all_list)
 
 
 if __name__ == "__main__":
+    DIR = (Path(__file__).parents[2] / 'olea')
+    PATH = DIR / MODULE / '__init__.py'
+    sys.path.append(str(DIR))
+
     init_content = split_file(PATH)
 
     ALT_PATH = PATH.parent / 'backup'

@@ -6,4 +6,3 @@ __pycache__/
 !.vscode/launch.json
 
 instance.py
-token

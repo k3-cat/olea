@@ -2,7 +2,7 @@ import json
 import re
 from abc import ABC, abstractmethod
 
-from flask import request
+from flask import g, request
 
 
 class BaseError(BaseException, ABC):
@@ -21,6 +21,7 @@ class BaseError(BaseException, ABC):
     def __json__(self):
         d = {
             'code': self.code,
+            'ref': g.ref,
             'msg': re.sub(r'(?!^)([A-Z])', r' \1', self.__class__.__name__),
             'parms': self.parms
         }

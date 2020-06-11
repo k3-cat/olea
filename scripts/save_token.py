@@ -1,3 +1,4 @@
+import sys
 import uuid
 from pathlib import Path
 
@@ -6,23 +7,19 @@ from flask import Flask, jsonify, redirect, request, url_for
 
 app = Flask(__name__)
 
-CLIENT_ID = ''
-CLIENT_SECRET = ''
-
 AUTHORITY = 'https://login.microsoftonline.com/common'
 SCOPES = ['Files.ReadWrite.All']
-
-TOKEN_PATH = Path(__file__).parent / 'token'
 
 state = str(uuid.uuid4())
 
 
 @app.route('/')
 def login():
-    auth_url = _build_msal_app().get_authorization_request_url(
-        scopes=SCOPES,
-        state=state or str(uuid.uuid4()),
-        redirect_uri=url_for('authorized', _external=True))
+    msal_app = _build_msal_app()
+    auth_url = msal_app.get_authorization_request_url(scopes=SCOPES,
+                                                      state=state,
+                                                      redirect_uri=url_for('authorized',
+                                                                           _external=True))
     return redirect(auth_url)
 
 
@@ -64,4 +61,9 @@ def _build_msal_app(cache=None):
 
 
 if __name__ == '__main__':
+    sys.path.append(str(Path(__file__).parents[1]))
+    from config.default import ONEDRIVE_TOKEN_PATH as TOKEN_PATH
+    from config.default import ONEDRIVE_CLIENT_ID as CLIENT_ID
+    from config.instance import ONEDRIVE_CLIENT_SECRET as CLIENT_SECRET
+
     app.run()

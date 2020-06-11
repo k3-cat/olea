@@ -1,23 +1,45 @@
-from flask import jsonify
+from flask import g, jsonify
 
 from olea.auth import login, perm
 
 from . import bp
-from .forms import AlterScopes, GrantedDuck, Login, Refresh
-from .services import DuckMgr, LemonMgr
+from .forms import AlterDuck, AlterScopes, ForgetPwd, Login, Refresh, ResetPwd, SetPwd
+from .services import DuckMgr, LemonMgr, PinkMgr
 
 
 @bp.route('/login', methods=['POST'])
 def login():
     form = Login()
-    lemon = LemonMgr.create(name=form.name, pwd=form.pwd, device_id=form.device_id)
-    return jsonify({'lemon': lemon.id, 'key': lemon.key})
+    lemon = LemonMgr.grante(name=form.name, pwd=form.pwd, device_id=form.device_id)
+    return jsonify({'id': lemon.id, 'key': lemon.key, 'exp': lemon.exp})
+
+
+@bp.route('/set-pwd', methods=['POST'])
+@login
+def set_pwd():
+    form = SetPwd()
+    PinkMgr(g.pink_id).set_pwd(form.pwd)
+    return jsonify({})
+
+
+@bp.route('/forget-pwd', methods=['POST'])
+def reset_pwd_i():
+    form = ForgetPwd()
+    PinkMgr.forget_pwd(name=form.name, email=form.email)
+    return jsonify({})
+
+
+@bp.route('/reset-pwd', methods=['POST'])
+def reset_pwd():
+    form = ResetPwd()
+    PinkMgr.reset_pwd(token=form.token, pwd=form.pwd)
+    return jsonify({})
 
 
 @bp.route('/refresh', methods=['POST'])
 def refresh():
     form = Refresh()
-    token, exp = LemonMgr(form.id).granted_access_token(key=form.key, device_id=form.device_id)
+    token, exp = LemonMgr(form.id).grante_access_token(key=form.key, device_id=form.device_id)
     return jsonify({'token': token, 'exp': exp})
 
 
@@ -35,12 +57,11 @@ def revoke_all_lemons():
     return jsonify({})
 
 
-@bp.route('/granted-duck', methods=['POST'])
+@bp.route('/<pink_id>/ducks', methods=['GET'])
 @perm(node='auth.duck')
-def granted_duck():
-    form = GrantedDuck()
-    duck = DuckMgr.create(pink_id=form.pink_id, node=form.node, scopes=form.scopes)
-    return jsonify({'id': duck.id})
+def list_ducks(pink_id):
+
+    return jsonify()
 
 
 @bp.route('/<id_>/alter-scopes', methods=['POST'])
@@ -56,8 +77,18 @@ def alter_scopes(id_):
     return jsonify({'new_scopes': final})
 
 
-@bp.route('/<id_>/revoke-duck', methods=['POST'])
+@bp.route('/<pink_id>/alter-ducks', methods=['POST'])
 @perm(node='auth.duck')
-def revoke_d(id_):
-    DuckMgr(id_).revoke()
-    return jsonify({})
+def alter_ducks(pink_id):
+    form = AlterDuck()
+    ducks, confilcts = DuckMgr.alter_ducks(pink_id=pink_id, add=form.add, remove=form.remove)
+    res = {'ducks': {duck.id: {'node': duck.node, 'scope': duck.scopes} for duck in ducks}}
+    if confilcts:
+        res['conflicts'] = {
+            duck.id: {
+                'node': duck.node,
+                'scope': duck.scopes
+            }
+            for duck in confilcts
+        }
+    return jsonify()

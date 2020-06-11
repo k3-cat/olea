@@ -1,16 +1,25 @@
-from flask import g, jsonify
+from flask import g, jsonify, request
 
-from olea.auth import login, perm
+from olea.auth import login, opt_perm, perm
 
 from . import bp
-from .forms import Create, ResetPwdF, ResetPwdI, SetPwd, UpdateInfo
-from .services import PinkMgr
+from .forms import Create, ResetPwdF, ResetPwdI, Search, SetPwd, UpdateInfo
+from .services import PinkMgr, PinkQuery
 
 
-@bp.route('/<id_>/get', methods=['GET'])
+@bp.route('/<id_>', methods=['GET'])
 @login
-def get_pink(id_: str):
-    return jsonify(query_pink(id_).to_dict(lv=1))
+def single(id_):
+    pink = PinkQuery.single(id_)
+    return jsonify({})
+
+
+@bp.route('/', methods=['GET'])
+@login
+def search():
+    form = Search(request.args)
+    pinks = PinkQuery.search(deps=form.deps, name=form.name, qq=form.qq)
+    return pinks
 
 
 @bp.route('/info', methods=['GET'])
@@ -25,28 +34,6 @@ def update_info():
     form = UpdateInfo()
     PinkMgr(g.pink_id).update_info(qq=form.qq, other=form.other, email=form.email)
     return 'True'
-
-
-@bp.route('/set-pwd', methods=['POST'])
-@login
-def set_pwd():
-    form = SetPwd()
-    PinkMgr(g.pink_id).set_pwd(form.pwd)
-    return jsonify({})
-
-
-@bp.route('/reset-pwd-i', methods=['POST'])
-def reset_pwd_i():
-    form = ResetPwdI()
-    PinkMgr.reset_pwd_init(name=form.name, email=form.email)
-    return jsonify({})
-
-
-@bp.route('/reset-pwd', methods=['POST'])
-def reset_pwd():
-    form = ResetPwdF()
-    PinkMgr.reset_pwd_fin(token=form.token, pwd=form.pwd)
-    return jsonify({})
 
 
 @bp.route('/create', methods=['POST'])

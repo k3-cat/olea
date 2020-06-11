@@ -6,3 +6,4 @@ duck_permission = DuckPermission(login=lemon_auth.login_required)
 
 login = lemon_auth.login_required
 perm = duck_permission.permission_required
+opt_perm = duck_permission.optinal_permission
