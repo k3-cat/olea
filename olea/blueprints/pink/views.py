@@ -8,14 +8,12 @@ from .services import PinkMgr, PinkQuery
 
 
 @bp.route('/<id_>', methods=['GET'])
-@login
 def single(id_):
     pink = PinkQuery.single(id_)
     return jsonify({})
 
 
 @bp.route('/', methods=['GET'])
-@login
 def search():
     form = Search(request.args)
     pinks = PinkQuery.search(deps=form.deps, name=form.name, qq=form.qq)
@@ -23,13 +21,11 @@ def search():
 
 
 @bp.route('/info', methods=['GET'])
-@login
 def info():
     return jsonify(g.pink.to_dict(lv=2))
 
 
 @bp.route('/update-info', methods=['POST'])
-@login
 def update_info():
     form = UpdateInfo()
     PinkMgr(g.pink_id).update_info(qq=form.qq, other=form.other, email=form.email)

@@ -1,9 +1,3 @@
-from .authentication import LemonAuth
-from .authorization import DuckPermission
-
-lemon_auth = LemonAuth(scheme='OLEA')
-duck_permission = DuckPermission(login=lemon_auth.login_required)
-
-login = lemon_auth.login_required
-perm = duck_permission.permission_required
-opt_perm = duck_permission.optinal_permission
+from .authentication import allow_anonymous, init_app
+from .authorization import optinal_permission as opt_perm
+from .authorization import permission_required as perm

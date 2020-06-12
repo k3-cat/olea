@@ -23,7 +23,6 @@ def search():
 
 
 @bp.route('/<id_>/modify-roles', methods=['POST'])
-@login
 def modify_roles(id_: str):
     form = ModifyRoles()
     roles = ProjMgr(id_).modify_roles(add=form.add, remove=form.remove)
@@ -39,7 +38,6 @@ def force_modify_roles(id_: str):
 
 
 @bp.route('/create', methods=['POST'])
-@login
 def create():
     form = Create()
     proj = ProjMgr.create(base=form.base, type_=form.type, suff='', leader_id=g.pink_id)

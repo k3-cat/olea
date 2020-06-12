@@ -1,38 +1,36 @@
-from functools import wraps
 
 from flask import abort, g, request
 from sentry_sdk import configure_scope
+from werkzeug.exceptions import Unauthorized
 
 from models import Pink
 from olea.errors import InvalidCredential
 from olea.exts import db, redis
 
+anonymous_endpoints = set()
 
-class LemonAuth():
-    def __init__(self, scheme='Bearer'):
-        self.scheme = scheme.upper()
 
-    def check_lemon(self):
-        try:
-            scheme, token = request.headers['Authorization'].split(maxsplit=1)
-        except (KeyError, ValueError):
-            abort(400)
-        if scheme.upper() != self.scheme:
-            abort(400)
+def init_app(app):
+    @app.before_request
+    def login():
+        if request.endpoint not in anonymous_endpoints:
+            check_lemon()
 
-        if not (pink_id := redis.get(token)):
-            raise InvalidCredential(type=InvalidCredential.T.acc)
 
-        g.pink_id = pink_id
-        with configure_scope() as scope:
-            scope.user = {'id': pink_id}
+def check_lemon():
+    try:
+        token = request.headers['Authorization']
+    except (KeyError, ValueError):
+        abort(401)
 
-        return True
+    if not (pink_id := redis.get(token)):
+        raise InvalidCredential(type=InvalidCredential.T.acc)
 
-    def login_required(self, f):
-        @wraps(f)
-        def wrapper(*args, **kwargs):
-            self.check_lemon()
-            return f(*args, **kwargs)
+    g.pink_id = pink_id
+    with configure_scope() as scope:
+        scope.user = {'id': pink_id}
 
-        return wrapper
+
+def allow_anonymous(f):
+    anonymous_endpoints.add(f'auth.{f.__name__}')
+    return f

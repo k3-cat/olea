@@ -8,86 +8,78 @@ from olea.errors import PermissionDenied
 from olea.exts import db, redis
 
 
-class DuckPermission():
-    def __init__(self, login):
-        self.login = login
+def clean_cache(pink_id):
+    redis.delete(f'duckT-{pink_id}')
+    redis.delete(f'duckF-{pink_id}')
 
-    @staticmethod
-    def clean_cache(pink_id):
-        redis.delete(f'{pink_id}-T')
-        redis.delete(f'{pink_id}-F')
 
-    @staticmethod
-    def cache_ducks(pink_id):
-        t = set()
-        f = set()
-        for duck in Duck.query.filter_by(pink_id=pink_id):
-            t.add(duck.node) if duck.allow else f.add(duck.node)
-        redis.set(f'{pink_id}-T', t)
-        redis.set(f'{pink_id}-F', f)
+def cache_ducks(pink_id):
+    t = f'duckT-{pink_id}'
+    f = f'duckF-{pink_id}'
+    if redis.exist(t):
+        return
+    for duck in Duck.query.filter_by(pink_id=pink_id):
+        redis.hset(t if duck.allow else f, duck.node, ';'.join(duck.scopes))
 
-    @staticmethod
-    def has_duck(node):
-        if not redis.exist(f'{g.pink_id}-T'):
-            DuckPermission.cache_ducks(g.pink_id)
-        return redis.sismember(f'{g.pink_id}-T', node)
 
-    @staticmethod
-    def check_duck(default_pass, node):
-        if not node:
-            path = request.path
-            if path.endswith('/'):
-                path += 'all'
-            node = re.sub(r'^/([a-z]*).*/([a-z_]*)$', r'\1.\2', path)
-        g.node = node
+def has_duck(node):
+    cache_ducks(g.pink_id)
+    return redis.hexist(f'duckT-{g.pink_id}', node)
 
-        if not redis.exist(f'{g.pink_id}-T'):
-            DuckPermission.cache_ducks(g.pink_id)
 
-        if (not default_pass and not redis.sismember(f'{g.pink_id}-T', node)) or \
-            (default_pass and redis.sismember(f'{g.pink_id}-F', node)):
-            raise PermissionDenied()
+def check_duck(default_pass, node):
+    if not node:
+        path = request.path
+        if path.endswith('/'):
+            path += 'all'
+        node = re.sub(r'^/([a-z]*).*/([a-z_]*)$', r'\1.\2', path)
+    g.node = node
 
-    @staticmethod
-    def check_scopes(scopes):
-        duck = Duck.query.fiter_by(node=g.node, pink_id=g.pink_id).first()
-        scope_set = set(duck.scopes)
-        # when scope_set is empty, it means ANY SCOPE
-        if (duck.allow and (diff := scopes - scope_set)) or \
-            (not duck.allow and (diff := scopes & scope_set if scope_set else scopes)):
-            raise PermissionDenied(scope=diff)
+    cache_ducks(g.pink_id)
+    if (not default_pass and not redis.hexist(f'duckT-{g.pink_id}', node)) or \
+        (default_pass and redis.hexist(f'duckF-{g.pink_id}', node)):
+        raise PermissionDenied()
 
-    def optinal_permission(self, node=''):
-        def decorate(f):
-            def check_opt_duck(scopes=None):
-                try:
-                    self.check_duck(False, node)
-                    passed = True
-                except PermissionDenied:
-                    passed = False
-                if scopes:
-                    self.check_scopes(scopes)
-                return passed
 
-            @wraps(f)
-            def wrapper(*args, **kwargs):
-                g.check_duck = check_opt_duck
-                result = f(*args, **kwargs)
-                return result
+def check_scopes(default_pass, scopes):
+    raw_scope = redis.hget(f'duck{"T" if default_pass else "F"}-{g.pink_id}', g.node)
+    scope_set = set(raw_scope.split(';'))
+    # when scope_set is empty, it means ANY SCOPE
+    if (default_pass and (diff := scopes - scope_set)) or \
+        (not default_pass and (diff := scopes & scope_set if scope_set else scopes)):
+        raise PermissionDenied(scope=diff)
 
-            return self.login(wrapper)
 
-        return decorate
+def optinal_permission(node=''):
+    def check_opt_duck(scopes=None):
+        try:
+            check_duck(False, node)
+            passed = True
+        except PermissionDenied:
+            passed = False
+        if passed and scopes:
+            check_scopes(False, scopes)
+        return passed
 
-    def permission_required(self, default_pass=False, node=''):
-        def decorate(f):
-            @wraps(f)
-            def wrapper(*args, **kwargs):
-                self.check_duck(default_pass, node)
-                g.check_scope = self.check_scopes
-                result = f(*args, **kwargs)
-                return result
+    def decorate(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            g.check_duck = check_opt_duck
+            return f(*args, **kwargs)
 
-            return self.login(wrapper)
+        return wrapper
 
-        return decorate
+    return decorate
+
+
+def permission_required(default_pass=False, node=''):
+    def decorate(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            check_duck(default_pass, node)
+            g.check_scope = lambda scopes: check_scopes(default_pass, scopes)
+            return f(*args, **kwargs)
+
+        return wrapper
+
+    return decorate

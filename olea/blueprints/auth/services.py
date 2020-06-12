@@ -4,7 +4,7 @@ from flask import current_app, g, request
 
 from models import Duck, Lemon, Pink
 from olea import email_mgr
-from olea.auth import duck_permission
+from olea.auth import authorization
 from olea.base import BaseMgr
 from olea.errors import (AccountDeactivated, DuplicatedRecord, InvalidCredential,
                          InvalidRefreshToken, RecordNotFound)
@@ -12,7 +12,7 @@ from olea.exts import db, redis
 from olea.utils import random_b85
 
 from .ip import ip2city
-from .pwd_tools import check_pwd, generate_pwd, pwd_context
+from .pwd_tools import check_pwd, generate_pwd
 
 
 class PinkMgr(BaseMgr):
@@ -24,19 +24,19 @@ class PinkMgr(BaseMgr):
         if pink and pink.email != email:
             return
         token = random_b85(k=20)
-        redis.set(token, pink.id, ex=cls.t_life)
+        redis.set(f'rst-{token}', pink.id, ex=cls.t_life)
         email_mgr.reset_pwd(email=pink.email, token=token)
 
     @staticmethod
     def reset_pwd(token, pwd):
-        if not (pink_id := redis.get(token)):
+        if not (pink_id := redis.get(f'rst-{token}')):
             raise InvalidCredential(type=InvalidCredential.T.rst)
         PinkMgr(pink_id).set_pwd(pwd)
         redis.delete(token)
 
     def set_pwd(self, pwd):
         check_pwd(pwd)
-        self.o.pwd = pwd_context.hash(pwd)
+        self.o.pwd = pwd
         return True
 
 
@@ -59,7 +59,7 @@ class LemonMgr(BaseMgr):
         pink: Pink = Pink.query.filter_by(name=name).first()
         if not pink.active:
             raise AccountDeactivated()
-        if not pink or not pwd_context.verify(pwd, pink.pwd):
+        if not pink or not pink.check_pwd(pwd):
             raise InvalidCredential(type=InvalidCredential.T.pwd)
         if lemon := pink.lemons.filter_by(device_id=device_id):
             db.session.delete(lemon)
@@ -115,13 +115,10 @@ class DuckMgr(BaseMgr):
             try:
                 ducks.append(DuckMgr.grante(pink_id, node, add[node]))
             except DuplicatedRecord as e:
-                if set(e.obj.scopes) == add[node]:
-                    ducks.append(e.obj)
-                else:
-                    conflicts.append(e.obj)
+                conflicts.append(e.obj)
         if remove:
             DuckMgr.revoke(remove)
-        duck_permission.clean_cache()
+        authorization.clean_cache()
         return (ducks, conflicts)
 
     @classmethod
@@ -140,6 +137,7 @@ class DuckMgr(BaseMgr):
     def alter_scopes(self, scopes: set):
         self.o.scopes = list(scopes)
         db.session.add(self.o)
+        authorization.clean_cache()
         return scopes
 
     def add_scopes(self, scopes):

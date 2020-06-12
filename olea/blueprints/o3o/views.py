@@ -9,7 +9,6 @@ from .services import PitMgr, RoleMgr
 
 
 @bp.route('/<id_>/pick', methods=['POST'])
-@login
 def pick(id_):
     pit = RoleMgr(id_).pick()
     return jsonify({'id': pit.id})
@@ -24,21 +23,18 @@ def full_pick(id_):
 
 
 @bp.route('/<id_>/drop', methods=['POST'])
-@login
 def drop(id_):
     pit = PitMgr(id_).drop()
     return jsonify({'id': pit.id})
 
 
 @bp.route('/<id_>/redo', methods=['POST'])
-@login
 def redo(id_):
     pit = PitMgr(id_).redo()
     return jsonify({'id': pit.id})
 
 
 @bp.route('/<id_>/submit', methods=['POST'])
-@login
 def submit(id_):
     form = Submit()
     pit = PitMgr(id_).submit(share_id=form.share_id)

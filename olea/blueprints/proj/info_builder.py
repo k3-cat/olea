@@ -13,13 +13,13 @@ WEB_EXP = current_app.config['WEB_EXP']
 
 
 def fetch_web(url):
-    web_page_t = redis.get(url)
+    web_page_t = redis.get(f'web-{url}')
     if not web_page_t:
         web_page = requests.get(f'{CN_SITE_URL}/{url}')
         if web_page.status_code == 404:
             raise InvalidSource(rsn=InvalidSource.Rsn.web, url=url)
         web_page_t = web_page.text
-    redis.set(url, web_page_t, ex=WEB_EXP)
+    redis.set(f'web-{url}', web_page_t, ex=WEB_EXP)
     soup = BeautifulSoup(web_page_t, 'lxml')
     return soup.find('div', {'id': 'main-content'})
 

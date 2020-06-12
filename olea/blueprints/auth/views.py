@@ -1,6 +1,6 @@
 from flask import g, jsonify
 
-from olea.auth import login, perm
+from olea.auth import allow_anonymous, perm
 
 from . import bp
 from .forms import AlterDuck, AlterScopes, ForgetPwd, Login, Refresh, ResetPwd, SetPwd
@@ -8,6 +8,7 @@ from .services import DuckMgr, LemonMgr, PinkMgr
 
 
 @bp.route('/login', methods=['POST'])
+@allow_anonymous
 def login():
     form = Login()
     lemon = LemonMgr.grante(name=form.name, pwd=form.pwd, device_id=form.device_id)
@@ -15,7 +16,6 @@ def login():
 
 
 @bp.route('/set-pwd', methods=['POST'])
-@login
 def set_pwd():
     form = SetPwd()
     PinkMgr(g.pink_id).set_pwd(form.pwd)
@@ -23,6 +23,7 @@ def set_pwd():
 
 
 @bp.route('/forget-pwd', methods=['POST'])
+@allow_anonymous
 def reset_pwd_i():
     form = ForgetPwd()
     PinkMgr.forget_pwd(name=form.name, email=form.email)
@@ -30,6 +31,7 @@ def reset_pwd_i():
 
 
 @bp.route('/reset-pwd', methods=['POST'])
+@allow_anonymous
 def reset_pwd():
     form = ResetPwd()
     PinkMgr.reset_pwd(token=form.token, pwd=form.pwd)
@@ -37,6 +39,7 @@ def reset_pwd():
 
 
 @bp.route('/refresh', methods=['POST'])
+@allow_anonymous
 def refresh():
     form = Refresh()
     token, exp = LemonMgr(form.id).grante_access_token(key=form.key, device_id=form.device_id)
@@ -44,14 +47,12 @@ def refresh():
 
 
 @bp.route('/<id_>/revoke-lemon', methods=['POST'])
-@login
 def revoke_lemon(id_):
     LemonMgr(id_).revoke()
     return jsonify({})
 
 
 @bp.route('/revoke-all-lemons', methods=['POST'])
-@login
 def revoke_all_lemons():
     LemonMgr.revoke_all()
     return jsonify({})
