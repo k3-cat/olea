@@ -4,7 +4,7 @@ from olea.auth import allow_anonymous, perm
 
 from . import bp
 from .forms import AlterDuck, AlterScopes, ForgetPwd, Login, Refresh, ResetPwd, SetPwd
-from .services import DuckMgr, LemonMgr, PinkMgr
+from .services import LemonMgr, PinkMgr
 
 
 @bp.route('/login', methods=['POST'])
@@ -56,40 +56,3 @@ def revoke_lemon(id_):
 def revoke_all_lemons():
     LemonMgr.revoke_all()
     return jsonify({})
-
-
-@bp.route('/<pink_id>/ducks', methods=['GET'])
-@perm(node='auth.duck')
-def list_ducks(pink_id):
-
-    return jsonify()
-
-
-@bp.route('/<id_>/alter-scopes', methods=['POST'])
-@perm(node='auth.duck')
-def alter_scopes(id_):
-    form = AlterScopes()
-    duck = DuckMgr(id_)
-    if form.method == AlterScopes.Method.diff:
-        duck.add_scopes(scopes=form.positive)
-        final = duck.remove_scopes(scopes=form.negative)
-    else:
-        final = duck.alter_scopes(scopes=form.positive)
-    return jsonify({'new_scopes': final})
-
-
-@bp.route('/<pink_id>/alter-ducks', methods=['POST'])
-@perm(node='auth.duck')
-def alter_ducks(pink_id):
-    form = AlterDuck()
-    ducks, confilcts = DuckMgr.alter_ducks(pink_id=pink_id, add=form.add, remove=form.remove)
-    res = {'ducks': {duck.id: {'node': duck.node, 'scope': duck.scopes} for duck in ducks}}
-    if confilcts:
-        res['conflicts'] = {
-            duck.id: {
-                'node': duck.node,
-                'scope': duck.scopes
-            }
-            for duck in confilcts
-        }
-    return jsonify()

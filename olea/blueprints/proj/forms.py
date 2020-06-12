@@ -7,8 +7,8 @@ __all__ = ['Create', 'FullCreate', 'ModifyRoles']
 
 
 class Search(BaseForm):
-    states = SetField(EnumField(Proj.State), optinal=True)
-    types = SetField(EnumField(Proj.Type), optinal=True)
+    states = SetField(EnumField(Proj.State), optional=True)
+    types = SetField(EnumField(Proj.Type), optional=True)
 
 
 class FullCreate(BaseForm):
@@ -28,8 +28,8 @@ class Create(BaseForm):
 
 
 class ModifyRoles(BaseForm):
-    add = DictField(EnumField(Dep), SetField(StringField()), optinal=True)
-    remove = SetField(StringField(), optinal=True)
+    add = DictField(EnumField(Dep), SetField(StringField()), optional=True)
+    remove = SetField(StringField(), optional=True)
 
     def check_add(self, field):
         if self.test_empty('add') and self.test_empty('remove'):

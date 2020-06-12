@@ -50,7 +50,7 @@ def check_scopes(default_pass, scopes):
         raise PermissionDenied(scope=diff)
 
 
-def optinal_permission(node=''):
+def optional_permission(node=''):
     def check_opt_duck(scopes=None):
         try:
             check_duck(False, node)

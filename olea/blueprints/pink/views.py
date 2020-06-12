@@ -3,8 +3,8 @@ from flask import g, jsonify, request
 from olea.auth import login, opt_perm, perm
 
 from . import bp
-from .forms import Create, ResetPwdF, ResetPwdI, Search, SetPwd, UpdateInfo
-from .services import PinkMgr, PinkQuery
+from .forms import AlterDuck, AlterScopes, Create, Search, SearchDuck, UpdateInfo
+from .services import DuckMgr, PinkMgr, PinkQuery
 
 
 @bp.route('/<id_>', methods=['GET'])
@@ -51,3 +51,44 @@ def create():
 def deactive(id_):
     PinkMgr(id_).deactive()
     return jsonify({})
+
+
+@bp.route('/ducks/', methods=['GET'])
+@perm(node='auth.duck')
+def list_ducks(pink_id):
+    form = SearchDuck(request.args)
+    ducks = PinkQuery.ducks(pink_id=form.pink_id,
+                            node=form.node,
+                            nodes=form.nodes,
+                            allow=form.allow)
+    return jsonify()
+
+
+@bp.route('/<pink>/<node>/alter-scopes', methods=['POST'])
+@perm(node='auth.duck')
+def alter_scopes(pink, node):
+    form = AlterScopes()
+    duck = DuckMgr(pink, node)
+    if form.method == AlterScopes.Method.diff:
+        duck.add_scopes(scopes=form.positive)
+        final = duck.remove_scopes(scopes=form.negative)
+    else:
+        final = duck.alter_scopes(scopes=form.positive)
+    return jsonify({'new_scopes': final})
+
+
+@bp.route('/<id_>/alter-ducks', methods=['POST'])
+@perm(node='auth.duck')
+def alter_ducks(id_):
+    form = AlterDuck()
+    ducks, confilcts = PinkMgr(id_).alter_ducks(pink_id=id_, add=form.add, remove=form.remove)
+    res = {'ducks': {duck.id: {'node': duck.node, 'scope': duck.scopes} for duck in ducks}}
+    if confilcts:
+        res['conflicts'] = {
+            duck.id: {
+                'node': duck.node,
+                'scope': duck.scopes
+            }
+            for duck in confilcts
+        }
+    return jsonify()

@@ -5,5 +5,5 @@ from models import Dep
 
 
 class Search(BaseForm):
-    deps = SetField(EnumField(Dep), optinal=True)
+    deps = SetField(EnumField(Dep), optional=True)
     pink_id = StringField(optional=True)

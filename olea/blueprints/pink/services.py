@@ -1,9 +1,10 @@
 from flask import current_app
 
-from models import Lemon, Pink
+from models import Duck, Lemon, Pink
 from olea import email_mgr
+from olea.auth import authorization
 from olea.base import BaseMgr, single_query
-from olea.errors import AccessDenied, InvalidCredential
+from olea.errors import AccessDenied, DuplicatedRecord, InvalidCredential
 from olea.exts import db, redis
 from olea.utils import random_b85
 
@@ -25,6 +26,18 @@ class PinkQuery():
                 query.filter(Pink.name.ilike(f'%{name}%'))
             if qq:
                 query.filter(Pink.qq.like(f'%{qq}%'))
+        return query.all()
+
+    @staticmethod
+    def ducks(pink_id, node, nodes, allow):
+        query = Duck.query.filter_by(pink_id=pink_id)
+        if node:
+            query.filter(Duck.node.ilike(f'%{node}%'))
+        else:
+            if nodes:
+                query.filter(Duck.node.in_(nodes))
+            if allow is not None:
+                query.filter_by(allow=allow)
         return query.all()
 
 
@@ -62,3 +75,33 @@ class PinkMgr(BaseMgr):
         self.o.active = False
         self.o.lemons.delete()
         return True
+
+    def alter_ducks(self, add, remove):
+        conflicts = self.o.ducks.filter(Duck.node.in_(add.keys())).all()
+        for node in add.keys() - {conflict.node for conflict in conflicts}:
+            info = add[node]
+            duck = self.model(pink_id=self.o.id,
+                              node=node,
+                              allow=info['allow'],
+                              scopes=list(info['scopes']))
+            self.o.ducks.add(duck)
+        if remove:
+            self.o.ducks.filter(Duck.node.in_(remove)).delete()
+        authorization.clean_cache()
+        return (self.o.ducks.all(), conflicts)
+
+
+class DuckMgr(BaseMgr):
+    modle = Duck
+
+    def alter_scopes(self, scopes: set):
+        self.o.scopes = list(scopes)
+        db.session.add(self.o)
+        authorization.clean_cache()
+        return scopes
+
+    def add_scopes(self, scopes):
+        return self.alter_scopes(set(self.o.scopes) | scopes)
+
+    def remove_scopes(self, scopes):
+        return self.alter_scopes(set(self.o.scopes) - scopes)

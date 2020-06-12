@@ -2,9 +2,8 @@ import datetime
 
 from flask import current_app, g, request
 
-from models import Duck, Lemon, Pink
+from models import Lemon, Pink
 from olea import email_mgr
-from olea.auth import authorization
 from olea.base import BaseMgr
 from olea.errors import (AccountDeactivated, DuplicatedRecord, InvalidCredential,
                          InvalidRefreshToken, RecordNotFound)
@@ -102,46 +101,3 @@ class LemonMgr(BaseMgr):
     def revoke_all():
         Pink.query.get(g.pink_id).lemons.delete()
         db.session.commit()
-
-
-class DuckMgr(BaseMgr):
-    modle = Duck
-
-    @staticmethod
-    def alter_ducks(pink_id, add, remove):
-        ducks = list()
-        conflicts = list()
-        for node in add.keys():
-            try:
-                ducks.append(DuckMgr.grante(pink_id, node, add[node]))
-            except DuplicatedRecord as e:
-                conflicts.append(e.obj)
-        if remove:
-            DuckMgr.revoke(remove)
-        authorization.clean_cache()
-        return (ducks, conflicts)
-
-    @classmethod
-    def grante(cls, pink_id, node, scopes: set):
-        if duck := Duck.query.filter_by(pink_id=pink_id, node=node):
-            raise DuplicatedRecord(obj=duck)
-        else:
-            duck = cls.model(id=cls.gen_id(), pink_id=pink_id, node=node, scopes=list(scopes))
-            db.session.add(duck)
-        return duck
-
-    @classmethod
-    def revoke(cls, pink_id, nodes):
-        cls.query.filter_by(pink_id=pink_id).filter(Duck.node.in_(nodes)).delete()
-
-    def alter_scopes(self, scopes: set):
-        self.o.scopes = list(scopes)
-        db.session.add(self.o)
-        authorization.clean_cache()
-        return scopes
-
-    def add_scopes(self, scopes):
-        return self.alter_scopes(set(self.o.scopes) | scopes)
-
-    def remove_scopes(self, scopes):
-        return self.alter_scopes(set(self.o.scopes) - scopes)
