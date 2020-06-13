@@ -12,15 +12,15 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Test Server",
+            "name": "Debug Server",
             "type": "python",
             "request": "launch",
             "module": "flask",
             "env": {
                 "FLASK_APP": "olea",
-                "FLASK_ENV": "dev",
+                "FLASK_ENV": "development",
             },
-            "cwd": "${workspaceFolder}/src",
+            "cwd": "${workspaceFolder}",
             "args": [
                 "run",
                 "--no-debugger",
@@ -35,26 +35,24 @@
             "module": "flask",
             "env": {
                 "FLASK_APP": "olea",
-                "FLASK_ENV": "prod",
+                "FLASK_ENV": "production",
             },
-            "cwd": "${workspaceFolder}/src",
+            "cwd": "${workspaceFolder}",
             "args": [
-                "run",
-                "--no-debugger",
-                "--no-reload"
+                "run"
             ],
             "jinja": false
         },
         {
-            "name": "Just Load",
+            "name": "Load Routes",
             "type": "python",
             "request": "launch",
             "module": "flask",
             "env": {
                 "FLASK_APP": "olea",
-                "FLASK_ENV": "dev",
+                "FLASK_ENV": "development",
             },
-            "cwd": "${workspaceFolder}/src",
+            "cwd": "${workspaceFolder}",
             "args": [
                 "routes"
             ],

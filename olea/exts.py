@@ -1,19 +1,16 @@
 from flask_apscheduler import scheduler
-from flask_json import FlaskJson
+from flask_json import FlaskJSON
 from flask_redis import FlaskRedis
 from mailgun import MailGun
 from onedrive import OneDrive
-from pypat import Pat
 from sqlalchemy_ import db
 
-fjson = FlaskJson()
+fjson = FlaskJSON()
 mailgun = MailGun()
 onerive = OneDrive()
 redis = FlaskRedis()
 
-pat = Pat()
-
-__all__ = ['db', 'pat', 'mailgun', 'onerive', 'redis', 'scheduler']
+__all__ = ['db', 'mailgun', 'onerive', 'redis', 'scheduler']
 
 
 def init_extensions(app):

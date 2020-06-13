@@ -1,0 +1,7 @@
+[redis]
+local = "unix://:@/tmp/redis.sock?db=0"
+foo = "redis://:<pwd>@<hostname>:6379/0"
+
+[db]
+local = "postgres://:@/<db>?host=/run/postgresql"
+bar = "postgres://<user>:<pwd>@<hostname>:5432/<db>"

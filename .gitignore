@@ -5,4 +5,7 @@ __pycache__/
 /.vscode/*
 !.vscode/launch.json
 
-instance.py
+/configs/*
+!configs/__init__.py
+!configs/url_mgr.py
+!configs/*.example.*

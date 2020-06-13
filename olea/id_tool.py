@@ -33,6 +33,3 @@ class IdTool():
 
     def _str_to_int(self, string):
         return [self.ANTI_ALPHABET[char] for char in string]
-
-
-id_tool = IdTool()
