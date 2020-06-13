@@ -39,9 +39,9 @@ def build_import_statement(module):
 
 
 if __name__ == "__main__":
-    DIR = (Path(__file__).parents[2] / 'olea')
-    PATH = DIR / MODULE / '__init__.py'
-    sys.path.append(str(DIR))
+    PROJ_ROOT = (Path(__file__).parents[2] / 'olea')
+    PATH = PROJ_ROOT / MODULE / '__init__.py'
+    sys.path.append(str(PROJ_ROOT))
 
     init_content = split_file(PATH)
 
