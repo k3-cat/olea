@@ -3,7 +3,7 @@ from abc import ABC
 from flask import g
 
 from olea.errors import AccessDenied, PermissionDenied, RecordNotFound
-from olea.id_tool import id_tool
+from olea.singleton import id_tool
 
 
 def single_query(model, id_or_obj, condiction):
@@ -34,7 +34,7 @@ class BaseMgr(ABC):
                 raise RecordNotFound(cls=self.model, id=obj_or_id)
         else:
             obj = obj_or_id
-        self.o: self.model = obj
+        self.o = obj
 
     @classmethod
     def gen_id(cls):

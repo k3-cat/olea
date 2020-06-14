@@ -46,7 +46,7 @@ def check_file_meta(dep, i):
             required['ppi'] = '> 146.5'
 
     else:
-        # prevent unexpected file uploading, should never be run
+        # prevent unexpected file uploading, should never be called
         raise Exception('Unexpected File Uploading')
 
     if required:

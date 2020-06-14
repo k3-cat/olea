@@ -1,7 +1,7 @@
 from .auth_fail import (AccessDenied, AccountDeactivated, InvalidCredential, InvalidRefreshToken,
                         PermissionDenied)
-from .bad_opt import (DoesNotMeetRequirements, InvalidSource, NotQualifiedToPick, RoleIsTaken,
-                      RolesLocked, StateLocked, UnallowedType)
+from .bad_opt import (DoesNotMeetRequirements, InvalidSource, NotQualifiedToPick, ProjMetaLocked,
+                      RoleIsTaken, StateLocked, UnallowedType)
 from .base_error import BaseError
 from .data_conflict import DuplicatedRecord, FileExist, FileVerConflict, RecordNotFound
 

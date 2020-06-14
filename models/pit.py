@@ -14,17 +14,19 @@ class Pit(BaseModel):
         init = 'initialized'
         pending = 'pending'
         working = 'working'
+        delayed = 'delayed'
+        past_due = 'past due'
         auditing = 'auditing'
-        delayed = 'working (delayed)'
+        auditing_p = 'auditing'
         fin = 'finished'
+        fin_p = 'finished (past due)'
         droped = 'droped'
-        droped_f = 'forced droped'
 
     id = Column(String, primary_key=True)
     role_id = Column(String, ForeignKey('role.id'))
     pink_id = Column(String, ForeignKey('pink.id'))
     state = Column(Enum(State), default=State.init, index=True)
-    track = Column(ARRAY(String), default=list())
+    track = Column(ARRAY(String), default=list)
     start_at = Column(DateTime)
     due = Column(DateTime)
     timestamp = Column(DateTime)
@@ -36,36 +38,30 @@ class Pit(BaseModel):
     __id_len__ = 13
 
     @hybrid_property
+    def not_past_due(self):
+        return self.state in {State.working_p, State.auditing_p, State.fin_p}
+
+    @property
     def mango(self):
         return self.mangos.first()
 
     class Trace(enum.Enum):
         pick_f = 'P'
         drop = 'd'
-        drop_f = 'D'
+        past_due = '->'
         submit = 's'
         submit_f = 'S'
         redo = 'r'
-        check_pass = '1'
-        check_fail = '0'
-        extend = 'X'
+        check_pass = 'o'
+        check_fail = 'x'
+        extend = '+'
 
-    def add_track(self, info: 'Pit.Trace', now: float, by=''):
+    def add_track(self, info: 'Pit.Trace', now, by=''):
         base = f'{info.name} - {now}'
-        if info in (Trace.drop_f, Trace.pick_f, Trace.submit_f, Trace.check_fail, Trace.check_pass):
+        if info in (Trace.past_due, Trace.pick_f, Trace.submit_f, Trace.check_fail,
+                    Trace.check_pass):
             self.track.append(f'{base} by:{by}')
         elif info == Trace.extend:
             self.track.append(f'{base} from:{self.due}')
         else:
             self.track.append(base)
-
-    def to_dict(self, lv: int):
-        if lv == 0:
-            return {
-                'id': self.id,
-                'proj_id': self.proj_id,
-                'dep_': self.dep.name,
-                'role': self.role,
-                'pink_id': self.pink.id,
-                'state': self.state.name,
-            }

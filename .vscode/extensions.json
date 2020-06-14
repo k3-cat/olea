@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "davidanson.vscode-markdownlint",
+    "formulahendry.code-runner",
+    "coenraads.bracket-pair-colorizer-2",
+    "eamodio.gitlens"
+  ]
+}

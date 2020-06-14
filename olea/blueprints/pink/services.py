@@ -44,7 +44,11 @@ class PinkQuery():
 class PinkMgr(BaseMgr):
     model = Pink
 
-    t_life = current_app.config['RESET_PWD_TOKEN_LIFE'].seconds
+    t_life = current_app.config['PWD_RESET_TOKEN_LIFE'].seconds
+
+    def __init__(self, obj_or_id):
+        self.o: self.model = None
+        super().__init__(obj_or_id)
 
     @classmethod
     def create(cls, name: str, qq: int, other: str, email: str, deps: list):
@@ -93,6 +97,10 @@ class PinkMgr(BaseMgr):
 
 class DuckMgr(BaseMgr):
     modle = Duck
+
+    def __init__(self, obj_or_id):
+        self.o: self.model = None
+        super().__init__(obj_or_id)
 
     def alter_scopes(self, scopes: set):
         self.o.scopes = list(scopes)

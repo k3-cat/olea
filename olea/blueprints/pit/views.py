@@ -3,7 +3,7 @@ from flask import jsonify, request
 from olea.auth import login, opt_perm, perm
 
 from . import bp
-from .forms import Search
+from .forms import ForceSubmit, Search, Submit
 from .services import PitMgr, PitQuery
 
 
@@ -14,24 +14,66 @@ def single(id_):
     return jsonify({'id': pit.id})
 
 
-@bp.route('/', methods=['GET'])
-@opt_perm
-def search():
+@bp.route('/my', methods=['GET'])
+def my():
     form = Search(data=request.args)
-    pits = PitQuery.search(deps=form.deps, pink_id=form.pink_id)
+    pits = PitQuery.my(deps=form.deps, states=form.states)
     return jsonify({})
 
 
-@bp.route('/<id_>/c-download', methods=['GET'])
+@bp.route('/check-list', methods=['GET'])
 @perm(node='pit.check')
-def checker_download(id_):
-    return jsonify({'share_id': PitMgr(id_).checker_download()})
+def check_list():
+    form = Search(data=request.args)
+    pits = PitQuery.check_list(deps=form.deps)
+    return jsonify({})
+
+
+@bp.route('/', methods=['GET'])
+@perm
+def search():
+    form = Search(data=request.args)
+    pits = PitQuery.search_all(deps=form.deps, states=form.states, pink_id=form.pink_id)
+    return jsonify({})
+
+
+@bp.route('/<id_>/drop', methods=['POST'])
+def drop(id_):
+    pit = PitMgr(id_).drop()
+    return jsonify({'id': pit.id})
+
+
+@bp.route('/<id_>/submit', methods=['POST'])
+def submit(id_):
+    form = Submit()
+    pit = PitMgr(id_).submit(share_id=form.share_id)
+    return jsonify({'id': pit.id})
+
+
+@bp.route('/f-submit', methods=['POST'])
+@perm
+def force_submit():
+    form = ForceSubmit()
+    pit = PitMgr.force_submit(token=form.token)
+    return jsonify({'id': pit.id})
+
+
+@bp.route('/<id_>/redo', methods=['POST'])
+def redo(id_):
+    pit = PitMgr(id_).redo()
+    return jsonify({'id': pit.id})
 
 
 @bp.route('/<id_>/download', methods=['GET'])
 @opt_perm
 def download(id_):
     return jsonify({'share_id': PitMgr(id_).download()})
+
+
+@bp.route('/<id_>/c-download', methods=['GET'])
+@perm(node='pit.check')
+def checker_download(id_):
+    return jsonify({'share_id': PitMgr(id_).checker_download()})
 
 
 @bp.route('/<id_>/check-pass', methods=['POST'])

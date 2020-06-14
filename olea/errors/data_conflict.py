@@ -32,5 +32,5 @@ class FileVerConflict(DataConflict):
 class FileExist(DataConflict):
     code = 'JQ9I'
 
-    def __init__(self, pit_id, ver):
-        super().__init__(pit_id=pit_id, ver=ver)
+    def __init__(self, pit):
+        super().__init__(pit_id=pit.id, ver=pit.ver)

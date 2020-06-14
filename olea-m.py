@@ -1,6 +1,5 @@
 def register_commands(app):
     import click
-    from flask.cli import with_appcontext
 
     @click.command()
     @click.option('--length', default=25)
@@ -29,3 +28,4 @@ if __name__ == '__main__':
     app = create_app()
 
     set_shellcontext(app)
+    register_commands(app)

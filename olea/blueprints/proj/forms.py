@@ -36,3 +36,11 @@ class ModifyRoles(BaseForm):
             raise FormError('empty form')
         if diff := field.data.keys() - {Dep.au, Dep.ps, Dep.ae}:
             raise FormError(f'currently does not allow to add roles into these deps: {diff}')
+
+
+class Finish(BaseForm):
+    url = StringField()
+
+
+class Pick(BaseForm):
+    pink_id = StringField()

@@ -2,7 +2,7 @@ import enum
 
 from sqlalchemy_ import (BaseModel, Column, ForeignKey, UniqueConstraint, hybrid_property,
                          relationship)
-from sqlalchemy_.types import JSONB, DateTime, Enum, Integer, String
+from sqlalchemy_.types import ARRAY, JSONB, DateTime, Enum, Integer, String
 
 __all__ = ['Proj']
 
@@ -14,6 +14,7 @@ class Proj(BaseModel):
         pre = 'pre-process'
         freezed = 'freezed'
         working = 'working'
+        upload = 'pending upload'
         fin = 'finished'
 
     class Type(enum.Enum):
@@ -28,20 +29,12 @@ class Proj(BaseModel):
     suff = Column(String)
     state = Column(Enum(State))
     leader_id = Column(String, ForeignKey('pink.id'))
-    chat = Column(JSONB)
-    word_count = Column(Integer)
+    track = Column(ARRAY(String), default=list)
     timestamp = Column(DateTime)
-    finished_at = Column(DateTime)
+    word_count = Column(Integer)
     url = Column(String)
-    income = Column(Integer)
+    chat = Column(JSONB)
 
-    progress = relationship(
-        'Progress',
-        uselist=False,
-        back_populates='proj',
-        cascade='all, delete-orphan',
-        passive_deletes=True,
-    )
     roles = relationship(
         'Role',
         back_populates='proj',
@@ -55,3 +48,17 @@ class Proj(BaseModel):
     @hybrid_property
     def display_title(self):
         return f'{self.title}({self.suff})' if self.suff else self.title
+
+    class Trace(enum.Enum):
+        re_open = 'r'
+        freeze = 'F'
+        upload = 'U'
+        start = '+'
+        finish = '-'
+
+    def add_track(self, info: 'Pit.Trace', now, by=''):
+        base = f'{info.name} - {now}'
+        if info == Trace.re_open:
+            self.track.append(f'{base} by:{by}')
+        else:
+            self.track.append(base)

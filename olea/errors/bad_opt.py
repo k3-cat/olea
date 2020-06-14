@@ -12,7 +12,7 @@ class BadOpt(BaseError, ABC):
 # ------------------- proj ---------------------
 
 
-class RolesLocked(BadOpt):
+class ProjMetaLocked(BadOpt):
     code = 'I4HX'
 
     def __init__(self, state):

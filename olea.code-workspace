@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"python.autoComplete.extraPaths": [
+			"site-packages/jsonform",
+			"site-packages/pypat",
+			"site-packages"
+		],
+		"python.formatting.yapfArgs": [
+			"--style={ based_on_style: pep8, column_limit: 100}"
+		],
+	}
+}

@@ -17,6 +17,10 @@ from .pwd_tools import check_pwd, generate_pwd
 class PinkMgr(BaseMgr):
     module = Pink
 
+    def __init__(self, obj_or_id):
+        self.o: self.model = None
+        super().__init__(obj_or_id)
+
     @classmethod
     def forget_pwd(cls, name, email):
         pink = cls.query.filter_by(name=name).first()
@@ -46,6 +50,7 @@ class LemonMgr(BaseMgr):
     r_life = current_app.config['REFRESH_TOKEN_LIFE']
 
     def __init__(self, obj_or_id):
+        self.o: self.model = None
         try:
             super().__init__(obj_or_id)
             if self.o.pink_id != g.pink_id:
