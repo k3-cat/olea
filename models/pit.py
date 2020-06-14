@@ -17,7 +17,6 @@ class Pit(BaseModel):
         delayed = 'delayed'
         past_due = 'past due'
         auditing = 'auditing'
-        auditing_p = 'auditing'
         fin = 'finished'
         fin_p = 'finished (past due)'
         droped = 'droped'
@@ -36,10 +35,6 @@ class Pit(BaseModel):
     mangos = relationship('Mango', back_populates='pit', lazy='dynamic')
     __table_args__ = (UniqueConstraint('role_id', 'pink_id', name='_pit_uc'), )
     __id_len__ = 13
-
-    @hybrid_property
-    def not_past_due(self):
-        return self.state in {State.working_p, State.auditing_p, State.fin_p}
 
     @property
     def mango(self):
