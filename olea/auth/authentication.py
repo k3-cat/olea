@@ -1,11 +1,8 @@
-
 from flask import abort, g, request
 from sentry_sdk import configure_scope
-from werkzeug.exceptions import Unauthorized
 
-from models import Pink
 from olea.errors import InvalidCredential
-from olea.exts import db, redis
+from olea.singleton import redis
 
 anonymous_endpoints = set()
 

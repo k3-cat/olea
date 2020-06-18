@@ -1,10 +1,11 @@
 from flask import jsonify, request
 
-from olea.auth import login, opt_perm, perm
+from olea.auth import opt_perm, perm
 
 from . import bp
 from .forms import ForceSubmit, Search, Submit
-from .services import PitMgr, PitQuery
+from .query import PitQuery
+from .services import PitMgr
 
 
 @bp.route('/<id_>', methods=['GET'])
@@ -40,7 +41,7 @@ def search():
 @bp.route('/<id_>/drop', methods=['POST'])
 def drop(id_):
     pit = PitMgr(id_).drop()
-    return jsonify({'id': pit.id})
+    return jsonify({})
 
 
 @bp.route('/<id_>/submit', methods=['POST'])

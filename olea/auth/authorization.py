@@ -1,11 +1,10 @@
 import re
-from functools import wraps
 
-from flask import abort, g, request
+from flask import g, request
 
 from models import Duck
 from olea.errors import PermissionDenied
-from olea.exts import db, redis
+from olea.singleton import redis
 
 
 def clean_cache(pink_id):

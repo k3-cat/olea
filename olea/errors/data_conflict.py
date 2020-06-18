@@ -10,8 +10,8 @@ class DataConflict(BaseError, ABC):
 class RecordNotFound(DataConflict):
     code = 'I4HX'
 
-    def __init__(self, cls, id_):
-        super().__init__(cls=cls.__name__, id=id_)
+    def __init__(self, cls_, id_):
+        super().__init__(cls=cls_.__name__, id=id_)
 
 
 class DuplicatedRecord(DataConflict):

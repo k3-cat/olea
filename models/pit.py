@@ -27,6 +27,7 @@ class Pit(BaseModel):
     state = Column(Enum(State), default=State.init, index=True)
     track = Column(ARRAY(String), default=list)
     start_at = Column(DateTime)
+    finish_at = Column(DateTime)
     due = Column(DateTime)
     timestamp = Column(DateTime)
 

@@ -1,11 +1,10 @@
-import json
 import re
 from abc import ABC, abstractmethod
 
-from flask import g, request
+from flask import g
 
 
-class BaseError(BaseException, ABC):
+class BaseError(Exception, ABC):
     http_code = 500
     code = ''
 

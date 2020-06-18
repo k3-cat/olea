@@ -11,8 +11,7 @@ toml = "^0.10.1"
 flask = "^1.1.2"
 flask-json = "^0.3.4"
 flask-sqlalchemy = "^2.4.1"
-flask-alembic = "^2.0.1"
-flask-apscheduler = "^1.11.0"
+flask-migrate = "^2.5.3"
 flask-redis = "^0.4.0"
 psycopg2 = "^2.8.5"
 passlib = {extras = ["argon2"], version = "^1.7.2"}
@@ -29,10 +28,12 @@ yapf = "^0.30.0"
 pylint = "^2.5.2"
 pytest = "^5.4.1"
 pre-commit = "^2.3.0"
+mypy = "^0.780"
 
 [tool.isort]
+force_to_top = "false"
 line_length = 100
-known_third_party = ["IP2Location", "bs4", "cryptography", "flask", "flask_apscheduler", "flask_json", "flask_jsonform", "flask_redis", "flask_sqlalchemy", "id_tool", "jsonform", "mailgun", "msal", "onedrive", "passlib", "pypat", "requests", "sentry_sdk", "sqlalchemy", "sqlalchemy_", "toml", "werkzeug"]
+known_third_party = ["IP2Location", "alembic", "bs4", "cryptography", "flask", "flask_json", "flask_jsonform", "flask_redis", "flask_sqlalchemy", "ip2loc", "jsonform", "mailgun", "msal", "onedrive", "passlib", "pypat", "requests", "sentry_sdk", "singleton", "sqlalchemy", "sqlalchemy_", "toml", "werkzeug"]
 
 [tool.pylint.messages_control]
 disable = """,

@@ -1,21 +1,25 @@
-import datetime
-
 from flask import current_app, g, request
 
 from models import Lemon, Pink
 from olea import email_mgr
 from olea.base import BaseMgr
-from olea.errors import (AccountDeactivated, DuplicatedRecord, InvalidCredential,
-                         InvalidRefreshToken, RecordNotFound)
-from olea.exts import db, redis
+from olea.errors import AccountDeactivated, InvalidCredential, InvalidRefreshToken, RecordNotFound
+from olea.singleton import db, ip2loc, redis
 from olea.utils import random_b85
 
-from .ip import ip2city
-from .pwd_tools import check_pwd, generate_pwd
+from .pwd_tools import check_pwd
+
+
+def verify_email(email):
+    token = random_b85(k=20)
+    # TODO: load timeout from config
+    redis.set(f've-{token}', email, ex=3600)
 
 
 class PinkMgr(BaseMgr):
     module = Pink
+
+    t_life = current_app.config['PWD_RESET_TOKEN_LIFE'].seconds
 
     def __init__(self, obj_or_id):
         self.o: self.model = None
@@ -23,7 +27,7 @@ class PinkMgr(BaseMgr):
 
     @classmethod
     def forget_pwd(cls, name, email):
-        pink = cls.query.filter_by(name=name).first()
+        pink = cls.model.query.filter_by(name=name).first()
         if pink and pink.email != email:
             return
         token = random_b85(k=20)
@@ -40,7 +44,9 @@ class PinkMgr(BaseMgr):
     def set_pwd(self, pwd):
         check_pwd(pwd)
         self.o.pwd = pwd
-        return True
+
+    def all_lemons(self):
+        return self.o.lemons
 
 
 class LemonMgr(BaseMgr):
@@ -84,12 +90,14 @@ class LemonMgr(BaseMgr):
         if self.o.key != key or self.o.device_id != device_id:
             raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.key)
         if self.o.ip != request.remote_addr \
-            and ip2city(self.o.ip) != ip2city(request.remote_addr):
+            and ip2loc.get_city(self.o.ip) != ip2loc.get_city(request.remote_addr):
             raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.ip)
         if self.o.exp < g.now:
             self.revoke()
             raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.exp, at=self.o.exp)
-        if (last := redis.hget('lass_access', g.pink_id)) and g.now.timestamp() - last > 86400:
+
+        last = redis.hget('lass_access', g.pink_id)
+        if last and g.now.timestamp() - last > 86400:
             self.o.exp = g.now + self.r_life
             db.session.add(self.o)
         redis.hset('last_access', g.pink_id, g.now.timestamp())

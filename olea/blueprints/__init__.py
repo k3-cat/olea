@@ -1,5 +1,4 @@
 def register_blueprints(app):
-    '''Register Flask blueprints.'''
     from werkzeug.utils import find_modules, import_string
 
     for module_str in find_modules(__name__):

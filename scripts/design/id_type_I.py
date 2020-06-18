@@ -32,6 +32,5 @@ if __name__ == '__main__':
 
     from id_tool import IdTool
 
-    id_tool = IdTool(alphabet='0123456789aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ_-()!',
-                     factor=11)
+    id_tool = IdTool()
     test(id_tool)

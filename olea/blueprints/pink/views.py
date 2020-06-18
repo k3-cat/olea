@@ -1,28 +1,25 @@
 from flask import g, jsonify, request
 
-from olea.auth import login, opt_perm, perm
+from olea.auth import allow_anonymous, opt_perm, perm
 
 from . import bp
-from .forms import AlterDuck, AlterScopes, Create, Search, SearchDuck, UpdateInfo
+from .forms import AlterDuck, AlterScopes, AssignToken, Registration, Search, SearchDuck, UpdateInfo
 from .services import DuckMgr, PinkMgr, PinkQuery
 
 
 @bp.route('/<id_>', methods=['GET'])
+@opt_perm
 def single(id_):
     pink = PinkQuery.single(id_)
     return jsonify({})
 
 
 @bp.route('/', methods=['GET'])
+@opt_perm
 def search():
     form = Search(request.args)
     pinks = PinkQuery.search(deps=form.deps, name=form.name, qq=form.qq)
     return pinks
-
-
-@bp.route('/info', methods=['GET'])
-def info():
-    return jsonify(g.pink.to_dict(lv=2))
 
 
 @bp.route('/update-info', methods=['POST'])
@@ -32,16 +29,24 @@ def update_info():
     return 'True'
 
 
-@bp.route('/create', methods=['POST'])
+@bp.route('/assign_token', methods=['POST'])
 @perm
-def create():
-    form = Create()
+def assign_token():
+    form = AssignToken()
+    token = PinkMgr.assign_token(deps=form.deps)
+    return jsonify({'token': token})
+
+
+@bp.route('/registration', methods=['POST'])
+@allow_anonymous
+def registration():
+    form = Registration()
     pink = PinkMgr.create(
         name=form.name,
         qq=form.qq,
         other=form.other,
-        email=form.email,
-        deps=form.deps,
+        email_token=form.token_email,
+        deps_token=form.token_dep,
     )
     return jsonify({'id': pink.id})
 
@@ -55,7 +60,7 @@ def deactive(id_):
 
 @bp.route('/ducks/', methods=['GET'])
 @perm(node='auth.duck')
-def list_ducks(pink_id):
+def list_ducks():
     form = SearchDuck(request.args)
     ducks = PinkQuery.ducks(pink_id=form.pink_id,
                             node=form.node,
@@ -81,7 +86,7 @@ def alter_scopes(pink, node):
 @perm(node='auth.duck')
 def alter_ducks(id_):
     form = AlterDuck()
-    ducks, confilcts = PinkMgr(id_).alter_ducks(pink_id=id_, add=form.add, remove=form.remove)
+    ducks, confilcts = PinkMgr(id_).alter_ducks(add=form.add, remove=form.remove)
     res = {'ducks': {duck.id: {'node': duck.node, 'scope': duck.scopes} for duck in ducks}}
     if confilcts:
         res['conflicts'] = {

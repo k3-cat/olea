@@ -1,8 +1,9 @@
+import datetime
 import os
 import sys
 from pathlib import Path
 
-from flask import Flask
+from flask import Flask, g, request
 
 PATH = Path(__file__).parents[1] / 'site-packages'
 sys.path.append(str(PATH / 'jsonform'))
@@ -14,8 +15,6 @@ def create_app(env=os.getenv('FLASK_ENV', 'production')):
     from configs import load_config
     from .blueprints import register_blueprints
     from .errors import register_error_handlers
-    from .exts import init_extensions
-    from .hooks import hook_hooks
 
     print(f'\n- - - - - olea [{env}] - - - - -\n')
     app = Flask(__name__)
@@ -24,8 +23,33 @@ def create_app(env=os.getenv('FLASK_ENV', 'production')):
 
     # configure_logger(app)
     register_error_handlers(app)
+    hook_hooks(app)
     init_extensions(app)
     register_blueprints(app)
-    hook_hooks(app)
 
     return app
+
+
+def init_extensions(app):
+    from olea.auth import init_app as auth_init_app
+    from olea.singleton import db, fjson, redis, mailgun, onerive, ip2loc
+
+    auth_init_app(app)
+    db.init_app(app)
+    fjson.init_app(app)
+    ip2loc.init_app(app)
+    redis.init_app(app)
+    mailgun.init_app(app)
+    onerive.init_app(app)
+
+
+def hook_hooks(app):
+    from olea.utils import random_b85
+    from sentry_sdk import configure_scope
+
+    @app.before_request
+    def add_track():
+        g.now = datetime.datetime.utcnow()
+        g.ref = random_b85(k=20)
+        with configure_scope() as scope:
+            scope.set_tag('ref', g.ref)

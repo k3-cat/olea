@@ -1,7 +1,7 @@
 from jsonform.conditions import BaseCondition
 from jsonform.errors import FieldError
 
-from olea.exts import mailgun
+from olea.singleton import mailgun
 
 
 class Email(BaseCondition):

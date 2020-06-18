@@ -1,15 +1,15 @@
 from .auth_fail import (AccessDenied, AccountDeactivated, InvalidCredential, InvalidRefreshToken,
                         PermissionDenied)
 from .bad_opt import (DoesNotMeetRequirements, InvalidSource, NotQualifiedToPick, ProjMetaLocked,
-                      RoleIsTaken, StateLocked, UnallowedType)
+                      RoleIsTaken, StateLocked, UnallowedType, WeekPwd)
 from .base_error import BaseError
 from .data_conflict import DuplicatedRecord, FileExist, FileVerConflict, RecordNotFound
 
 __all__ = [
     'AccessDenied', 'AccountDeactivated', 'BaseError', 'DoesNotMeetRequirements',
     'DuplicatedRecord', 'FileExist', 'FileVerConflict', 'InvalidCredential', 'InvalidRefreshToken',
-    'InvalidSource', 'NotQualifiedToPick', 'PermissionDenied', 'RecordNotFound', 'RoleIsTaken',
-    'RolesLocked', 'StateLocked', 'UnallowedType'
+    'InvalidSource', 'NotQualifiedToPick', 'PermissionDenied', 'ProjMetaLocked', 'RecordNotFound',
+    'RoleIsTaken', 'StateLocked', 'UnallowedType', 'WeekPwd', 'register_error_handlers'
 ]
 
 
@@ -17,7 +17,7 @@ def register_error_handlers(app):
     from flask_json import json_response
 
     # - - - - - - - - - - - - - - - - - - - - - - -
-    @app.register_error_handler(BaseError)
+    @app.errorhandler(BaseError)
     def handle_olea_exceptions(e: BaseError):
         return json_response(status_=e.http_code, data_=e)
 

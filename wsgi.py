@@ -1,3 +1,3 @@
-from olea import create_app
+from olea_m import create_manager
 
-application = create_app()
+application = create_manager()

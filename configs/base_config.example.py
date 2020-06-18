@@ -16,32 +16,26 @@ class Config():
     IPDB_PATH = DATA_FOLDER / 'ipdb.bin'
     PWDDB_PATH = DATA_FOLDER / 'pwddb'
 
+    # --- due ---------------------------------------
+    PORJ_PRE_DUE = timedelta(days=3)
+    AU_DUE = timedelta(days=7)
+    PS_DUE = timedelta(days=7)
+    AE_DUE = timedelta(days=14)
+
     # --- exp ---------------------------------------
     WEB_EXP = timedelta(minutes=30)
     IP_RECORD_EXP = timedelta(days=60)
 
     # --- token life --------------------------------
+    EMAIL_VERIFICATION_LIFE = timedelta(hours=1)
     ACCESS_TOKEN_LIFE = timedelta(minutes=10)
     REFRESH_TOKEN_LIFE = timedelta(days=90)
-    RESET_PWD_TOKEN_LIFE = timedelta(minutes=30)
-
-    # --- argon2 ------------------------------------
-    ARGON2_TIME_COST = 0
-    ARGON2_MEMORY_COST = 0
-    ARGON2_PARALLELISM = 0
+    PWD_RESET_TOKEN_LIFE = timedelta(minutes=30)
 
     # --- sqlalchemy --------------------------------
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DB_NAME = 'local'
     SQLALCHEMY_DATABASE_URI = UrlMgr.db_url(DB_NAME)
-
-    # --- alembic -----------------------------------
-    ALEMBIC = {
-        'script_location': PROJ_ROOT / 'migrations',
-        'file_template': '%%(rev)s',
-        'timezone': 'UTC'
-    }
-    ALEMBIC_CONTEXT = {'url': SQLALCHEMY_DATABASE_URI}
 
     # --- redis -------------------------------------
     REDIS_NAME = 'local'
@@ -62,5 +56,4 @@ class Config():
     ONEDRIVE_ROOT_FOLDER = ''
 
     # --- ip2loc ------------------------------------
-    IP2LOC_API_KEY = '< - secret - >'
     IP2LOC_DOWNLOAD_TOKEN = '< - secret - >'

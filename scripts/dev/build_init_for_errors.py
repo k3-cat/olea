@@ -34,7 +34,7 @@ def build_import_statement(module):
         imports.append(
             f'from {module_name.replace(module, "")} import {", ".join(all_in_module)}\n')
     all_list.sort()
-
+    all_list.append('register_error_handlers')
     return (imports, all_list)
 
 

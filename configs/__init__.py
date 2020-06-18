@@ -1,4 +1,7 @@
-def load_config(env):
+import os
+
+
+def load_config(env=os.getenv('FLASK_ENV', 'production')):
     from werkzeug.utils import import_string
 
     if env == 'production':

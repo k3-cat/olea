@@ -1,10 +1,11 @@
 from flask import g, jsonify, request
 
-from olea.auth import login, opt_perm, perm
+from olea.auth import opt_perm, perm
 
 from . import bp
 from .forms import Create, Finish, FullCreate, ModifyRoles, Pick, Search
-from .services import ProjMgr, ProjQuery, RoleMgr
+from .query import ProjQuery
+from .services import ProjMgr, RoleMgr
 
 
 @bp.route('/<id_>', methods=['GET'])
@@ -41,20 +42,12 @@ def full_create():
 def modify_roles(id_: str):
     form = ModifyRoles()
     roles = ProjMgr(id_).modify_roles(add=form.add, remove=form.remove)
-    return jsonify({role.id: role.name for role in roles})
-
-
-@bp.route('/<id_>/f-modify-roles', methods=['POST'])
-@perm
-def force_modify_roles(id_: str):
-    form = ModifyRoles()
-    roles = ProjMgr(id_).force_modify_roles(add=form.add, remove=form.remove)
-    return jsonify({role.id: role.name for role in roles})
+    return jsonify({role.id: {'name': role.name, 'dep': role.dep.name} for role in roles})
 
 
 @bp.route('/<id_>/start', methods=['POST'])
 def start(id_):
-    ProjMgr.start()
+    ProjMgr(id_).start()
     return jsonify()
 
 
@@ -76,5 +69,5 @@ def pick(role_id):
 @perm
 def full_pick(role_id):
     form = Pick()
-    pit = RoleMgr(role_id).full_pick(pink=form.pink_id)
+    pit = RoleMgr(role_id).full_pick(pink_id=form.pink_id)
     return jsonify({'id': pit.id})

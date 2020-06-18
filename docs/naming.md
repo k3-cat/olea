@@ -17,4 +17,3 @@
 | ----- | --------------- |
 | dep   | department      |
 | dep\_ | department name |
-| exts  | extensions      |

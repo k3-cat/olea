@@ -1,20 +1,18 @@
-from flask import current_app
+from flask import current_app, g
 
-from models import Duck, Lemon, Pink
+from models import Duck, Pink
 from olea import email_mgr
 from olea.auth import authorization
 from olea.base import BaseMgr, single_query
-from olea.errors import AccessDenied, DuplicatedRecord, InvalidCredential
-from olea.exts import db, redis
+from olea.errors import RecordNotFound
+from olea.singleton import db, redis
 from olea.utils import random_b85
-
-from ..auth.pwd_tools import generate_pwd
 
 
 class PinkQuery():
     @staticmethod
     def single(id_):
-        return single_query(id_)
+        return single_query(model=Pink, id_or_obj=id_, condiction=lambda obj: obj.id == g.pink_id)
 
     @staticmethod
     def search(deps, name, qq):
@@ -44,36 +42,42 @@ class PinkQuery():
 class PinkMgr(BaseMgr):
     model = Pink
 
-    t_life = current_app.config['PWD_RESET_TOKEN_LIFE'].seconds
-
     def __init__(self, obj_or_id):
         self.o: self.model = None
         super().__init__(obj_or_id)
 
+    @staticmethod
+    def assign_token(deps):
+        g.check_scope(deps)
+        # TODO: set time out
+        token = random_b85(k=20)
+        redis.set(f'deps-{token}', ','.join(deps), ex=86400 * 3)
+        return token
+
     @classmethod
-    def create(cls, name: str, qq: int, other: str, email: str, deps: list):
-        pwd = generate_pwd()
-        pink = cls.model(
-            id=cls.gen_id(),
-            name=name,
-            qq=str(qq),
-            other=other,
-            email=email,
-            deps=deps,
-        )
+    def create(cls, name: str, qq: int, other: str,pwd, email_token: str, deps_token: list):
+        pink = cls.model(id=cls.gen_id(), name=name, qq=str(qq), other=other)
         pink.pwd = pwd
+        if not (deps_s := redis.get(f'deps-{deps_token}')):
+            # TODO: add new error type
+            raise Exception()
+        pink.deps = deps_s.split(',')
+        PinkMgr(pink).set_email(email_token)
         db.session.add(pink)
-        email_mgr.new_pink(email=pink.email, name=pink.name, pwd=pwd)
+        email_mgr.new_pink(email=pink.email, name=pink.name)
         return pink
 
-    def update_info(self, qq: int, line: str, email: str):
+    def update_info(self, qq: int, other: str):
         if qq:
             self.o.qq = str(qq)
-        if line:
-            self.o.line = line
-        if email:
-            self.o.email = email
-        return True
+        if other:
+            self.o.other = other
+
+    def set_email(self, token):
+        if not (email := redis.get(f've-{token}')):
+            # TODO: add new error type
+            raise Exception
+        self.o.email = email
 
     def deactive(self):
         self.o.active = False
@@ -98,14 +102,16 @@ class PinkMgr(BaseMgr):
 class DuckMgr(BaseMgr):
     modle = Duck
 
-    def __init__(self, obj_or_id):
+    def __init__(self, /, pink_id, node):
         self.o: self.model = None
-        super().__init__(obj_or_id)
+        if not (obj := self.model.query.get((pink_id, node))):
+                raise RecordNotFound(cls=self.model, id=(','.join((pink_id, node))))
+        self.o = obj
 
     def alter_scopes(self, scopes: set):
         self.o.scopes = list(scopes)
         db.session.add(self.o)
-        authorization.clean_cache()
+        authorization.clean_cache(self.o.pink_id)
         return scopes
 
     def add_scopes(self, scopes):

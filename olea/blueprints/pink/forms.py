@@ -1,3 +1,5 @@
+import enum
+
 from flask_jsonform import BaseForm, FieldError, FormError, JsonForm
 from jsonform.conditions import InRange
 from jsonform.fields import (BooleanField, DictField, EnumField, IntegerField, ListField, SetField,
@@ -5,8 +7,11 @@ from jsonform.fields import (BooleanField, DictField, EnumField, IntegerField, L
 
 from models import Dep
 
-from .custom_conditions import Email
 from .text_tools import measure_width
+
+
+class SetEmail(BaseForm):
+    token = StringField()
 
 
 class Search(BaseForm):
@@ -18,19 +23,22 @@ class Search(BaseForm):
 class UpdateInfo(BaseForm):
     qq = IntegerField(optional=True, condition=InRange(min_val=100_000_000, max_val=10_000_000_000))
     other = ListField(StringField(), optional=True)
-    email = StringField(optional=True, condition=Email())
 
     def check(self):
         if self.test_empty('qq') and self.test_empty('other'):
             raise FormError('must provide at least one contact method')
 
 
-class Create(BaseForm):
+class AssignToken(BaseForm):
+    deps = SetField(EnumField(Dep))
+
+
+class Registration(BaseForm):
     name = StringField()
     qq = IntegerField(optional=True, condition=InRange(min_val=100_000_000, max_val=10_000_000_000))
     other = ListField(StringField(), optional=True)
-    email = StringField(condition=Email())
-    deps = ListField(EnumField(Dep))
+    token_dep = StringField()
+    token_email = StringField()
 
     def check_name(self, field):
         if measure_width(field.data) > 16:
@@ -43,7 +51,7 @@ class Create(BaseForm):
 
 class SearchDuck():
     pink_id = StringField(optional=True)
-    node = StringField(optional=True)
+    nodes = SetField(StringField(), optional=True)
     scopes = SetField(StringField(), optional=True)
     allow = BooleanField(optional=True)
 
@@ -65,7 +73,7 @@ class AlterDuck(BaseForm):
 
 
 class AlterScopes(BaseForm):
-    class Method(enum.Emun):
+    class Method(enum.Enum):
         diff = 'merge diffferences'
         full = 'overwrite full set'
 

@@ -2,7 +2,6 @@ import pickle
 import random
 import string
 from math import log2
-from pathlib import Path
 from typing import Set
 
 from flask import current_app
@@ -12,10 +11,6 @@ from olea.errors import WeekPwd
 PWD_CHARS = string.digits + string.ascii_letters + string.punctuation
 with current_app.config['PWDDB_PATH'].open('rb') as f:
     COMMON_PWD: Set[str] = pickle.load(f)
-
-
-def generate_pwd() -> str:
-    return ''.join(random.choices(PWD_CHARS, k=20))
 
 
 def is_common_pwd(pwd: str) -> bool:

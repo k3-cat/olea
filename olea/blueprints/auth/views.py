@@ -1,10 +1,10 @@
 from flask import g, jsonify
 
-from olea.auth import allow_anonymous, perm
+from olea.auth import allow_anonymous
 
 from . import bp
-from .forms import AlterDuck, AlterScopes, ForgetPwd, Login, Refresh, ResetPwd, SetPwd
-from .services import LemonMgr, PinkMgr
+from .forms import ForgetPwd, Login, Refresh, ResetPwd, SetPwd, VEmail
+from .services import LemonMgr, PinkMgr, verify_email
 
 
 @bp.route('/login', methods=['POST'])
@@ -38,12 +38,26 @@ def reset_pwd():
     return jsonify({})
 
 
+@bp.route('/email-verification', methods=['POST'])
+@allow_anonymous
+def email_verification():
+    form = VEmail()
+    verify_email(email=form.email)
+    return jsonify({})
+
+
 @bp.route('/refresh', methods=['POST'])
 @allow_anonymous
 def refresh():
     form = Refresh()
     token, exp = LemonMgr(form.id).grante_access_token(key=form.key, device_id=form.device_id)
     return jsonify({'token': token, 'exp': exp})
+
+
+@bp.route('/lemons/', methods=['GET'])
+def lemons():
+    lemons = PinkMgr(g.pink_id).all_lemons()
+    return jsonify()
 
 
 @bp.route('/<id_>/revoke-lemon', methods=['POST'])

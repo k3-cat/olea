@@ -52,7 +52,7 @@ class NotQualifiedToPick(BadOpt):
 
 
 class WeekPwd(BadOpt):
-    code = ''
+    code = 'cdef'
 
     class Rsn(enum.Enum):
         common = 'common pwd'

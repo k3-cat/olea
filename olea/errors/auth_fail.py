@@ -16,11 +16,11 @@ class AuthFail(BaseError, ABC):
 class AccessDenied(AuthFail):
     code = 'UJCB'
 
-    def __init__(self, obj: object, cls: object):
+    def __init__(self, obj=None, cls_=None):
         if obj:
             super().__init__(cls=obj.__class__.__name__, id=obj.id)
         else:
-            super().__init__(cls=cls.__name__)
+            super().__init__(cls=cls_.__name__)
 
 
 class PermissionDenied(AuthFail):
@@ -36,6 +36,9 @@ class PermissionDenied(AuthFail):
 class AccountDeactivated(AuthFail):
     code = 'ssss'
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
 
 class InvalidCredential(AuthFail):
     code = '516O'
@@ -45,8 +48,8 @@ class InvalidCredential(AuthFail):
         acc = 'access token'
         rst = 'reset token'
 
-    def __init__(self, type: 'InvalidCredential.T'):
-        super().__init__(type=type)
+    def __init__(self, type_: 'InvalidCredential.T'):
+        super().__init__(type=type_)
 
 
 class InvalidRefreshToken(AuthFail):

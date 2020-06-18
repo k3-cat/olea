@@ -1,5 +1,10 @@
 import random
-from base64 import _b85alphabet, b85encode
+
+# from base64 import _b85alphabet
+_b85alphabet = ('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+                'abcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~')
+
+__all__ = ['random_b85']
 
 
 def random_b85(k):

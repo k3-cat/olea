@@ -6,7 +6,7 @@ from flask import current_app
 
 from models import Proj
 from olea.errors import InvalidSource
-from olea.exts import redis
+from olea.singleton import redis
 
 CN_SITE_URL = 'http://scp-wiki-cn.wikidot.com'
 WEB_EXP = current_app.config['WEB_EXP']
@@ -62,7 +62,8 @@ def fetch_title(base, type_):
     if type_ == Proj.Type.doc:
         base = re.match(r'^(?:scp-)?(.*)$', base.lower()).group(1)
         source = f'/scp-{base}'
-        title = f"SCP-{base.upper()}{re.match('^<li><a.*/a>(.*)</li>$', fetch_title_by_id(base)).group(1)}"
+        title = (f'SCP-{base.upper()}'
+                 f"{re.match(r'^<li><a.*/a>(.*)</li>$', fetch_title_by_id(base)).group(1)}")
     elif type_ == Proj.Type.sub:
         if base[0] != '/':
             base = f'/{base}'
@@ -82,8 +83,7 @@ def count_chars(source, type_):
         web = fetch_web(source)
         page_content = web.find('div', {'id': 'page-content'})
 
-        # TODO: fix text
-        text = page_content.text.lower().replace('aaaa', 'x')
+        text = page_content.text.lower().replace('\u2588', 'x')
         text = re.sub(r'x  (x  )*x', 'xx', re.sub(r'[0-9a-z-]', ' x ', text))
         text = re.sub(r'(?![\u4e00-\u9fa5]|[0-9a-z-]).', ' ', text)
         str_list = re.sub(r'\s+', ' ', text).split()

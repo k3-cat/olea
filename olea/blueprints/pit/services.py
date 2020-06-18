@@ -1,69 +1,17 @@
 import datetime
-from functools import wraps
 
 from flask import g
 
-from models import Dep, Mango, Pit, Proj, Role
-from olea.base import BaseMgr, single_query
-from olea.errors import (AccessDenied, DoesNotMeetRequirements, FileExist, FileVerConflict,
-                         RecordNotFound, StateLocked)
-from olea.exts import db, onerive, redis
-from olea.singleton import pat
+from models import Mango, Pit, Proj, Role
+from olea.base import BaseMgr
+from olea.dep_graph import DepGraph
+from olea.errors import AccessDenied, DoesNotMeetRequirements, FileExist, FileVerConflict
+from olea.singleton import db, onerive, pat, redis
 
 from .quality_control import CheckFailed, check_file_meta
+from .utils import check_owner, check_state
 
-
-class PitQuery():
-    @staticmethod
-    def single(id_):
-        return single_query(model=Pit,
-                            id_or_obj=id_,
-                            condiction=lambda obj: obj.pink_id == g.pink_id)
-
-    SEARCH_ALL = {Pit.State.working, Pit.State.past_due, Pit.State.delayed, Pit.State.auditing}
-    MY = {
-        Pit.State.init, Pit.State.working, Pit.State.past_due, Pit.State.auditing,
-        Pit.State.delayed, Pit.State.droped
-    }
-    ALL_DEP = {Dep.ae, Dep.au, Dep.ps}
-
-    @classmethod
-    def check_list(cls, deps):
-        deps = deps & cls.ALL_DEP if deps else cls.ALL_DEP
-        if not g.check_scope(scope=deps):
-            raise AccessDenied(cls=Pit)
-
-        pits = Pit.query.join(Role) \
-            .filter(Pit.state == Pit.State.auditing) \
-            .filter(Role.dep.in_(deps)).all()
-
-        return pits
-
-    @classmethod
-    def my(cls, deps, states):
-        deps = deps & cls.ALL_DEP if deps else cls.ALL_DEP
-
-        pits = Pit.query.join(Role) \
-            .filter(Pit.state.in_(states & cls.MY)) \
-            .filter(Pit.pink_id == g.pink_id) \
-            .filter(Role.dep.in_(deps)).all()
-
-        return pits
-
-    @classmethod
-    def search_all(cls, deps, states, pink_id=''):
-        deps = deps & cls.ALL_DEP if deps else cls.ALL_DEP
-
-        if not g.check_scope(scope=deps):
-            raise AccessDenied(cls=Pit)
-
-        query = Pit.query.join(Role) \
-            .filter(Pit.state.in_(states & cls.SEARCH_ALL))
-        if pink_id:
-            query = query.filter(Pit.pink_id == pink_id)
-        pits = query.filter(Role.dep.in_(deps)).all()
-
-        return pits
+dep_graph = DepGraph()
 
 
 class RoleMgr(BaseMgr):
@@ -76,38 +24,9 @@ class RoleMgr(BaseMgr):
 class PitMgr(BaseMgr):
     model = Pit
 
-    ALLOWED_DEPS = {
-        Dep.ps: {Dep.ae},
-        Dep.au: {Dep.ae},
-    }
-
     def __init__(self, obj_or_id):
         self.o: self.model = None
         super().__init__(obj_or_id)
-
-    def check_owner(self):
-        def decorate(f):
-            @wraps(f)
-            def wrapper(*args, **kwargs):
-                if self.o.pink_id != g.pink_id:
-                    raise AccessDenied(obj=self.o)
-                return f(*args, **kwargs)
-
-            return wrapper
-
-        return decorate
-
-    def check_state(self, required: Tuple[Pit.State]):
-        def decorate(f):
-            @wraps(f)
-            def wrapper(*args, **kwargs):
-                if self.o.state not in required:
-                    raise StateLocked(current=self.o.state, required=required)
-                return f(*args, **kwargs)
-
-            return wrapper
-
-        return decorate
 
     @check_owner
     @check_state({Pit.State.working, Pit.State.init})
@@ -134,7 +53,10 @@ class PitMgr(BaseMgr):
     @classmethod
     def force_submit(cls, token):
         head, payload = pat.decode_with_head(token)
-        pit = cls.query.get(head['p'])
+        pit = cls.model.query.get(head['p'])
+
+        if g.now > pit.due or pit.state == Pit.State.past_due:
+            redis.set(f'pstate-{pit.id}', 'past-due')
         pit.state = Pit.State.auditing
         pit.add_track(info=Pit.Trace.submit_f,
                       now=datetime.datetime.fromtimestamp(payload['t']),
@@ -142,10 +64,22 @@ class PitMgr(BaseMgr):
         mango = MangoMgr.f_create(pit, share_id=payload['share_id'], sha1=payload['sha1'])
         return mango
 
+    def _resume_state(self):
+        state = redis.get(f'pstate-{self.o.id}')
+        if not state:
+            self.o.state = Pit.State.working
+        if state == 'delayed':
+            self.o.state = Pit.State.delayed
+        elif state == 'past-due':
+            self.o.state = Pit.State.past_due
+
+        else:
+            raise Exception('BAD RECORD')
+
     @check_owner
     @check_state({Pit.State.auditing})
     def redo(self):
-        self.o.state = Pit.State.working if self.o.not_past_due() else Pit.State.past_due
+        self._resume_state()
         self.o.add_track(info=Pit.Trace.redo, now=g.now)
 
     def _download(self):
@@ -167,7 +101,7 @@ class PitMgr(BaseMgr):
             .filter(Pit.state.in_({Pit.State.pending, Pit.State.working, Pit.State.auditing})) \
             .filter(Role.proj_id == self.o.role.proj_id) \
             .all()
-        if not self.ALLOWED_DEPS[self.o.role.dep] & {role.dep for role in roles}:
+        if not dep_graph.is_depend_on(own={role.dep for role in roles}, target=self.o.role.dep):
             raise AccessDenied(obj=self.o.mango)
         return self._download()
 
@@ -177,45 +111,32 @@ class PitMgr(BaseMgr):
 
     @check_state({Pit.State.auditing})
     def check_pass(self):
-        self.o.add_track(info=Pit.Trace.check_pass, now=g.now, by=g.pink_id)
-
         state = redis.get(f'pstate-{self.o.id}')
         if not state or state != 'past-due':
             self.o.state = Pit.State.fin
         else:
             self.o.state = Pit.State.fin_p
+        redis.delete(f'pstate-{self.o.id}')
 
-        ProjMgr(self.o.role.pink_id).check_ready_to_upload()
+        self.o.finish_at = g.now
+        self.o.add_track(info=Pit.Trace.check_pass, now=g.now, by=g.pink_id)
+
+        ProjMgr(self.o.role.pink_id).post_works()
 
     @check_state({Pit.State.auditing})
     def check_fail(self):
+        if 0 < (self.o.due - g.now).days < 3:
+            redis.set(f'pstate-{self.o.id}', 'delayed')
+            # sequence of the following two statements MUST NOT BE CHANGED
+            self.o.add_track(info=Pit.Trace.extend, now=g.now)
+            self.o.due = g.now + datetime.timedelta(days=3)
+        self._resume_state()
         self.o.add_track(info=Pit.Trace.check_fail, now=g.now, by=g.pink_id)
 
-        state = redis.get(f'pstate-{self.o.id}')
-        if not state or state == 'delayed':
-            if (self.o.due - g.now).days < 3:
-                state = 'delayed'
-                redis.set(f'pstate-{self.o.id}', 'delayed')
-                self.o.add_track(info=Pit.Trace.extend, now=g.now)
-                self.o.due = g.now + datetime.timedelta(days=3)
-
-            if state == 'delayed':
-                self.o.state = Pit.State.delayed
-            else:
-                self.o.state = Pit.State.working
-
-        elif state == 'past-due':
-            self.o.state = Pit.State.past_due
-
-        else:
-            raise Exception('BAD RECORD')
-
     def past_due(self):
-        # check_state(self.o.state, (Pit.State.working, ))
-        self.o.state = Pit.State.past_due
         redis.set(f'pstate-{self.o.id}', 'past-due')
+        self.o.state = Pit.State.past_due
         self.o.add_track(info=Pit.Trace.past_due, now=g.now, by=g.pink_id)
-        return True
 
 
 class ProjMgr(BaseMgr):
@@ -225,13 +146,39 @@ class ProjMgr(BaseMgr):
         self.o: self.model = None
         super().__init__(obj_or_id)
 
-    def check_ready_to_upload(self):
-        roles = self.o.roles.count()
-        finished = Role.query.join(Pit) \
+    def post_works(self, pit_):
+        extended = pit_.finish_at - pit_.start_at - dep_graph.DURATION[pit_.role.dep]
+
+        pits_count = Pit.query.join(Role) \
+            .filter(Role.dep == pit_.role.dep) \
             .filter(Role.proj_id == self.o.id) \
-            .filter(Pit.state == Pit.State.fin) \
+            .filter(~Pit.state.in_({Pit.State.fin, Pit.State.fin_p})) \
             .count()
-        if roles == finished:
+        if pits_count > 0:
+            return
+
+        # alter start and due
+        dependents = dep_graph.get_all_dependents(dep=pit_.role.dep)
+        direct_dependents = dep_graph.I_RULE[pit_.role.dep]
+        pits = Pit.query.join(Role) \
+            .filter(Role.dep.in_(dependents)) \
+            .filter(Role.proj_id == self.o.id) \
+            .all()
+        for pit_ in pits:
+            # finished before 1 day prior to due
+            if extended.seconds < -86400:
+                pit_.start_at -= extended
+                pit_.due -= extended
+            # pit is extended
+            else:
+                pit_.due += extended
+
+            if pit_.role.dep in direct_dependents:
+                pit_.state = Pit.State.working
+
+        # check if proj can upload
+        # no `pits`, means no further pits to fill + all pits in current dep are done
+        if not pits:
             self._upload()
 
     def _upload(self):
@@ -256,7 +203,6 @@ class MangoMgr(BaseMgr):
                                payload={
                                    'id': share_id,
                                    'sha1': i['sha1'],
-                                   'state': pit.state,
                                    'confl': e.confl
                                },
                                head={
@@ -277,7 +223,7 @@ class MangoMgr(BaseMgr):
 
     @classmethod
     def _create(cls, pit, i):
-        if mango := cls.query.filter_by(sha1=i['sha1']):
+        if mango := cls.model.query.filter_by(sha1=i['sha1']):
             raise FileExist(pit=mango.pit)
 
         if last := pit.mango:
