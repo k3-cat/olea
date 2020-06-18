@@ -6,7 +6,7 @@ from models import Mango, Pit, Proj, Role
 from olea.base import BaseMgr
 from olea.dep_graph import DepGraph
 from olea.errors import AccessDenied, DoesNotMeetRequirements, FileExist, FileVerConflict
-from olea.singleton import db, onerive, pat, redis
+from olea.singleton import db, onedrive, pat, redis
 
 from .quality_control import CheckFailed, check_file_meta
 from .utils import check_owner, check_state
@@ -61,7 +61,9 @@ class PitMgr(BaseMgr):
         pit.add_track(info=Pit.Trace.submit_f,
                       now=datetime.datetime.fromtimestamp(payload['t']),
                       by=g.pink_id)
-        mango = MangoMgr.f_create(pit, share_id=payload['share_id'], sha1=payload['sha1'])
+        mango = MangoMgr.f_create(pit,
+                                  share_id=payload['share_id'],
+                                  sha1=payload['sha1'])
         return mango
 
     def _resume_state(self):
@@ -83,11 +85,12 @@ class PitMgr(BaseMgr):
         self.o.add_track(info=Pit.Trace.redo, now=g.now)
 
     def _download(self):
-        return onerive.share(self.o.mango.id)
+        return onedrive.share(self.o.mango.id)
 
     @check_state({Pit.State.fin, Pit.State.fin_p})
     def download(self):
-        if self.o.pink_id == g.pink_id or g.check_opt_duck(scopes={self.o.role.dep}):
+        if self.o.pink_id == g.pink_id or g.check_opt_duck(
+                scopes={self.o.role.dep}):
             return self._download()
         '''
         sub_query = db.session.query(Pit.role_id) \
@@ -101,7 +104,9 @@ class PitMgr(BaseMgr):
             .filter(Pit.state.in_({Pit.State.pending, Pit.State.working, Pit.State.auditing})) \
             .filter(Role.proj_id == self.o.role.proj_id) \
             .all()
-        if not dep_graph.is_depend_on(own={role.dep for role in roles}, target=self.o.role.dep):
+        if not dep_graph.is_depend_on(own={role.dep
+                                           for role in roles},
+                                      target=self.o.role.dep):
             raise AccessDenied(obj=self.o.mango)
         return self._download()
 
@@ -146,11 +151,12 @@ class ProjMgr(BaseMgr):
         self.o: self.model = None
         super().__init__(obj_or_id)
 
-    def post_works(self, pit_):
-        extended = pit_.finish_at - pit_.start_at - dep_graph.DURATION[pit_.role.dep]
+    def post_works(self, pit):
+        extended = pit.finish_at - pit.start_at - dep_graph.DURATION[
+            pit.role.dep]
 
         pits_count = Pit.query.join(Role) \
-            .filter(Role.dep == pit_.role.dep) \
+            .filter(Role.dep == pit.role.dep) \
             .filter(Role.proj_id == self.o.id) \
             .filter(~Pit.state.in_({Pit.State.fin, Pit.State.fin_p})) \
             .count()
@@ -158,13 +164,14 @@ class ProjMgr(BaseMgr):
             return
 
         # alter start and due
-        dependents = dep_graph.get_all_dependents(dep=pit_.role.dep)
-        direct_dependents = dep_graph.I_RULE[pit_.role.dep]
+        direct_dependents = dep_graph.I_RULE[pit.role.dep]
         pits = Pit.query.join(Role) \
-            .filter(Role.dep.in_(dependents)) \
+            .filter(Role.dep.in_(direct_dependents)) \
             .filter(Role.proj_id == self.o.id) \
             .all()
         for pit_ in pits:
+            pit_.state = Pit.State.working
+
             # finished before 1 day prior to due
             if extended.seconds < -86400:
                 pit_.start_at -= extended
@@ -172,9 +179,6 @@ class ProjMgr(BaseMgr):
             # pit is extended
             else:
                 pit_.due += extended
-
-            if pit_.role.dep in direct_dependents:
-                pit_.state = Pit.State.working
 
         # check if proj can upload
         # no `pits`, means no further pits to fill + all pits in current dep are done
@@ -195,7 +199,7 @@ class MangoMgr(BaseMgr):
 
     @staticmethod
     def create(pit, share_id):
-        i = onerive.get_shared_item_info(share_id=share_id)
+        i = onedrive.get_shared_item_info(share_id=share_id)
         try:
             check_file_meta(pit.role.dep, i)
         except CheckFailed as e:
@@ -209,13 +213,15 @@ class MangoMgr(BaseMgr):
                                    'p': pit.id,
                                    't': g.now.timestamp()
                                })
-            raise DoesNotMeetRequirements(confl=e.confl, required=e.required, token=token)
+            raise DoesNotMeetRequirements(confl=e.confl,
+                                          required=e.required,
+                                          token=token)
 
         MangoMgr._create(pit, i)
 
     @staticmethod
     def f_create(pit, share_id, sha1):
-        i = onerive.get_shared_item_info(share_id=share_id)
+        i = onedrive.get_shared_item_info(share_id=share_id)
         if sha1 != i['sha1']:
             raise FileVerConflict(req_sha1=i['sha1'])
 
@@ -227,10 +233,11 @@ class MangoMgr(BaseMgr):
             raise FileExist(pit=mango.pit)
 
         if last := pit.mango:
-            onerive.delete(item_id=last.id)
-        ref = onerive.copy_from_share(drive_id=i['drive_id'],
-                                      item_id=i['id'],
-                                      name=f'{pit.id}.{i["name"].split(".")[-1]}')
+            onedrive.delete(item_id=last.id)
+        ref = onedrive.copy_from_share(
+            drive_id=i['drive_id'],
+            item_id=i['id'],
+            name=f'{pit.id}.{i["name"].split(".")[-1]}')
 
         mango = cls.model(id=ref,
                           pit_id=pit.id,

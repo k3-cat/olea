@@ -32,7 +32,7 @@ def create_app(env=os.getenv('FLASK_ENV', 'production')):
 
 def init_extensions(app):
     from olea.auth import init_app as auth_init_app
-    from olea.singleton import db, fjson, redis, mailgun, onerive, ip2loc
+    from olea.singleton import db, fjson, redis, mailgun, onedrive, ip2loc
 
     auth_init_app(app)
     db.init_app(app)
@@ -40,7 +40,7 @@ def init_extensions(app):
     ip2loc.init_app(app)
     redis.init_app(app)
     mailgun.init_app(app)
-    onerive.init_app(app)
+    onedrive.init_app(app)
 
 
 def hook_hooks(app):

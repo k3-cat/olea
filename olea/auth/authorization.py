@@ -1,4 +1,5 @@
 import re
+from functools import wraps
 
 from flask import g, request
 
@@ -41,7 +42,8 @@ def check_duck(default_pass, node):
 
 
 def check_scopes(default_pass, scopes):
-    raw_scope = redis.hget(f'duck{"T" if default_pass else "F"}-{g.pink_id}', g.node)
+    raw_scope = redis.hget(f'duck{"T" if default_pass else "F"}-{g.pink_id}',
+                           g.node)
     scope_set = set(raw_scope.split(';'))
     # when scope_set is empty, it means ANY SCOPE
     if (default_pass and (diff := scopes - scope_set)) or \

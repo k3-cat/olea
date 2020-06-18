@@ -4,7 +4,7 @@ from models import Duck, Pink
 from olea import email_mgr
 from olea.auth import authorization
 from olea.base import BaseMgr, single_query
-from olea.errors import RecordNotFound
+from olea.errors import InvalidCredential, RecordNotFound
 from olea.singleton import db, redis
 from olea.utils import random_b85
 
@@ -42,25 +42,26 @@ class PinkQuery():
 class PinkMgr(BaseMgr):
     model = Pink
 
+    t_life = current_app.config['DEPS_TOKEN_LIFE'].seconds
+
     def __init__(self, obj_or_id):
         self.o: self.model = None
         super().__init__(obj_or_id)
 
-    @staticmethod
-    def assign_token(deps):
+    @classmethod
+    def assign_token(cls, deps, amount):
         g.check_scope(deps)
-        # TODO: set time out
-        token = random_b85(k=20)
-        redis.set(f'deps-{token}', ','.join(deps), ex=86400 * 3)
-        return token
+        deps_s = ','.join(deps)
+        tokens = [random_b85(k=20) for __ in range(amount)]
+        redis.mset({f'deps-{token}':deps_s for token in tokens}, ex=cls.t_life)
+        return tokens
 
     @classmethod
     def create(cls, name: str, qq: int, other: str,pwd, email_token: str, deps_token: list):
         pink = cls.model(id=cls.gen_id(), name=name, qq=str(qq), other=other)
-        pink.pwd = pwd
         if not (deps_s := redis.get(f'deps-{deps_token}')):
-            # TODO: add new error type
-            raise Exception()
+            raise InvalidCredential(type_=InvalidCredential.T.deps)
+        pink.pwd = pwd
         pink.deps = deps_s.split(',')
         PinkMgr(pink).set_email(email_token)
         db.session.add(pink)
@@ -75,8 +76,7 @@ class PinkMgr(BaseMgr):
 
     def set_email(self, token):
         if not (email := redis.get(f've-{token}')):
-            # TODO: add new error type
-            raise Exception
+            raise InvalidCredential(type_=InvalidCredential.T.email)
         self.o.email = email
 
     def deactive(self):

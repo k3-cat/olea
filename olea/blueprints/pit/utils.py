@@ -1,3 +1,4 @@
+from functools import wraps
 from typing import Set
 
 from flask import g

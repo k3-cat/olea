@@ -21,7 +21,9 @@ class Search(BaseForm):
 
 
 class UpdateInfo(BaseForm):
-    qq = IntegerField(optional=True, condition=InRange(min_val=100_000_000, max_val=10_000_000_000))
+    qq = IntegerField(optional=True,
+                      condition=InRange(min_val=100_000_000,
+                                        max_val=10_000_000_000))
     other = ListField(StringField(), optional=True)
 
     def check(self):
@@ -31,11 +33,14 @@ class UpdateInfo(BaseForm):
 
 class AssignToken(BaseForm):
     deps = SetField(EnumField(Dep))
+    amount = IntegerField()
 
 
 class Registration(BaseForm):
     name = StringField()
-    qq = IntegerField(optional=True, condition=InRange(min_val=100_000_000, max_val=10_000_000_000))
+    qq = IntegerField(optional=True,
+                      condition=InRange(min_val=100_000_000,
+                                        max_val=10_000_000_000))
     other = ListField(StringField(), optional=True)
     token_dep = StringField()
     token_email = StringField()

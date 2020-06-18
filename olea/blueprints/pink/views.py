@@ -25,7 +25,9 @@ def search():
 @bp.route('/update-info', methods=['POST'])
 def update_info():
     form = UpdateInfo()
-    PinkMgr(g.pink_id).update_info(qq=form.qq, other=form.other, email=form.email)
+    PinkMgr(g.pink_id).update_info(qq=form.qq,
+                                   other=form.other,
+                                   email=form.email)
     return 'True'
 
 
@@ -33,7 +35,7 @@ def update_info():
 @perm
 def assign_token():
     form = AssignToken()
-    token = PinkMgr.assign_token(deps=form.deps)
+    token = PinkMgr.assign_token(deps=form.deps, amount=form.amount)
     return jsonify({'token': token})
 
 
@@ -86,8 +88,16 @@ def alter_scopes(pink, node):
 @perm(node='auth.duck')
 def alter_ducks(id_):
     form = AlterDuck()
-    ducks, confilcts = PinkMgr(id_).alter_ducks(add=form.add, remove=form.remove)
-    res = {'ducks': {duck.id: {'node': duck.node, 'scope': duck.scopes} for duck in ducks}}
+    ducks, confilcts = PinkMgr(id_).alter_ducks(add=form.add,
+                                                remove=form.remove)
+    res = {
+        'ducks':
+        {duck.id: {
+            'node': duck.node,
+            'scope': duck.scopes
+        }
+         for duck in ducks}
+    }
     if confilcts:
         res['conflicts'] = {
             duck.id: {

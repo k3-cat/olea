@@ -3,7 +3,7 @@ from flask import jsonify, request
 from olea.auth import opt_perm, perm
 
 from . import bp
-from .forms import ForceSubmit, Search, Submit
+from .forms import Checks, ForceSubmit, Search, SearchMy, Submit
 from .query import PitQuery
 from .services import PitMgr
 
@@ -17,15 +17,15 @@ def single(id_):
 
 @bp.route('/my', methods=['GET'])
 def my():
-    form = Search(data=request.args)
+    form = SearchMy(data=request.args)
     pits = PitQuery.my(deps=form.deps, states=form.states)
     return jsonify({})
 
 
-@bp.route('/check-list', methods=['GET'])
+@bp.route('/checks/', methods=['GET'])
 @perm(node='pit.check')
-def check_list():
-    form = Search(data=request.args)
+def checks():
+    form = Checks(data=request.args)
     pits = PitQuery.check_list(deps=form.deps)
     return jsonify({})
 

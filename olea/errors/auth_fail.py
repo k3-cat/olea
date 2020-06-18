@@ -47,6 +47,8 @@ class InvalidCredential(AuthFail):
         pwd = 'pwd'
         acc = 'access token'
         rst = 'reset token'
+        deps = 'creation token'
+        email = 'email verification token'
 
     def __init__(self, type_: 'InvalidCredential.T'):
         super().__init__(type=type_)

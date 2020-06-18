@@ -25,10 +25,10 @@ ip2location = "^8.4.1"
 [tool.poetry.dev-dependencies]
 isort = {extras = ["pyproject"], version = "^4.3.21"}
 yapf = "^0.30.0"
-pylint = "^2.5.2"
+pylint = "^2.5.3"
+mypy = "^0.780"
 pytest = "^5.4.1"
 pre-commit = "^2.3.0"
-mypy = "^0.780"
 
 [tool.isort]
 force_to_top = "false"

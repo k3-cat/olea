@@ -1,3 +1,5 @@
+from functools import wraps
+
 from flask import current_app, g, request
 
 from models import Lemon, Pink
@@ -10,10 +12,17 @@ from olea.utils import random_b85
 from .pwd_tools import check_pwd
 
 
-def verify_email(email):
-    token = random_b85(k=20)
-    # TODO: load timeout from config
-    redis.set(f've-{token}', email, ex=3600)
+def _verify_email():
+    ve_life = current_app.config['EMAIL_VERIFICATION_LIFE'].seconds
+
+    def verify_email(email):
+        token = random_b85(k=20)
+        redis.set(f've-{token}', email, ex=ve_life)
+
+    return wraps(verify_email)
+
+
+verify_email = _verify_email()
 
 
 class PinkMgr(BaseMgr):
@@ -94,7 +103,8 @@ class LemonMgr(BaseMgr):
             raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.ip)
         if self.o.exp < g.now:
             self.revoke()
-            raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.exp, at=self.o.exp)
+            raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.exp,
+                                      at=self.o.exp)
 
         last = redis.hget('lass_access', g.pink_id)
         if last and g.now.timestamp() - last > 86400:

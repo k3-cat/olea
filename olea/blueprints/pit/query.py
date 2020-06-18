@@ -12,16 +12,8 @@ class PitQuery():
                             id_or_obj=id_,
                             condiction=lambda obj: obj.pink_id == g.pink_id)
 
-    SEARCH_ALL = {Pit.State.working, Pit.State.past_due, Pit.State.delayed, Pit.State.auditing}
-    MY = {
-        Pit.State.init, Pit.State.pending, Pit.State.working, Pit.State.past_due,
-        Pit.State.auditing, Pit.State.delayed, Pit.State.droped
-    }
-    ALL_DEP = {Dep.ae, Dep.au, Dep.ps}
-
     @classmethod
-    def check_list(cls, deps):
-        deps = deps & cls.ALL_DEP if deps else cls.ALL_DEP
+    def checks(cls, deps):
         if not g.check_scope(scope=deps):
             raise AccessDenied(cls_=Pit)
 
@@ -33,10 +25,8 @@ class PitQuery():
 
     @classmethod
     def my(cls, deps, states):
-        deps = deps & cls.ALL_DEP if deps else cls.ALL_DEP
-
         pits = Pit.query.join(Role) \
-            .filter(Pit.state.in_(states & cls.MY if states else cls.MY)) \
+            .filter(Pit.state.in_(states)) \
             .filter(Pit.pink_id == g.pink_id) \
             .filter(Role.dep.in_(deps)).all()
 
