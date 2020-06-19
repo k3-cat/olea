@@ -18,26 +18,27 @@ class DepGraph(metaclass=Singleton):
         Dep.ae: timedelta(days=14),
     }
 
-    def __init__(self):
-        for dep, dependences in self.RULE.items():
+    def __new__(cls):
+        for dep, dependences in cls.RULE.items():
             # check circular dependence
             # cannot use dfs
-            chain = self.RULE.get(dep, set())
-            while True:
+            chain = cls.RULE.get(dep, set())
+            chain_len = 0
+            while chain_len != len(chain):
                 chain_len = len(chain)
-                for dep_ in chain:
-                    chain = chain | self.RULE.get(dep_, set())
-                if len(chain) == chain_len:
-                    break
+                for _dep in chain:
+                    chain = chain | cls.RULE.get(_dep, set())
             if dep in chain:
                 raise Exception('Circular Dependence')
 
             # build inverse rule
-            for dep_ in dependences:
-                if dep_ in self.I_RULE:
-                    self.I_RULE[dep_].add(dep)
+            for _dep in dependences:
+                if _dep in cls.I_RULE:
+                    cls.I_RULE[_dep].add(dep)
                 else:
-                    self.I_RULE[dep_] = {dep}
+                    cls.I_RULE[_dep] = {dep}
+
+        return super().__new__(cls)
 
     def is_depend_on(self, own, target):
         dependencies = {}
@@ -60,8 +61,8 @@ class DepGraph(metaclass=Singleton):
 
     def get_duration(self, dep):
         local_max = timedelta(seconds=0)
-        for dep_ in self.RULE.get(dep, set()):
-            if (time := self.get_duration(dep_)) > local_max:
+        for _dep in self.RULE.get(dep, set()):
+            if (time := self.get_duration(_dep)) > local_max:
                 local_max = time
         return self.DURATION[dep] + local_max
 
