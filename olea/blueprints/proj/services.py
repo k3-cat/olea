@@ -88,6 +88,10 @@ class ProjMgr(BaseMgr):
         self.o.state = Proj.State.freezed
         self.o.add_track(info=Proj.Trace.freeze, now=g.now)
 
+    def post_chat(self, reply_to_id, content):
+        # TODO: permission check
+        return ChatMgr.post(self, reply_to_id, content)
+
 
 class RoleMgr(BaseMgr):
     model = Role
@@ -122,10 +126,6 @@ class RoleMgr(BaseMgr):
         if self.o.dep not in pink.deps:
             raise NotQualifiedToPick(dep=self.o.dep)
         return self.full_pick(pink.id)
-
-    def post_chat(self, reply_to_id, content):
-        # TODO: permission check
-        return ChatMgr.post(self, reply_to_id, content)
 
 
 class PitMgr(BaseMgr):

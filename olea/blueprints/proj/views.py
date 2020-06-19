@@ -3,9 +3,9 @@ from flask import g, jsonify, request
 from olea.auth import opt_perm, perm
 
 from . import bp
-from .forms import Create, Finish, FullCreate, ModifyRoles, Pick, Search
+from .forms import Chat, Create, Finish, FullCreate, ModifyRoles, Pick, Search, PostChat
 from .query import ProjQuery
-from .services import ProjMgr, RoleMgr
+from .services import ProjMgr, RoleMgr, ChatMgr
 
 
 @bp.route('/<id_>', methods=['GET'])
@@ -66,18 +66,23 @@ def chats(id_):
 
 @bp.route('/<id_>/chats/post', methods=['POST'])
 def post_chat(id_):
-    pass
+    form = PostChat()
+    chat = ProjMgr(id_).post_chat(reply_to_id=form.reply_to_id, content=form.content)
+    return jsonify({})
 
 
 @bp.route('/<chat_id>/edit', methods=['POST'])
-def edit_chat(id_):
-    pass
+def edit_chat(chat_id):
+    form = Chat()
+    chat = ChatMgr(chat_id).edit(content=form.content)
+    return jsonify({})
 
 
 @bp.route('/<chat_id>/delete', methods=['POST'])
 @opt_perm(node='chats.delete')
-def delete_chat(id_):
-    pass
+def delete_chat(chat_id):
+    ChatMgr(chat_id).delete()
+    return jsonify({})
 
 
 @bp.route('/<role_id>/pick', methods=['POST'])

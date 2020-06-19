@@ -44,3 +44,12 @@ class Finish(BaseForm):
 
 class Pick(BaseForm):
     pink_id = StringField()
+
+
+class PostChat(BaseForm):
+    reply_to_id = StringField()
+    content = StringField()
+
+
+class Chat(BaseForm):
+    content = StringField()
