@@ -3,8 +3,9 @@ from flask import g, jsonify, request
 from olea.auth import allow_anonymous, opt_perm, perm
 
 from . import bp
-from .forms import AlterDuck, AlterScopes, AssignToken, Registration, Search, SearchDuck, UpdateInfo
-from .services import DuckMgr, PinkMgr, PinkQuery
+from .forms import AlterDuck, AlterScopes, AssignToken, SignUp, Search, SearchDuck, UpdateInfo
+from .services import DuckMgr, PinkMgr
+from .query import PinkQuery
 
 
 @bp.route('/<id_>', methods=['GET'])
@@ -25,9 +26,7 @@ def search():
 @bp.route('/update-info', methods=['POST'])
 def update_info():
     form = UpdateInfo()
-    PinkMgr(g.pink_id).update_info(qq=form.qq,
-                                   other=form.other,
-                                   email=form.email)
+    PinkMgr(g.pink_id).update_info(qq=form.qq, other=form.other, email=form.email)
     return 'True'
 
 
@@ -39,11 +38,11 @@ def assign_token():
     return jsonify({'token': token})
 
 
-@bp.route('/registration', methods=['POST'])
+@bp.route('/sign-up', methods=['POST'])
 @allow_anonymous
-def registration():
-    form = Registration()
-    pink = PinkMgr.create(
+def sign_up():
+    form = SignUp()
+    pink = PinkMgr.sign_up(
         name=form.name,
         qq=form.qq,
         other=form.other,
@@ -61,13 +60,30 @@ def deactive(id_):
 
 
 @bp.route('/ducks/', methods=['GET'])
-@perm(node='auth.duck')
+@opt_perm(node='auth.duck')
 def list_ducks():
     form = SearchDuck(request.args)
     ducks = PinkQuery.ducks(pink_id=form.pink_id,
                             node=form.node,
                             nodes=form.nodes,
                             allow=form.allow)
+    return jsonify()
+
+
+@bp.route('/<id_>/alter-ducks', methods=['POST'])
+@perm(node='auth.duck')
+def alter_ducks(id_):
+    form = AlterDuck()
+    ducks, confilcts = PinkMgr(id_).alter_ducks(add=form.add, remove=form.remove)
+    res = {'ducks': {duck.id: {'node': duck.node, 'scope': duck.scopes} for duck in ducks}}
+    if confilcts:
+        res['conflicts'] = {
+            duck.id: {
+                'node': duck.node,
+                'scope': duck.scopes
+            }
+            for duck in confilcts
+        }
     return jsonify()
 
 
@@ -82,28 +98,3 @@ def alter_scopes(pink, node):
     else:
         final = duck.alter_scopes(scopes=form.positive)
     return jsonify({'new_scopes': final})
-
-
-@bp.route('/<id_>/alter-ducks', methods=['POST'])
-@perm(node='auth.duck')
-def alter_ducks(id_):
-    form = AlterDuck()
-    ducks, confilcts = PinkMgr(id_).alter_ducks(add=form.add,
-                                                remove=form.remove)
-    res = {
-        'ducks':
-        {duck.id: {
-            'node': duck.node,
-            'scope': duck.scopes
-        }
-         for duck in ducks}
-    }
-    if confilcts:
-        res['conflicts'] = {
-            duck.id: {
-                'node': duck.node,
-                'scope': duck.scopes
-            }
-            for duck in confilcts
-        }
-    return jsonify()

@@ -1,7 +1,7 @@
 import enum
 
-from sqlalchemy_ import BaseModel, Column
-from sqlalchemy_.types import ARRAY, DateTime, Enum, String, Text
+from sqlalchemy_ import BaseModel, Column, ForeignKey
+from sqlalchemy_.types import ARRAY, JSONB, Boolean, DateTime, Enum, Integer, String, Text
 
 from .common_enums import Dep
 
@@ -11,14 +11,30 @@ __all__ = ['Ann']
 class Ann(BaseModel):
     __tablename__ = 'ann'
 
-    class Category(enum.Enum):
+    class Cat(enum.Enum):
         tips = 'tips'
         normal = 'normal'
         important = 'important'
 
     id = Column(String, primary_key=True)
-    category = Column(Enum(Category))
+    cat = Column(Enum(Cat))
     deps = Column(ARRAY(Enum(Dep)))
+    poster = Column(String, ForeignKey('pink.id', ondelete='SET NULL'))
     expired_at = Column(DateTime)
+
+    ver = Column(Integer, default=0)
     timestamp = Column(DateTime)
-    info = Column(Text)
+    content = Column(Text)
+
+    history = Column(JSONB, default=dict)
+
+    deleted = Column(Boolean, default=False)
+
+    def update(self, now, content):
+        self.history[self.ver] = {
+            'timestamp': self.timestamp.timestamp(),
+            'content': self.content,
+        }
+        self.ver += 1
+        self.timestamp = now
+        self.content = content

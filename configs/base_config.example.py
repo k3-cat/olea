@@ -3,7 +3,7 @@ from pathlib import Path
 
 from .url_mgr import UrlMgr
 
-PROJ_ROOT = Path(__file__).parents[1]
+DIR = Path(__file__).parents[1]
 
 
 class Config():
@@ -12,7 +12,7 @@ class Config():
     MAX_CONTENT_LENGTH = 10 * 1024
 
     # --- path --------------------------------------
-    DATA_FOLDER = PROJ_ROOT / 'data'
+    DATA_FOLDER = DIR / 'data'
     IPDB_PATH = DATA_FOLDER / 'ipdb.bin'
     PWDDB_PATH = DATA_FOLDER / 'pwddb'
 

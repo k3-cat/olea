@@ -22,11 +22,11 @@ def build_import_statement(module):
 
 
 if __name__ == "__main__":
-    PROJ_ROOT = (Path(__file__).parents[2])
-    PATH = PROJ_ROOT / MODULE / '__init__.py'
-    sys.path.append(str(PROJ_ROOT))
+    DIR = (Path(__file__).parents[2])
+    PATH = DIR / MODULE / '__init__.py'
+    sys.path.append(str(DIR))
     # able to import sqlalchemy_
-    sys.path.append(str(PROJ_ROOT / 'site-packages'))
+    sys.path.append(str(DIR / 'site-packages'))
 
     ALT_PATH = PATH.parent / 'backup'
     PATH.replace(ALT_PATH)
@@ -37,7 +37,7 @@ if __name__ == "__main__":
         ALT_PATH.replace(PATH)
         raise
 
-    with (PROJ_ROOT / 'models/__init__.py').open('w') as f:
+    with (DIR / 'models/__init__.py').open('w') as f:
         f.writelines(imports)
         f.write('\n__all__ = ')
         f.write(json.dumps(all_list).replace('"', "'"))

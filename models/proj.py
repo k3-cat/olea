@@ -28,20 +28,15 @@ class Proj(BaseModel):
     type = Column(Enum(Type))
     suff = Column(String)
     state = Column(Enum(State))
-    leader_id = Column(String, ForeignKey('pink.id'))
+    leader_id = Column(String, ForeignKey('pink.id', ondelete='SET NULL'))
     track = Column(ARRAY(String), default=list)
     timestamp = Column(DateTime)
-    word_count = Column(Integer)
+    word_count = Column(Integer, default=0)
     url = Column(String)
-    chat = Column(JSONB)
+    chat_index = Column(JSONB, default=dict)
 
-    roles = relationship(
-        'Role',
-        back_populates='proj',
-        cascade='all, delete-orphan',
-        lazy='dynamic',
-        passive_deletes=True,
-    )
+    roles = relationship('Role', back_populates='proj', lazy='dynamic', passive_deletes=True)
+    chats = relationship('Chat', back_populates='proj', lazy='dynamic', passive_deletes=True)
     __table_args__ = (UniqueConstraint('source', 'type', 'suff', name='_proj_uc'), )
     __id_len__ = 11
 

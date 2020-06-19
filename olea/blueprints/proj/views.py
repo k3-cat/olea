@@ -59,6 +59,27 @@ def finish(id_):
     return jsonify()
 
 
+@bp.route('/<id_>/chats/', methods=['GET'])
+def chats(id_):
+    pass
+
+
+@bp.route('/<id_>/chats/post', methods=['POST'])
+def post_chat(id_):
+    pass
+
+
+@bp.route('/<chat_id>/edit', methods=['POST'])
+def edit_chat(id_):
+    pass
+
+
+@bp.route('/<chat_id>/delete', methods=['POST'])
+@opt_perm(node='chats.delete')
+def delete_chat(id_):
+    pass
+
+
 @bp.route('/<role_id>/pick', methods=['POST'])
 def pick(role_id):
     pit = RoleMgr(role_id).pick()

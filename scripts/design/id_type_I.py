@@ -27,8 +27,8 @@ def test(id_tool):
 
 
 if __name__ == '__main__':
-    PROJ_ROOT = (Path(__file__).parents[2])
-    sys.path.append(str(PROJ_ROOT / 'site-packages'))
+    DIR = (Path(__file__).parents[2])
+    sys.path.append(str(DIR / 'site-packages'))
 
     from id_tool import IdTool
 

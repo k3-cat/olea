@@ -31,12 +31,12 @@ class PinkMgr(BaseMgr):
     t_life = current_app.config['PWD_RESET_TOKEN_LIFE'].seconds
 
     def __init__(self, obj_or_id):
-        self.o: self.model = None
+        self.o: Pink = None
         super().__init__(obj_or_id)
 
     @classmethod
     def forget_pwd(cls, name, email):
-        pink = cls.model.query.filter_by(name=name).first()
+        pink = cls.model.query.filter_by(name=name).one()
         if pink and pink.email != email:
             return
         token = random_b85(k=20)
@@ -65,7 +65,7 @@ class LemonMgr(BaseMgr):
     r_life = current_app.config['REFRESH_TOKEN_LIFE']
 
     def __init__(self, obj_or_id):
-        self.o: self.model = None
+        self.o: Lemon = None
         try:
             super().__init__(obj_or_id)
             if self.o.pink_id != g.pink_id:
@@ -75,7 +75,7 @@ class LemonMgr(BaseMgr):
 
     @classmethod
     def grante(cls, name, pwd, device_id):
-        pink: Pink = Pink.query.filter_by(name=name).first()
+        pink: Pink = Pink.query.filter_by(name=name).one()
         if not pink.active:
             raise AccountDeactivated()
         if not pink or not pink.check_pwd(pwd):
@@ -103,8 +103,7 @@ class LemonMgr(BaseMgr):
             raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.ip)
         if self.o.exp < g.now:
             self.revoke()
-            raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.exp,
-                                      at=self.o.exp)
+            raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.exp, at=self.o.exp)
 
         last = redis.hget('lass_access', g.pink_id)
         if last and g.now.timestamp() - last > 86400:

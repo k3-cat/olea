@@ -48,6 +48,13 @@ class NotQualifiedToPick(BadOpt):
         super().__init__(dep=dep.name)
 
 
+class InvalidReply(BadOpt):
+    code = 'abcd'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
 # ------------------- pink ---------------------
 
 

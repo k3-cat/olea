@@ -2,11 +2,11 @@ from typing import List
 
 from flask import g
 
-from models import Dep, Pink, Pit, Proj, Role
+from models import Dep, Pink, Pit, Proj, Role, Chat
 from olea.base import BaseMgr
 from olea.dep_graph import DepGraph
 from olea.errors import (AccessDenied, DuplicatedRecord, NotQualifiedToPick, ProjMetaLocked,
-                         RoleIsTaken)
+                         RoleIsTaken, InvalidReply)
 from olea.singleton import db
 
 from .info_builder import build_info
@@ -18,7 +18,7 @@ class ProjMgr(BaseMgr):
     model = Proj
 
     def __init__(self, obj_or_id):
-        self.o: self.model = None
+        self.o: Proj = None
         super().__init__(obj_or_id)
 
     @classmethod
@@ -93,7 +93,7 @@ class RoleMgr(BaseMgr):
     model = Role
 
     def __init__(self, obj_or_id):
-        self.o: self.model = None
+        self.o: Role = None
         super().__init__(obj_or_id)
 
     @classmethod
@@ -123,12 +123,16 @@ class RoleMgr(BaseMgr):
             raise NotQualifiedToPick(dep=self.o.dep)
         return self.full_pick(pink.id)
 
+    def post_chat(self, reply_to_id, content):
+        # TODO: permission check
+        return ChatMgr.post(self, reply_to_id, content)
+
 
 class PitMgr(BaseMgr):
     model = Pit
 
     def __init__(self, obj_or_id, europaea=False):
-        self.o: self.model = None
+        self.o: Pit = None
         super().__init__(obj_or_id)
         if not europaea and self.o.pink_id != g.pink_id:
             raise AccessDenied(obj=self.o)
@@ -138,3 +142,47 @@ class PitMgr(BaseMgr):
         pit = cls.model(id=cls.gen_id(), role=role, pink_id=pink_id, timestamp=g.now)
         db.session.add(pit)
         return pit
+
+
+class ChatMgr(BaseMgr):
+    module = Chat
+
+    def __init__(self, obj_or_id):
+        self.o: Chat = None
+        super().__init__(obj_or_id)
+
+    @classmethod
+    def post(cls, proj: Proj, reply_to_id: str, content: str):
+        chat = cls.model(id=cls.gen_id(),
+                         proj_id=proj.id,
+                         pink_id=g.pink_id,
+                         content=content,
+                         timestamp=g.now)
+
+        index = proj.chat_index
+        if reply_to_id:
+            if reply_to_id not in index:
+                raise InvalidReply()
+
+            index = index[reply_to_id]
+            chat.reply_to_id = reply_to_id
+
+        index[chat.id] = dict()
+        chat.set_order(proj_timestamp=proj.timestamp, now=g.now)
+
+        return chat
+
+    def edit(self, content):
+        if self.o.pink_id != g.pink_id:
+            raise AccessDenied(obj=self.o)
+
+        self.o.update(now=g.now, content=content)
+
+    def delete(self):
+        self.o.delete = True
+
+        if self.o.reply_to_id:
+            index = self.o.proj.index[self.o.reply_to_id]
+        else:
+            index = self.o.proj.index
+        index.pop(self.o.id)

@@ -1,4 +1,5 @@
 from .ann import Ann
+from .chat import Chat
 from .common_enums import Dep
 from .duck import Duck
 from .lemon import Lemon
@@ -8,4 +9,4 @@ from .pit import Pit
 from .proj import Proj
 from .role import Role
 
-__all__ = ['Ann', 'Dep', 'Duck', 'Lemon', 'Mango', 'Pink', 'Pit', 'Proj', 'Role']
+__all__ = ['Ann', 'Chat', 'Dep', 'Duck', 'Lemon', 'Mango', 'Pink', 'Pit', 'Proj', 'Role']

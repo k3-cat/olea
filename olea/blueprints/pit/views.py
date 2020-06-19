@@ -15,7 +15,7 @@ def single(id_):
     return jsonify({'id': pit.id})
 
 
-@bp.route('/my', methods=['GET'])
+@bp.route('/my/', methods=['GET'])
 def my():
     form = SearchMy(data=request.args)
     pits = PitQuery.my(deps=form.deps, states=form.states)

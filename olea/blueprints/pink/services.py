@@ -3,40 +3,10 @@ from flask import current_app, g
 from models import Duck, Pink
 from olea import email_mgr
 from olea.auth import authorization
-from olea.base import BaseMgr, single_query
+from olea.base import BaseMgr
 from olea.errors import InvalidCredential, RecordNotFound
 from olea.singleton import db, redis
 from olea.utils import random_b85
-
-
-class PinkQuery():
-    @staticmethod
-    def single(id_):
-        return single_query(model=Pink, id_or_obj=id_, condiction=lambda obj: obj.id == g.pink_id)
-
-    @staticmethod
-    def search(deps, name, qq):
-        query = Pink.query
-        if deps:
-            query.filter(Pink.deps.in_(deps))
-        else:
-            if name:
-                query.filter(Pink.name.ilike(f'%{name}%'))
-            if qq:
-                query.filter(Pink.qq.like(f'%{qq}%'))
-        return query.all()
-
-    @staticmethod
-    def ducks(pink_id, node, nodes, allow):
-        query = Duck.query.filter_by(pink_id=pink_id)
-        if node:
-            query.filter(Duck.node.ilike(f'%{node}%'))
-        else:
-            if nodes:
-                query.filter(Duck.node.in_(nodes))
-            if allow is not None:
-                query.filter_by(allow=allow)
-        return query.all()
 
 
 class PinkMgr(BaseMgr):
@@ -45,7 +15,7 @@ class PinkMgr(BaseMgr):
     t_life = current_app.config['DEPS_TOKEN_LIFE'].seconds
 
     def __init__(self, obj_or_id):
-        self.o: self.model = None
+        self.o: Pink = None
         super().__init__(obj_or_id)
 
     @classmethod
@@ -57,7 +27,7 @@ class PinkMgr(BaseMgr):
         return tokens
 
     @classmethod
-    def create(cls, name: str, qq: int, other: str,pwd, email_token: str, deps_token: list):
+    def sign_up(cls, name: str, qq: int, other: str,pwd, email_token: str, deps_token: list):
         pink = cls.model(id=cls.gen_id(), name=name, qq=str(qq), other=other)
         if not (deps_s := redis.get(f'deps-{deps_token}')):
             raise InvalidCredential(type_=InvalidCredential.T.deps)
@@ -103,7 +73,7 @@ class DuckMgr(BaseMgr):
     modle = Duck
 
     def __init__(self, /, pink_id, node):
-        self.o: self.model = None
+        self.o: Duck = None
         if not (obj := self.model.query.get((pink_id, node))):
                 raise RecordNotFound(cls=self.model, id=(','.join((pink_id, node))))
         self.o = obj
