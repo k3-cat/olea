@@ -87,7 +87,7 @@ def alter_ducks(id_):
     return jsonify()
 
 
-@bp.route('/<pink>/<node>/alter-scopes', methods=['POST'])
+@bp.route('/<pink>:<node>/alter-scopes', methods=['POST'])
 @perm(node='auth.duck')
 def alter_scopes(pink, node):
     form = AlterScopes()

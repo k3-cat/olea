@@ -5,22 +5,16 @@ from jsonform.fields import EnumField, SetField, StringField
 from models import Dep, Pit
 
 
-class SearchMy(BaseForm):
-    deps = SetField(EnumField(Dep), optional=True, default={Dep.ae, Dep.au, Dep.ps})
+class InDep(BaseForm):
+    dep = SetField(EnumField(Dep))
     states = SetField(EnumField(Pit.State),
-                      condition=In(Pit.State.init, Pit.State.pending, Pit.State.working,
-                                   Pit.State.past_due, Pit.State.auditing, Pit.State.delayed,
-                                   Pit.State.droped),
-                      optional=True)
-    pink_id = StringField(optional=True)
+                      condition=In(Pit.State.working, Pit.State.past_due, Pit.State.delayed,
+                                   Pit.State.auditing))
 
 
 class Search(BaseForm):
     deps = SetField(EnumField(Dep), optional=True, default={Dep.ae, Dep.au, Dep.ps})
-    states = SetField(EnumField(Pit.State),
-                      condition=In(Pit.State.working, Pit.State.past_due, Pit.State.delayed,
-                                   Pit.State.auditing),
-                      optional=True)
+    states = SetField(EnumField(Pit.State), optional=True)
     pink_id = StringField(optional=True)
 
 

@@ -3,9 +3,9 @@ from flask import g, jsonify, request
 from olea.auth import opt_perm, perm
 
 from . import bp
-from .forms import Chat, Create, Finish, FullCreate, ModifyRoles, Pick, Search, PostChat
-from .query import ProjQuery
-from .services import ProjMgr, RoleMgr, ChatMgr
+from .forms import Chat, Chats, Create, Finish, FullCreate, ModifyRoles, Pick, PostChat, Search
+from .query import ChatQuery, ProjQuery
+from .services import ChatMgr, ProjMgr, RoleMgr
 
 
 @bp.route('/<id_>', methods=['GET'])
@@ -59,9 +59,15 @@ def finish(id_):
     return jsonify()
 
 
-@bp.route('/<id_>/chats/', methods=['GET'])
-def chats(id_):
-    pass
+@bp.route('/<id_>/chats-index', methods=['GET'])
+def chats_index(id_):
+    index = ChatQuery.chat_index(proj_id=id_)
+
+
+@bp.route('/chats/', methods=['GET'])
+def chats():
+    form = Chats(data=request.args)
+    chats = ChatQuery.chats(chats=form.chats)
 
 
 @bp.route('/<id_>/chats/post', methods=['POST'])
@@ -71,27 +77,27 @@ def post_chat(id_):
     return jsonify({})
 
 
-@bp.route('/<chat_id>/edit', methods=['POST'])
+@bp.route('/chats/<chat_id>/edit', methods=['POST'])
 def edit_chat(chat_id):
     form = Chat()
     chat = ChatMgr(chat_id).edit(content=form.content)
     return jsonify({})
 
 
-@bp.route('/<chat_id>/delete', methods=['POST'])
+@bp.route('/chats/<chat_id>/delete', methods=['POST'])
 @opt_perm(node='chats.delete')
 def delete_chat(chat_id):
     ChatMgr(chat_id).delete()
     return jsonify({})
 
 
-@bp.route('/<role_id>/pick', methods=['POST'])
+@bp.route('/roles/<role_id>/pick', methods=['POST'])
 def pick(role_id):
     pit = RoleMgr(role_id).pick()
     return jsonify({'id': pit.id})
 
 
-@bp.route('/<role_id>/f-pick', methods=['POST'])
+@bp.route('/roles/<role_id>/f-pick', methods=['POST'])
 @perm
 def full_pick(role_id):
     form = Pick()

@@ -2,7 +2,7 @@ import enum
 
 from sqlalchemy_ import (BaseModel, Column, ForeignKey, UniqueConstraint, hybrid_property,
                          relationship)
-from sqlalchemy_.types import ARRAY, JSONB, DateTime, Enum, Integer, String
+from sqlalchemy_.types import ARRAY, DateTime, Enum, Integer, String
 
 __all__ = ['Proj']
 
@@ -33,7 +33,6 @@ class Proj(BaseModel):
     timestamp = Column(DateTime)
     word_count = Column(Integer, default=0)
     url = Column(String)
-    chat_index = Column(JSONB, default=dict)
 
     roles = relationship('Role', back_populates='proj', lazy='dynamic', passive_deletes=True)
     chats = relationship('Chat', back_populates='proj', lazy='dynamic', passive_deletes=True)
@@ -51,7 +50,7 @@ class Proj(BaseModel):
         start = '+'
         finish = '-'
 
-    def add_track(self, info: 'Pit.Trace', now, by=''):
+    def add_track(self, info: 'Proj.Trace', now, by=''):
         base = f'{info.name} - {now}'
         if info == Trace.re_open:
             self.track.append(f'{base} by:{by}')

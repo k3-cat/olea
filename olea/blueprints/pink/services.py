@@ -20,7 +20,7 @@ class PinkMgr(BaseMgr):
 
     @classmethod
     def assign_token(cls, deps, amount):
-        g.check_scope(deps)
+        g.check_scopes(deps)
         deps_s = ','.join(deps)
         tokens = [random_b85(k=20) for __ in range(amount)]
         redis.mset({f'deps-{token}':deps_s for token in tokens}, ex=cls.t_life)

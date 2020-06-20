@@ -14,7 +14,7 @@ class PitQuery():
 
     @classmethod
     def checks(cls, deps):
-        if not g.check_scope(scope=deps):
+        if not g.check_scopes(scopes=deps):
             raise AccessDenied(cls_=Pit)
 
         pits = Pit.query.join(Role) \
@@ -24,25 +24,27 @@ class PitQuery():
         return pits
 
     @classmethod
-    def my(cls, deps, states):
+    def in_dep(cls, dep, status):
+        if not g.check_scopes(scopes=dep):
+            raise AccessDenied(cls_=Pit)
+
         pits = Pit.query.join(Role) \
-            .filter(Pit.state.in_(states)) \
-            .filter(Pit.pink_id == g.pink_id) \
-            .filter(Role.dep.in_(deps)).all()
+            .filter(Role.dep == dep) \
+            .filter(Pit.state.in_(status)).all()
 
         return pits
 
     @classmethod
-    def search_all(cls, deps, states, pink_id=''):
-        deps = deps & cls.ALL_DEP if deps else cls.ALL_DEP
-
-        if not g.check_scope(scope=deps):
+    def search(cls, deps, states, pink_id=''):
+        if (not pink_id or pink_id != g.pink_id) and not g.check_opt_duck(scopes=deps):
             raise AccessDenied(cls_=Pit)
 
-        query = Pit.query.join(Role) \
-            .filter(Pit.state.in_(states & cls.SEARCH_ALL if states else cls.SEARCH_ALL))
+        query = Pit.query.join(Role)
+        if deps:
+            query = query.filter(Role.dep.in_(deps))
+        if states:
+            query = query.filter(Pit.state.in_(states))
         if pink_id:
             query = query.filter(Pit.pink_id == pink_id)
-        pits = query.filter(Role.dep.in_(deps)).all()
 
-        return pits
+        return query.all()

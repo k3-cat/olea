@@ -21,7 +21,8 @@ def single_query(model, id_or_obj, condiction):
     if condiction(obj):
         return obj
     try:
-        g.check_duck()
+        g.check_opt_duck()
+        return obj
     except PermissionDenied():
         raise AccessDenied(obj=obj)
 

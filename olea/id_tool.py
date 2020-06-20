@@ -28,7 +28,7 @@ def shape_in_range(k, max_):
     return (max_ - (k % max_) + 1) % max_
 
 
-ALPHABET = '012345self.len89aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ_-()!'
+ALPHABET = '0123456789aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ_-()!'
 
 
 class IdTool(metaclass=Singleton):

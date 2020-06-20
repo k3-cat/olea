@@ -1,13 +1,14 @@
+import json
 from typing import List
 
 from flask import g
 
-from models import Dep, Pink, Pit, Proj, Role, Chat
+from models import Chat, Dep, Pink, Pit, Proj, Role
 from olea.base import BaseMgr
 from olea.dep_graph import DepGraph
-from olea.errors import (AccessDenied, DuplicatedRecord, NotQualifiedToPick, ProjMetaLocked,
-                         RoleIsTaken, InvalidReply)
-from olea.singleton import db
+from olea.errors import (AccessDenied, DuplicatedRecord, InvalidReply, NotQualifiedToPick,
+                         ProjMetaLocked, RoleIsTaken)
+from olea.singleton import db, redis
 
 from .info_builder import build_info
 
@@ -84,6 +85,9 @@ class ProjMgr(BaseMgr):
         self.o.url = url
         self.o.add_track(info=Proj.Trace.finish, now=g.now)
 
+        pending_removes = [f'cPath-{self.o.id}', f'cTree-{self.o.id}']
+        redis.delete(*pending_removes)
+
     def freeze(self):
         self.o.state = Proj.State.freezed
         self.o.add_track(info=Proj.Trace.freeze, now=g.now)
@@ -151,6 +155,21 @@ class ChatMgr(BaseMgr):
         self.o: Chat = None
         super().__init__(obj_or_id)
 
+    @staticmethod
+    def _is_visible(proj_id, id_):
+        if (path := redis.hget(f'cPath-{proj_id}', id_)) is None:
+            raise InvalidReply()
+
+        # chats under the root
+        if not path:
+            return path
+
+        path_ = path.split('/')
+        if len(path_) != redis.exists(*path_):
+            raise InvalidReply()
+
+        return path
+
     @classmethod
     def post(cls, proj: Proj, reply_to_id: str, content: str):
         chat = cls.model(id=cls.gen_id(),
@@ -158,31 +177,41 @@ class ChatMgr(BaseMgr):
                          pink_id=g.pink_id,
                          content=content,
                          timestamp=g.now)
+        chat.set_order(proj_timestamp=proj.timestamp, now=g.now)
 
-        index = proj.chat_index
         if reply_to_id:
-            if reply_to_id not in index:
-                raise InvalidReply()
+            path = cls._is_visible(proj.id, reply_to_id)
+            path = '/'.join((path, reply_to_id))
+            father = reply_to_id
 
-            index = index[reply_to_id]
             chat.reply_to_id = reply_to_id
 
-        index[chat.id] = dict()
-        chat.set_order(proj_timestamp=proj.timestamp, now=g.now)
+        else:
+            path = ''
+            father = proj.id
+
+        redis.hset(f'cTree-{proj.id}', chat.id, '')
+        redis.hset(f'cPath-{proj.id}', chat.id, path)
+
+        if not (replys_s := redis.hget(f'cTree-{proj.id}', father)):
+            redis.hset(f'cTree-{proj.id}', father, chat.id)
+        else:
+            replys = replys_s.split(';')
+            replys.append(chat.id)
+            redis.hset(f'cTree-{proj.id}', father, ';'.join(replys))
 
         return chat
 
     def edit(self, content):
         if self.o.pink_id != g.pink_id:
             raise AccessDenied(obj=self.o)
+        self._is_visible(self.o.proj_id, self.o.id)
 
         self.o.update(now=g.now, content=content)
 
     def delete(self):
-        self.o.delete = True
+        self._is_visible(self.o.proj_id, self.o.id)
 
-        if self.o.reply_to_id:
-            index = self.o.proj.index[self.o.reply_to_id]
-        else:
-            index = self.o.proj.index
-        index.pop(self.o.id)
+        redis.hdel(f'cTree-{self.o.proj_id}', self.o.id)
+
+        self.o.delete = True

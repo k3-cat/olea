@@ -64,7 +64,7 @@ def optional_permission(node=''):
     def decorate(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
-            g.check_duck = check_opt_duck
+            g.check_opt_duck = check_opt_duck
             return f(*args, **kwargs)
 
         return wrapper

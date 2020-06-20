@@ -51,5 +51,9 @@ class PostChat(BaseForm):
     content = StringField()
 
 
+class Chats(BaseForm):
+    chats = SetField(StringField())
+
+
 class Chat(BaseForm):
     content = StringField()
