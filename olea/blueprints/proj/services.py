@@ -85,8 +85,7 @@ class ProjMgr(BaseMgr):
         self.o.url = url
         self.o.add_track(info=Proj.Trace.finish, now=g.now)
 
-        pending_removes = [f'cPath-{self.o.id}', f'cTree-{self.o.id}']
-        redis.delete(*pending_removes)
+        redis.delete(f'cPath-{self.o.id}', f'cTree-{self.o.id}')
 
     def freeze(self):
         self.o.state = Proj.State.freezed
@@ -190,15 +189,19 @@ class ChatMgr(BaseMgr):
             path = ''
             father = proj.id
 
-        redis.hset(f'cTree-{proj.id}', chat.id, '')
-        redis.hset(f'cPath-{proj.id}', chat.id, path)
+        replys_s = redis.hget(f'cTree-{proj.id}', father)
+        with redis.pipeline(transaction=True) as p:
+            p.hset(f'cTree-{proj.id}', chat.id, '')
+            p.hset(f'cPath-{proj.id}', chat.id, path)
 
-        if not (replys_s := redis.hget(f'cTree-{proj.id}', father)):
-            redis.hset(f'cTree-{proj.id}', father, chat.id)
-        else:
-            replys = replys_s.split(';')
-            replys.append(chat.id)
-            redis.hset(f'cTree-{proj.id}', father, ';'.join(replys))
+            if not replys_s:
+                p.hset(f'cTree-{proj.id}', father, chat.id)
+            else:
+                replys = replys_s.split(';')
+                replys.append(chat.id)
+                p.hset(f'cTree-{proj.id}', father, ';'.join(replys))
+
+            p.execute()
 
         return chat
 

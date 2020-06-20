@@ -5,7 +5,7 @@ from olea import email_mgr
 from olea.auth import authorization
 from olea.base import BaseMgr
 from olea.errors import InvalidCredential, RecordNotFound
-from olea.singleton import db, redis
+from olea.singleton import db, redis, pat
 from olea.utils import random_b85
 
 
@@ -23,19 +23,22 @@ class PinkMgr(BaseMgr):
         g.check_scopes(deps)
         deps_s = ','.join(deps)
         tokens = [random_b85(k=20) for __ in range(amount)]
-        redis.mset({f'deps-{token}':deps_s for token in tokens}, ex=cls.t_life)
+        redis.mset({f'deps-{token}': deps_s for token in tokens}, ex=cls.t_life)
         return tokens
 
     @classmethod
     def sign_up(cls, name: str, qq: int, other: str,pwd, email_token: str, deps_token: list):
-        pink = cls.model(id=cls.gen_id(), name=name, qq=str(qq), other=other)
         if not (deps_s := redis.get(f'deps-{deps_token}')):
             raise InvalidCredential(type_=InvalidCredential.T.deps)
+
+        pink = cls.model(id=cls.gen_id(), name=name,email=None, qq=str(qq), other=other)
         pink.pwd = pwd
         pink.deps = deps_s.split(',')
         PinkMgr(pink).set_email(email_token)
         db.session.add(pink)
+
         email_mgr.new_pink(email=pink.email, name=pink.name)
+
         return pink
 
     def update_info(self, qq: int, other: str):
@@ -45,9 +48,11 @@ class PinkMgr(BaseMgr):
             self.o.other = other
 
     def set_email(self, token):
-        if not (email := redis.get(f've-{token}')):
+        payload = pat.decode(token)
+        if self.o.email != payload['old']:
             raise InvalidCredential(type_=InvalidCredential.T.email)
-        self.o.email = email
+
+        self.o.email = payload['new']
 
     def deactive(self):
         self.o.active = False

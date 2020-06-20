@@ -6,18 +6,21 @@ from models import Lemon, Pink
 from olea import email_mgr
 from olea.base import BaseMgr
 from olea.errors import AccountDeactivated, InvalidCredential, InvalidRefreshToken, RecordNotFound
-from olea.singleton import db, ip2loc, redis
+from olea.singleton import db, ip2loc, redis, pat
 from olea.utils import random_b85
 
 from .pwd_tools import check_pwd
 
 
 def _verify_email():
-    ve_life = current_app.config['EMAIL_VERIFICATION_LIFE'].seconds
+    ve_life = current_app.config['EMAIL_VERIFICATION_LIFE']
 
     def verify_email(email):
-        token = random_b85(k=20)
-        redis.set(f've-{token}', email, ex=ve_life)
+        token = pat.encode(exp=(g.now + ve_life).timestamp(),
+                           payload={
+                               'old': Pink.query.get(g.pink_id) if g.pink_id else None,
+                               'new': email
+                           })
 
     return wraps(verify_email)
 
@@ -108,11 +111,13 @@ class LemonMgr(BaseMgr):
         last = redis.hget('lass_access', g.pink_id)
         if last and g.now.timestamp() - last > 86400:
             self.o.exp = g.now + self.r_life
-            db.session.add(self.o)
-        redis.hset('last_access', g.pink_id, g.now.timestamp())
 
         token = random_b85(k=20)
-        redis.set(token, g.pink_id, ex=a_life.seconds)
+        with redis.pipeline(transaction=False) as p:
+            p.hset('last_access', g.pink_id, g.now.timestamp())
+            p.set(token, g.pink_id, ex=a_life.seconds)
+            p.execute()
+
         return token, g.now + self.a_life
 
     def revoke(self):

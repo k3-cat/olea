@@ -4,7 +4,6 @@
 | --------------------- | -------------------------------------------- | ------------------------- |
 | {access token}        | user id                                      | 10 mins                   |
 | rst-{reset pwd token} | user id                                      | 1 hour                    |
-| ve-{token}            | user's new email                             | 1 hour                    |
 | deps-{token}          | new user's departments, assigned by admin    | 1 day                     |
 | --------------------- | -------------------------------------------- | ------------------------- |
 | duckT-{user id}       | key: passwd permission<br>val: scopes string | untill permission changes |

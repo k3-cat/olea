@@ -9,8 +9,7 @@ from olea.singleton import redis
 
 
 def clean_cache(pink_id):
-    redis.delete(f'duckT-{pink_id}')
-    redis.delete(f'duckF-{pink_id}')
+    redis.delete(f'duckT-{pink_id}', f'duckF-{pink_id}')
 
 
 def cache_ducks(pink_id):
@@ -24,7 +23,7 @@ def cache_ducks(pink_id):
 
 def has_duck(node):
     cache_ducks(g.pink_id)
-    return redis.hexist(f'duckT-{g.pink_id}', node)
+    return redis.hexists(f'duckT-{g.pink_id}', node)
 
 
 def check_duck(default_pass, node):
@@ -36,8 +35,8 @@ def check_duck(default_pass, node):
     g.node = node
 
     cache_ducks(g.pink_id)
-    if (not default_pass and not redis.hexist(f'duckT-{g.pink_id}', node)) or \
-        (default_pass and redis.hexist(f'duckF-{g.pink_id}', node)):
+    if (not default_pass and not redis.hexists(f'duckT-{g.pink_id}', node)) or \
+        (default_pass and redis.hexists(f'duckF-{g.pink_id}', node)):
         raise PermissionDenied()
 
 
