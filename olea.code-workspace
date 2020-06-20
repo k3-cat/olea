@@ -11,7 +11,8 @@
 			"site-packages"
 		],
 		"python.formatting.yapfArgs": [
-			"--style={ based_on_style: pep8, column_limit: 100}"
+			"--style={ based_on_style: pep8, column_limit: 100}",
+			"--exclude ./migrations/versions"
 		],
 	}
 }
