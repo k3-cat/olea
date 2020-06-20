@@ -11,15 +11,14 @@ class Chat(BaseModel):
     order = Column(Integer, unique=True)
     proj_id = Column(String, ForeignKey('proj.id', ondelete='CASCADE'))
     pink_id = Column(String, ForeignKey('pink.id', ondelete='SET NULL'))
-    reply_to_id = Column(String, ForeignKey('chat.id', ondelete='CASCADE'))
+    reply_to_id = Column(String, ForeignKey('chat.id', ondelete='CASCADE'), nullable=True)
+    deleted = Column(Boolean, default=False)
 
     ver = Column(Integer, default=0)
     content = Column(Text)
     timestamp = Column(DateTime)
 
     history = Column(JSONB, default=dict)
-
-    deleted = Column(Boolean, default=False)
 
     proj = relationship('Proj', back_populates='chats')
     reply_to = relationship('Chat', remote_side=[id], back_populates='replys')

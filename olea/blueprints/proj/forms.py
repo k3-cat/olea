@@ -7,27 +7,28 @@ __all__ = ['Create', 'FullCreate', 'ModifyRoles']
 
 
 class Search(BaseForm):
-    states = SetField(EnumField(Proj.State), optional=True)
-    types = SetField(EnumField(Proj.Type), optional=True)
+    states = SetField(EnumField(Proj.S), optional=True)
+    cats = SetField(EnumField(Proj.C), optional=True)
 
 
 class FullCreate(BaseForm):
     base = StringField()
-    type = EnumField(Proj.Type)
+    cat = EnumField(Proj.C)
     suff = StringField()
     leader = StringField()
 
 
 class Create(BaseForm):
     base = StringField()
-    type = EnumField(Proj.Type)
+    cat = EnumField(Proj.C)
 
-    def check_type(self, field):
-        if field not in (Proj.Type.doc, Proj.Type.sub):
-            raise FormError(f'type, {field} is not acceptable')
+    def check_cat(self, field):
+        if field not in (Proj.C.doc, Proj.C.sub):
+            raise FormError(f'cat, {field} is not acceptable')
 
 
 class ModifyRoles(BaseForm):
+    # TODO: add note
     add = DictField(EnumField(Dep), SetField(StringField()), optional=True)
     remove = SetField(StringField(), optional=True)
 

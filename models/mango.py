@@ -14,6 +14,7 @@ class Mango(BaseModel):
     sha1 = Column(String, unique=True)
     modified_at = Column(DateTime)
     timestamp = Column(DateTime)
+
     metainfo = Column(JSONB)
 
     pit = relationship('Pit', back_populates='mangos')

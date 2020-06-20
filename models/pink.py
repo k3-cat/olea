@@ -16,7 +16,7 @@ class Pink(BaseModel):
     name = Column(String, unique=True)
     email = Column(String, unique=True)
     qq = Column(String)
-    other = Column(ARRAY(String))
+    other = Column(String, nullable=True)
     deps = Column(ARRAY(Enum(Dep)))
     _pwd = Column(String)
     active = Column(Boolean, default=True)

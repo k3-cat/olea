@@ -17,7 +17,7 @@ def check_owner(f):
     return wrapper
 
 
-def check_state(required: Set[Pit.State]):
+def check_state(required: Set[Pit.S]):
     def decorate(f):
         @wraps(f)
         def wrapper(self, *args, **kwargs):

@@ -9,7 +9,7 @@ class Search(BaseForm):
 
 
 class Post(BaseForm):
-    cat = EnumField(Ann.Cat)
+    level = EnumField(Ann.L)
     deps = SetField(EnumField(Dep))
     expired_at = DateTimeField()
     content = StringField()

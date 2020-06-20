@@ -61,16 +61,19 @@ class PinkMgr(BaseMgr):
 
     def alter_ducks(self, add, remove):
         conflicts = self.o.ducks.filter(Duck.node.in_(add.keys())).all()
+
         for node in add.keys() - {conflict.node for conflict in conflicts}:
             info = add[node]
-            duck = self.model(pink_id=self.o.id,
-                              node=node,
-                              allow=info['allow'],
-                              scopes=list(info['scopes']))
-            self.o.ducks.add(duck)
+            duck = DuckMgr.grante(pink_id=self.o.id,
+                    node=node,
+                    allow=info['allow'],
+                    scopes=list(info['scopes']))
+
         if remove:
             self.o.ducks.filter(Duck.node.in_(remove)).delete()
+
         authorization.clean_cache()
+
         return (self.o.ducks.all(), conflicts)
 
 
@@ -80,13 +83,24 @@ class DuckMgr(BaseMgr):
     def __init__(self, /, pink_id, node):
         self.o: Duck = None
         if not (obj := self.model.query.get((pink_id, node))):
-                raise RecordNotFound(cls=self.model, id=(','.join((pink_id, node))))
+            raise RecordNotFound(cls=self.model, id=(','.join((pink_id, node))))
         self.o = obj
+
+    @classmethod
+    def grante(cls, pink_id, node, allow, scopes):
+        duck = cls.model(pink_id=pink_id,
+                    node=node,
+                    allow=allow,
+                    scopes=scopes)
+        db.session.add(duck)
+
+        return duck
 
     def alter_scopes(self, scopes: set):
         self.o.scopes = list(scopes)
-        db.session.add(self.o)
+
         authorization.clean_cache(self.o.pink_id)
+
         return scopes
 
     def add_scopes(self, scopes):

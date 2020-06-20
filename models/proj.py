@@ -10,14 +10,16 @@ __all__ = ['Proj']
 class Proj(BaseModel):
     __tablename__ = 'proj'
 
-    class State(enum.Enum):
+    # State
+    class S(enum.Enum):
         pre = 'pre-process'
         freezed = 'freezed'
         working = 'working'
         upload = 'pending upload'
         fin = 'finished'
 
-    class Type(enum.Enum):
+    # Category
+    class C(enum.Enum):
         doc = 'documentary'
         sub = 'sub-content'
         ani = 'animation'
@@ -25,34 +27,36 @@ class Proj(BaseModel):
     id = Column(String, primary_key=True)
     title = Column(String, index=True)
     source = Column(String)
-    type = Column(Enum(Type))
+    cat = Column(Enum(C))
     suff = Column(String)
-    state = Column(Enum(State))
+    state = Column(Enum(S), default=S.pre)
     leader_id = Column(String, ForeignKey('pink.id', ondelete='SET NULL'))
-    track = Column(ARRAY(String), default=list)
+    word_count = Column(Integer)
+    url = Column(String, nullable=True)
     timestamp = Column(DateTime)
-    word_count = Column(Integer, default=0)
-    url = Column(String)
+
+    track = Column(ARRAY(String), default=list)
 
     roles = relationship('Role', back_populates='proj', lazy='dynamic', passive_deletes=True)
     chats = relationship('Chat', back_populates='proj', lazy='dynamic', passive_deletes=True)
-    __table_args__ = (UniqueConstraint('source', 'type', 'suff', name='_proj_uc'), )
+    __table_args__ = (UniqueConstraint('source', 'cat', 'suff', name='_proj_uc'), )
     __id_len__ = 11
 
     @hybrid_property
     def display_title(self):
         return f'{self.title}({self.suff})' if self.suff else self.title
 
-    class Trace(enum.Enum):
+    # Trace
+    class T(enum.Enum):
         re_open = 'r'
         freeze = 'F'
         upload = 'U'
         start = '+'
         finish = '-'
 
-    def add_track(self, info: 'Proj.Trace', now, by=''):
+    def add_track(self, info: 'Proj.T', now, by=''):
         base = f'{info.name} - {now}'
-        if info == Trace.re_open:
+        if info == Proj.T.re_open:
             self.track.append(f'{base} by:{by}')
         else:
             self.track.append(base)

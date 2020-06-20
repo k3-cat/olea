@@ -11,24 +11,24 @@ __all__ = ['Ann']
 class Ann(BaseModel):
     __tablename__ = 'ann'
 
-    class Cat(enum.Enum):
+    # Level
+    class L(enum.Enum):
         tips = 'tips'
         normal = 'normal'
         important = 'important'
 
     id = Column(String, primary_key=True)
-    cat = Column(Enum(Cat))
+    level = Column(Enum(L))
     deps = Column(ARRAY(Enum(Dep)))
     poster = Column(String, ForeignKey('pink.id', ondelete='SET NULL'))
     expired_at = Column(DateTime)
+    deleted = Column(Boolean, default=False)
 
     ver = Column(Integer, default=0)
     timestamp = Column(DateTime)
     content = Column(Text)
 
     history = Column(JSONB, default=dict)
-
-    deleted = Column(Boolean, default=False)
 
     def update(self, now, content):
         self.history[self.ver] = {

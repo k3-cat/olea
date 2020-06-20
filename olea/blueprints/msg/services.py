@@ -3,6 +3,7 @@ from flask import g
 from models import Ann
 from olea.base import BaseMgr
 from olea.errors import AccessDenied
+from olea.singleton import db
 
 
 class AnnMgr(BaseMgr):
@@ -22,6 +23,8 @@ class AnnMgr(BaseMgr):
                         poster=g.pink_id,
                         timestamp=g.now,
                         content=content)
+        db.session.add(ann)
+
         return ann
 
     def edit(self, content):

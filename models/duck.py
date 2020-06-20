@@ -9,7 +9,7 @@ class Duck(BaseModel):
 
     pink_id = Column(String, ForeignKey('pink.id', ondelete='CASADE'), primary_key=True)
     node = Column(String, primary_key=True)
-    scopes = Column(ARRAY(String))
     allow = Column(Boolean)
+    scopes = Column(ARRAY(String))
 
     pink = relationship('Pink', back_populates='lemons')

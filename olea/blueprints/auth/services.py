@@ -93,9 +93,8 @@ class LemonMgr(BaseMgr):
                           ip=request.remote_addr,
                           exp=g.now + cls.r_life,
                           timestamp=g.now)
-
         db.session.add(lemon)
-        db.session.commit()
+
         return lemon
 
     def grante_access_token(self, key, device_id):
@@ -122,9 +121,8 @@ class LemonMgr(BaseMgr):
 
     def revoke(self):
         db.session.delete(self.o)
-        db.session.commit()
 
     @staticmethod
     def revoke_all():
-        Pink.query.get(g.pink_id).lemons.delete()
-        db.session.commit()
+        # lemons will never be added into session, unless when issuing an access token
+        Pink.query.get(g.pink_id).lemons.delete(synchronize_session=False)

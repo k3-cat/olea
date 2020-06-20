@@ -7,7 +7,7 @@ from olea.singleton import redis
 
 
 class ProjQuery():
-    PUBLIC_STATES = {Proj.State.working, Proj.State.pre, Proj.State.upload}
+    PUBLIC_STATES = {Proj.S.working, Proj.S.pre, Proj.S.upload}
 
     @classmethod
     def single(cls, id_):
@@ -17,12 +17,12 @@ class ProjQuery():
         return proj
 
     @classmethod
-    def search(cls, states=None, types=None):
+    def search(cls, states=None, cats=None):
         if states - cls.PUBLIC_STATE and not g.check_opt_perm:
             raise AccessDenied(cls_=Proj)
         query = Proj.query.filter(Proj.state.in_(states))
-        if types:
-            query.filter(Proj.type.in_(types))
+        if cats:
+            query.filter(Proj.cat.in_(cats))
         return query.all()
 
 

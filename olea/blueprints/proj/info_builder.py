@@ -9,18 +9,20 @@ from olea.errors import InvalidSource
 from olea.singleton import redis
 
 CN_SITE_URL = 'http://scp-wiki-cn.wikidot.com'
-WEB_EXP = current_app.config['WEB_EXP']
+web_exp = current_app.config['WEB_EXP']
 
 
 def fetch_web(url):
-    web_page_t = redis.get(f'web-{url}')
-    if not web_page_t:
+    if not (web_page_t := redis.get(f'web-{url}')):
         web_page = requests.get(f'{CN_SITE_URL}/{url}')
         if web_page.status_code == 404:
             raise InvalidSource(rsn=InvalidSource.Rsn.web, url=url)
+
         web_page_t = web_page.text
-    redis.set(f'web-{url}', web_page_t, ex=WEB_EXP)
+        redis.set(f'web-{url}', web_page_t, ex=web_exp)
+
     soup = BeautifulSoup(web_page_t, 'lxml')
+
     return soup.find('div', {'id': 'main-content'})
 
 
@@ -30,6 +32,7 @@ def fetch_title_by_url(url):
 
     web = fetch_web(url)
     title_e = web.find('div', {'id': 'page-title'})
+
     return title_e.text.strip()
 
 
@@ -45,40 +48,48 @@ def fetch_title_by_id(id_):
         else:
             url = 'scp-series'
             page = int(primary.group(1)) // 1000 + 1
+
         url += '-cn' if 'cn-' in id_ else ''
         url += f'-{page}/' if page != 1 else '/'
+
     elif re.match(r'^[0-9]{3,4}-jp(?:-j)?$', id_):
         url = 'scp-international/'
+
     else:
         raise InvalidSource(rsn=InvalidSource.Rsn.inp)
+
     web = fetch_web(url)
-    title_e = web.find_all(name='a', text=f'SCP-{id_}', limit=1)[0]
-    if not title_e:
+    if not (title_e := web.find_all(name='a', text=f'SCP-{id_}', limit=1)[0]):
         raise InvalidSource(rsn=InvalidSource.Rsn.non)
+
     return str(title_e.parent)
 
 
-def fetch_title(base, type_):
-    if type_ == Proj.Type.doc:
+def fetch_title(base, cat):
+    if cat == Proj.C.doc:
         base = re.match(r'^(?:scp-)?(.*)$', base.lower()).group(1)
         source = f'/scp-{base}'
         title = (f'SCP-{base.upper()}'
                  f"{re.match(r'^<li><a.*/a>(.*)</li>$', fetch_title_by_id(base)).group(1)}")
-    elif type_ == Proj.Type.sub:
+
+    elif cat == Proj.C.sub:
         if base[0] != '/':
             base = f'/{base}'
         source = base.lower()
         title = fetch_title_by_url(source)
+
     else:
         base_ = base.split('\n')
         title = base_[0]
         source = base_[1]
+
     return (title, source)
 
 
-def count_chars(source, type_):
-    if type_ not in (Proj.Type.doc, Proj.Type.sub):
+def count_chars(source, cat):
+    if cat not in (Proj.C.doc, Proj.C.sub):
         count = 0
+
     else:
         web = fetch_web(source)
         page_content = web.find('div', {'id': 'page-content'})
@@ -93,10 +104,11 @@ def count_chars(source, type_):
                 count += 1
             else:
                 count += len(elem)
+
     return count
 
 
-def build_info(base, type_):
-    title, source = fetch_title(base, type_)
-    words_count = count_chars(source, type_)
+def build_info(base, cat):
+    title, source = fetch_title(base, cat)
+    words_count = count_chars(source, cat)
     return (title, source, words_count)

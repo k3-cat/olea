@@ -10,7 +10,8 @@ __all__ = ['Pit']
 class Pit(BaseModel):
     __tablename__ = 'pit'
 
-    class State(enum.Enum):
+    # State
+    class S(enum.Enum):
         init = 'initialized'
         pending = 'pending'
         working = 'working'
@@ -24,12 +25,13 @@ class Pit(BaseModel):
     id = Column(String, primary_key=True)
     role_id = Column(String, ForeignKey('role.id', ondelete='CASCADE'))
     pink_id = Column(String, ForeignKey('pink.id', ondelete='SET NULL'))
-    state = Column(Enum(State), default=State.init, index=True)
-    track = Column(ARRAY(String), default=list)
-    start_at = Column(DateTime)
-    finish_at = Column(DateTime)
-    due = Column(DateTime)
+    state = Column(Enum(S), default=S.init, index=True)
+    start_at = Column(DateTime, nullable=True)
+    finish_at = Column(DateTime, nullable=True)
+    due = Column(DateTime, nullable=True)
     timestamp = Column(DateTime)
+
+    track = Column(ARRAY(String), default=list)
 
     pink = relationship('Pink', back_populates='pits')
     role = relationship('Role', back_populates='pits')
@@ -41,7 +43,8 @@ class Pit(BaseModel):
     __table_args__ = (UniqueConstraint('role_id', 'pink_id', name='_pit_uc'), )
     __id_len__ = 13
 
-    class Trace(enum.Enum):
+    # Trace
+    class T(enum.Enum):
         pick_f = 'P'
         drop = 'd'
         shift = '<-'
@@ -54,14 +57,14 @@ class Pit(BaseModel):
         check_fail = 'x'
         extend = '+'
 
-    def add_track(self, info: 'Pit.Trace', now, by=''):
+    def add_track(self, info: 'Pit.T', now, by=''):
         base = f'{info.value} - {now}'
-        if info in (Trace.past_due, Trace.pick_f, Trace.submit_f, Trace.check_fail,
-                    Trace.check_pass):
+        if info in (Pit.T.past_due, Pit.T.pick_f, Pit.T.submit_f, Pit.T.check_fail,
+                    Pit.T.check_pass):
             self.track.append(f'{base} by:{by}')
-        elif info in (Trace.shift, Trace.cascade):
+        elif info in (Pit.T.shift, Pit.T.cascade):
             self.track.append(f'{base} by:{by} from:{self.due}')
-        elif info == Trace.extend:
+        elif info == Pit.T.extend:
             self.track.append(f'{base} from:{self.due}')
         else:
             self.track.append(base)

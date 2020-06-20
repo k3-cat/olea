@@ -13,9 +13,9 @@ class Role(BaseModel):
 
     id = Column(String, primary_key=True)
     proj_id = Column(String, ForeignKey('proj.id', ondelete='CASCADE'))
-    dep = Column(Enum(Dep))
-    name = Column(String)
-    note = Column(Text)
+    dep = Column(Enum(Dep), index=True)
+    name = Column(String, unique=True)
+    note = Column(Text, nullable=True)
     taken = Column(Boolean, default=False)
 
     proj = relationship('Proj', back_populates='roles')

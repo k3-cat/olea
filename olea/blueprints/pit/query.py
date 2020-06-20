@@ -17,9 +17,9 @@ class PitQuery():
         if not g.check_scopes(scopes=deps):
             raise AccessDenied(cls_=Pit)
 
-        pits = Pit.query.join(Role) \
-            .filter(Pit.state == Pit.State.auditing) \
-            .filter(Role.dep.in_(deps)).all()
+        pits = Pit.query.join(Role). \
+            filter(Pit.state == Pit.S.auditing). \
+            filter(Role.dep.in_(deps)).all()
 
         return pits
 
@@ -28,9 +28,9 @@ class PitQuery():
         if not g.check_scopes(scopes=dep):
             raise AccessDenied(cls_=Pit)
 
-        pits = Pit.query.join(Role) \
-            .filter(Role.dep == dep) \
-            .filter(Pit.state.in_(status)).all()
+        pits = Pit.query.join(Role). \
+            filter(Role.dep == dep). \
+            filter(Pit.state.in_(status)).all()
 
         return pits
 
