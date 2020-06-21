@@ -29,7 +29,10 @@ class ProjQuery():
 class ChatQuery():
     @staticmethod
     def chat_index(proj_id):
-        return redis.hgetall(f'cTree-{proj_id}')
+        available = redis.smembers(f'cAvbl-{proj_id}')
+        index = dict(zip(available, redis.hmget(f'cTree-{proj_id}', *available)))
+
+        return index
 
     @staticmethod
     def chats(chats):

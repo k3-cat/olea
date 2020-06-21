@@ -1,5 +1,6 @@
 import json
 from typing import List
+from collections import deque
 
 from flask import g
 
@@ -164,18 +165,12 @@ class ChatMgr(BaseMgr):
 
     @staticmethod
     def _is_visible(proj_id, id_):
-        if (path := redis.hget(f'cPath-{proj_id}', id_)) is None:
+        if not redis.sismember(f'cAvbl-{proj_id}', id_):
             raise InvalidReply()
 
-        # chats under the root
-        if not path:
-            return path
-
-        path_ = path.split('/')
-        if len(path_) != redis.exists(*path_):
-            raise InvalidReply()
-
-        return path
+    @staticmethod
+    def _get_path(proj_id, id_):
+        return redis.sscan(f'cPath-{proj_id}', f'*/{id_}')
 
     @classmethod
     def post(cls, proj: Proj, reply_to_id: str, content: str):
@@ -189,18 +184,20 @@ class ChatMgr(BaseMgr):
         db.session.add(chat)
 
         if reply_to_id:
-            path = cls._is_visible(proj.id, reply_to_id)
-            path = '/'.join((path, reply_to_id))
+            cls._is_visible(proj.id, reply_to_id)
+
+            path = cls._get_path(proj.id, reply_to_id)
             father = reply_to_id
 
         else:
-            path = ''
+            path = '/'
             father = proj.id
 
         replys_s = redis.hget(f'cTree-{proj.id}', father)
         with redis.pipeline(transaction=True) as p:
             p.hset(f'cTree-{proj.id}', chat.id, '')
-            p.hset(f'cPath-{proj.id}', chat.id, path)
+            p.sadd(f'cAvbl-{proj.id}', chat.id)
+            p.sadd(f'cPath-{proj.id}', path)
 
             if not replys_s:
                 p.hset(f'cTree-{proj.id}', father, chat.id)
@@ -223,6 +220,8 @@ class ChatMgr(BaseMgr):
     def delete(self):
         self._is_visible(self.o.proj_id, self.o.id)
 
-        redis.hdel(f'cTree-{self.o.proj_id}', self.o.id)
-
         self.o.delete = True
+
+        path = '/'.join(self._get_path(self.o.proj_id, self.o.id).split('/')[:-1])
+        queue = [redis.sscan_iter(f'cPath-{self.o.proj_id}', f'{path}/*')]
+        redis.srem(f'cAvbl-{self.o.proj_id}', *[cpath.split('/')[-1] for cpath in  queue])

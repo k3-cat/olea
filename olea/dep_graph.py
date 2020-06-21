@@ -2,6 +2,7 @@ from datetime import timedelta
 from typing import Dict, Set
 
 from singleton import Singleton
+from collections import deque
 
 from models import Dep
 
@@ -21,15 +22,14 @@ class DepGraph(metaclass=Singleton):
     def __new__(cls):
         for dep, dependences in cls.RULE.items():
             # check circular dependence
-            # cannot use dfs
-            chain = cls.RULE.get(dep, set())
-            chain_len = 0
-            while chain_len != len(chain):
-                chain_len = len(chain)
-                for _dep in chain:
-                    chain = chain | cls.RULE.get(_dep, set())
-            if dep in chain:
-                raise Exception('Circular Dependence')
+            queue = deque([dep])
+            chain = set()
+            while queue:
+                deps = cls.RULE.get(queue.pop_left(), set())
+                queue.extend(deps)
+                chain = chain | deps
+                if dep in chain:
+                    raise Exception('Circular Dependence')
 
             # build inverse rule
             for _dep in dependences:
@@ -45,19 +45,6 @@ class DepGraph(metaclass=Singleton):
         for dep in set(own):
             dependencies = dependencies | self.RULE[dep]
         return target in dependencies
-
-    @staticmethod
-    def _dfs(dict_, key):
-        result = dict_.get(key, set())
-        for key_ in result:
-            result = result | _dfs(key_)
-        return result
-
-    def get_all_dependents(self, dep):
-        return self._dfs(self.I_RULE, dep)
-
-    def get_all_dependences(self, dep):
-        return self._dfs(self.RULE, dep)
 
     def get_duration(self, dep):
         local_max = timedelta(seconds=0)
