@@ -10,6 +10,8 @@
 
 ## permission required request only
 
-| name | type | description                   |
-| ---- | ---- | ----------------------------- |
-| node | str  | permission node that required |
+| name           | type     | description                                                |
+| -------------- | -------- | ---------------------------------------------------------- |
+| node           | str      | permission node that required                              |
+| check_scopes   | callable | check if permission applys to the required scopes          |
+| check_opt_duck | callable | check if user has permission, only called when rbac denied |

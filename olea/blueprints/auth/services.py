@@ -45,7 +45,7 @@ class PinkMgr(BaseMgr):
             return
         token = random_b85(k=20)
         redis.set(f'rst-{token}', pink.id, ex=cls.t_life)
-        email_mgr.reset_pwd(email=pink.email, token=token)
+        email_mgr.pwd_reset(email=pink.email, name=pink.name, token=token)
 
     @staticmethod
     def reset_pwd(token, pwd):

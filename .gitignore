@@ -1,8 +1,8 @@
-/.venv
+/.venv/
 __pycache__/
 
-/.mypy_cache
-/.pytest_cache
+/.mypy_cache/
+/.pytest_cache/
 
 /.vscode/*
 !.vscode/launch.json

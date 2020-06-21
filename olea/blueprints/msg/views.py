@@ -19,7 +19,7 @@ def search():
 @perm
 def post_():
     form = Post()
-    ann = AnnMgr.post(cat=form.cat, deps=form.deps, expire_at=form.expire_at, content=form.content)
+    ann = AnnMgr.post(cat=form.cat, deps=form.deps, exp=form.exp, content=form.content)
     return jsonify({})
 
 

@@ -11,7 +11,7 @@ class Search(BaseForm):
 class Post(BaseForm):
     level = EnumField(Ann.L)
     deps = SetField(EnumField(Dep))
-    expired_at = DateTimeField()
+    exp = DateTimeField()
     content = StringField()
 
 

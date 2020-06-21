@@ -14,12 +14,12 @@ class AnnMgr(BaseMgr):
         super().__init__(obj_or_id)
 
     @classmethod
-    def post(cls, cat, deps, expire_at, content):
+    def post(cls, cat, deps, exp, content):
         g.check_scopes(deps)
         ann = cls.model(id=cls.gen_id(),
                         cat=cat,
                         deps=deps,
-                        expire_at=expire_at,
+                        exp=exp,
                         poster=g.pink_id,
                         timestamp=g.now,
                         content=content)

@@ -21,7 +21,7 @@ class Ann(BaseModel):
     level = Column(Enum(L))
     deps = Column(ARRAY(Enum(Dep)))
     poster = Column(String, ForeignKey('pink.id', ondelete='SET NULL'))
-    expired_at = Column(DateTime)
+    exp = Column(DateTime)
     deleted = Column(Boolean, default=False)
 
     ver = Column(Integer, default=0)
@@ -29,6 +29,8 @@ class Ann(BaseModel):
     content = Column(Text)
 
     history = Column(JSONB, default=dict)
+
+    __id_len__ = 8
 
     def update(self, now, content):
         self.history[self.ver] = {

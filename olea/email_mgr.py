@@ -12,5 +12,11 @@ def email_verification(email, token):
                  values={'token': token})
 
 
-def reset_pwd(email, token):
-    mailgun.send(subject='你的密码重置令牌', to=(email, ), template='reset_pwd', values={'token': token})
+def pwd_reset(email, name, token):
+    mailgun.send(subject='这是你刚下单的令牌 ~',
+                 to=(email, ),
+                 template='pwd_reset',
+                 values={
+                     'name': name,
+                     'token': token
+                 })
