@@ -1,6 +1,7 @@
 from flask import abort, g, request
 from sentry_sdk import configure_scope
 
+from models import Pink
 from olea.errors import InvalidCredential
 from olea.singleton import redis
 
@@ -31,3 +32,10 @@ def check_lemon():
 def allow_anonymous(f):
     anonymous_endpoints.add(f'auth.{f.__name__}')
     return f
+
+def revoke_all_lemons(pink_or_id):
+    # lemons will never be added into session, unless when issuing an access token
+    if isinstance(pink_or_id, str):
+        pink_or_id = Pink.query.get(pink_or_id)
+
+    pink_or_id.lemons.delete(synchronize_session=False)

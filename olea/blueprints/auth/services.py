@@ -4,6 +4,7 @@ from flask import current_app, g, request
 
 from models import Lemon, Pink
 from olea import email_mgr
+from olea.auth.authentication import revoke_all_lemons
 from olea.base import BaseMgr
 from olea.errors import AccountDeactivated, InvalidCredential, InvalidRefreshToken, RecordNotFound
 from olea.singleton import db, ip2loc, redis, pat
@@ -50,7 +51,10 @@ class PinkMgr(BaseMgr):
     def reset_pwd(token, pwd):
         if not (pink_id := redis.get(f'rst-{token}')):
             raise InvalidCredential(type=InvalidCredential.T.rst)
+
         PinkMgr(pink_id).set_pwd(pwd)
+        revoke_all_lemons(pink_or_id=pink_id)
+
         redis.delete(token)
 
     def set_pwd(self, pwd):
@@ -122,7 +126,5 @@ class LemonMgr(BaseMgr):
     def revoke(self):
         db.session.delete(self.o)
 
-    @staticmethod
-    def revoke_all():
-        # lemons will never be added into session, unless when issuing an access token
-        Pink.query.get(g.pink_id).lemons.delete(synchronize_session=False)
+    def revoke_all(self):
+        revoke_all_lemons(pink_or_id=g.pink_id)

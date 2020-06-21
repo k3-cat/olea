@@ -33,6 +33,8 @@ class Proj(BaseModel):
     leader_id = Column(String, ForeignKey('pink.id', ondelete='SET NULL'))
     word_count = Column(Integer)
     url = Column(String, nullable=True)
+    start_at = Column(DateTime, nullable=True)
+    finish_at = Column(DateTime, nullable=True)
     timestamp = Column(DateTime)
 
     track = Column(ARRAY(String), default=list)

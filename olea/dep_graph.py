@@ -1,8 +1,9 @@
+from collections import deque
 from datetime import timedelta
+from functools import lru_cache
 from typing import Dict, Set
 
 from singleton import Singleton
-from collections import deque
 
 from models import Dep
 
@@ -25,7 +26,7 @@ class DepGraph(metaclass=Singleton):
             queue = deque([dep])
             chain = set()
             while queue:
-                deps = cls.RULE.get(queue.pop_left(), set())
+                deps = cls.RULE.get(queue.popleft(), set())
                 queue.extend(deps)
                 chain = chain | deps
                 if dep in chain:
@@ -40,12 +41,16 @@ class DepGraph(metaclass=Singleton):
 
         return super().__new__(cls)
 
-    def is_depend_on(self, own, target):
-        dependencies = {}
-        for dep in set(own):
-            dependencies = dependencies | self.RULE[dep]
-        return target in dependencies
+    def is_depend_on(self, own: Set[Dep], target: Dep) -> bool:
+        queue = deque(own)
+        dependencies: Set[Dep] = set()
+        while queue:
+            dependencies = dependencies | self.RULE.get(queue.popleft(), set())
+            if target in dependencies:
+                return True
+        return False
 
+    @lru_cache
     def get_duration(self, dep):
         local_max = timedelta(seconds=0)
         for _dep in self.RULE.get(dep, set()):
@@ -55,3 +60,6 @@ class DepGraph(metaclass=Singleton):
 
     def get_start_time(self, base, dep):
         return base + self.get_duration(dep) - self.DURATION[dep]
+
+    def get_finish_time(self, base, dep):
+        return base + self.get_duration(dep)

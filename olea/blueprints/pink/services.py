@@ -3,9 +3,10 @@ from flask import current_app, g
 from models import Duck, Pink
 from olea import email_mgr
 from olea.auth import authorization
+from olea.auth.authentication import revoke_all_lemons
 from olea.base import BaseMgr
 from olea.errors import InvalidCredential, RecordNotFound
-from olea.singleton import db, redis, pat
+from olea.singleton import db, pat, redis
 from olea.utils import random_b85
 
 
@@ -56,8 +57,8 @@ class PinkMgr(BaseMgr):
 
     def deactive(self):
         self.o.active = False
-        self.o.lemons.delete()
-        return True
+
+        revoke_all_lemons(self.o)
 
     def alter_ducks(self, add, remove):
         conflicts = self.o.ducks.filter(Duck.node.in_(add.keys())).all()

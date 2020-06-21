@@ -74,6 +74,7 @@ class ProjMgr(BaseMgr):
         if self.o.state != Proj.S.pre:
             raise ProjMetaLocked(state=self.o.state)
 
+        self.o.start_at = g.now
         self.o.state = Proj.S.working
         self.o.add_track(info=Proj.T.start, now=g.now)
 
@@ -87,11 +88,12 @@ class ProjMgr(BaseMgr):
             pit.state = Pit.S.working if pit.start_at == g.now else Pit.S.pending
 
     def finish(self, url):
+        self.o.finish_at = g.now
         self.o.state = Proj.S.fin
         self.o.url = url
         self.o.add_track(info=Proj.T.finish, now=g.now)
 
-        redis.delete(f'cPath-{self.o.id}', f'cTree-{self.o.id}')
+        redis.delete(f'cAvbl-{self.o.id}', f'cPath-{self.o.id}', f'cTree-{self.o.id}')
 
     def freeze(self):
         self.o.state = Proj.S.freezed
@@ -222,6 +224,23 @@ class ChatMgr(BaseMgr):
 
         self.o.delete = True
 
-        path = '/'.join(self._get_path(self.o.proj_id, self.o.id).split('/')[:-1])
-        queue = [redis.sscan_iter(f'cPath-{self.o.proj_id}', f'{path}/*')]
-        redis.srem(f'cAvbl-{self.o.proj_id}', *[cpath.split('/')[-1] for cpath in  queue])
+        path_ = self._get_path(self.o.proj_id, self.o.id).split('/')
+        replys = redis.hget(f'cTree-{self.o.proj_id}', path_[-2]).split(';').delete(self.o.id)
+        queue = [redis.sscan_iter(f'cPath-{self.o.proj_id}', f'{"/".join(path_)}*')]
+        with redis.pipeline(transaction=True) as p:
+            p.hset(f'cTree-{self.o.proj_id}', path_[-2], ';'.join(replys))
+            p.srem(f'cAvbl-{self.o.proj_id}', *[cpath.split('/')[-1] for cpath in queue])
+
+            p.execute()
+
+    def restore(self):
+        self.o.delete = False
+
+        path_ = self._get_path(self.o.proj_id, self.o.id).split('/')
+        replys = redis.hget(f'cTree-{self.o.proj_id}', path_[-2]).split(';').append(self.o.id)
+        queue = [redis.sscan_iter(f'cPath-{self.o.proj_id}', f'{"/".join(path_)}*')]
+        with redis.pipeline(transaction=True) as p:
+            p.hset(f'cTree-{self.o.proj_id}', path_[-2], ';'.join(replys))
+            p.sadd(f'cAvbl-{self.o.proj_id}', *[cpath.split('/')[-1] for cpath in queue])
+
+            p.execute()
