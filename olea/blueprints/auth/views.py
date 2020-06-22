@@ -12,7 +12,7 @@ from .services import LemonMgr, PinkMgr, verify_email
 def login():
     form = Login()
     lemon = LemonMgr.grante(name=form.name, pwd=form.pwd, device_id=form.device_id)
-    return jsonify({'id': lemon.id, 'key': lemon.key, 'exp': lemon.exp})
+    return jsonify({'id': lemon.id, 'key': lemon.key, 'exp': lemon.expiration})
 
 
 @bp.route('/set-pwd', methods=['POST'])

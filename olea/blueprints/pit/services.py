@@ -29,7 +29,7 @@ class PitMgr(BaseMgr):
         super().__init__(obj_or_id)
 
     @check_owner
-    @check_state({Pit.S.working, Pit.S.init})
+    @check_state(set(Pit.S) - {Pit.S.droped, Pit.S.auditing, Pit.S.fin, Pit.S.fin_p})
     def drop(self):
         if self.o.state == Pit.S.init:
             db.session.delete(self.o)
@@ -45,9 +45,11 @@ class PitMgr(BaseMgr):
     def submit(self, share_id):
         if g.now > self.o.due or self.o.state == Pit.S.past_due:
             redis.set(f'pstate-{self.o.id}', 'past-due')
+
         self.o.state = Pit.S.auditing
         self.o.add_track(info=Pit.T.submit, now=g.now)
         mango = MangoMgr.create(self.o, share_id)
+
         return mango
 
     @classmethod
@@ -55,13 +57,16 @@ class PitMgr(BaseMgr):
         head, payload = pat.decode_with_head(token)
         pit = cls.model.query.get(head['p'])
 
-        if g.now > pit.due or pit.state == Pit.S.past_due:
+        submit_time = datetime.datetime.fromtimestamp(head['t'])
+        if submit_time <= pit.due and pit.state == Pit.S.past_due:
+            PitMgr(pit)._resume_state()
+        elif submit_time > pit.due or pit.state == Pit.S.past_due:
             redis.set(f'pstate-{pit.id}', 'past-due')
+
         pit.state = Pit.S.auditing
-        pit.add_track(info=Pit.T.submit_f,
-                      now=datetime.datetime.fromtimestamp(payload['t']),
-                      by=g.pink_id)
+        pit.add_track(info=Pit.T.submit_f, now=submit_time, by=g.pink_id)
         mango = MangoMgr.f_create(pit, share_id=payload['share_id'], sha1=payload['sha1'])
+
         return mango
 
     def past_due(self):

@@ -1,9 +1,9 @@
 import enum
 
 from sqlalchemy_ import BaseModel, Column, ForeignKey
-from sqlalchemy_.types import ARRAY, JSONB, Boolean, DateTime, Enum, Integer, String, Text
+from sqlalchemy_.types import ARRAY, Enum, JSONB, Boolean, DateTime, Integer, String, Text
 
-from .common_enums import Dep
+from .common_enums import DEP
 
 __all__ = ['Ann']
 
@@ -18,10 +18,10 @@ class Ann(BaseModel):
         important = 'important'
 
     id = Column(String, primary_key=True)
-    level = Column(Enum(L))
-    deps = Column(ARRAY(Enum(Dep)), index=True)
-    poster = Column(String, ForeignKey('pink.id', ondelete='SET NULL'))
-    exp = Column(DateTime)
+    level = Column(Enum(L, name='ann_level'))
+    deps = Column(ARRAY(DEP), index=True)
+    poster_id = Column(String, ForeignKey('pink.id', ondelete='SET NULL'))
+    expiration = Column(DateTime)
     deleted = Column(Boolean, default=False)
 
     ver = Column(Integer, default=0)

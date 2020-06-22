@@ -107,13 +107,13 @@ class LemonMgr(BaseMgr):
         if self.o.ip != request.remote_addr \
             and ip2loc.get_city(self.o.ip) != ip2loc.get_city(request.remote_addr):
             raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.ip)
-        if self.o.exp < g.now:
+        if self.o.expiration < g.now:
             self.revoke()
-            raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.exp, at=self.o.exp)
+            raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.exp, at=self.o.expiration)
 
         last = redis.hget('lass_access', g.pink_id)
         if last and g.now.timestamp() - last > 86400:
-            self.o.exp = g.now + self.r_life
+            self.o.expiration = g.now + self.r_life
 
         token = random_b85(k=20)
         with redis.pipeline(transaction=False) as p:

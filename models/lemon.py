@@ -12,7 +12,7 @@ class Lemon(BaseModel):
     pink_id = Column(String, ForeignKey('pink.id', ondelete='CASCADE'))
     ip = Column(String)
     device_id = Column(UUID)
-    exp = Column(DateTime)
+    expiration = Column(DateTime)
     timestamp = Column(DateTime)
 
     pink = relationship('Pink', back_populates='lemons')

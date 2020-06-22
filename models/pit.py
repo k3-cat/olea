@@ -2,7 +2,7 @@ import enum
 
 from sqlalchemy_ import (BaseModel, Column, ForeignKey, UniqueConstraint, hybrid_property,
                          relationship)
-from sqlalchemy_.types import ARRAY, DateTime, Enum, String
+from sqlalchemy_.types import ARRAY, Enum, DateTime, String
 
 __all__ = ['Pit']
 
@@ -25,7 +25,7 @@ class Pit(BaseModel):
     id = Column(String, primary_key=True)
     role_id = Column(String, ForeignKey('role.id', ondelete='CASCADE'))
     pink_id = Column(String, ForeignKey('pink.id', ondelete='SET NULL'))
-    state = Column(Enum(S), default=S.init, index=True)
+    state = Column(Enum(S, name='pit_state'), default=S.init, index=True)
     start_at = Column(DateTime, nullable=True)
     finish_at = Column(DateTime, nullable=True)
     due = Column(DateTime, nullable=True)

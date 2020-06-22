@@ -14,13 +14,13 @@ class AnnMgr(BaseMgr):
         super().__init__(obj_or_id)
 
     @classmethod
-    def post(cls, cat, deps, exp, content):
+    def post(cls, cat, deps, expiration, content):
         g.check_scopes(deps)
         ann = cls.model(id=cls.gen_id(),
                         cat=cat,
                         deps=deps,
-                        exp=exp,
-                        poster=g.pink_id,
+                        expiration=expiration,
+                        poster_id=g.pink_id,
                         content=content,
                         at=g.now)
         db.session.add(ann)
@@ -28,13 +28,13 @@ class AnnMgr(BaseMgr):
         return ann
 
     def edit(self, content):
-        if self.o.poster != g.pink_id:
+        if self.o.poster_id != g.pink_id:
             raise AccessDenied(obj=self.o)
 
         self.o.update(now=g.now, content=content)
 
     def delete(self):
-        if self.o.poster != g.pink_id:
+        if self.o.poster_id != g.pink_id:
             raise AccessDenied(obj=self.o)
 
         self.o.deleted = True

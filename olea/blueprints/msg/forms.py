@@ -10,7 +10,7 @@ class Search(BaseForm):
 class Post(BaseForm):
     level = Enum(Ann.L)
     deps = Set(Enum(Dep))
-    exp = DateTime
+    expiration = DateTime
     content = String
 
 

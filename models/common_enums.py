@@ -1,4 +1,5 @@
 import enum
+from sqlalchemy_.types import Enum
 
 __all__ = ['Dep']
 
@@ -10,3 +11,6 @@ class Dep(enum.IntEnum):
     au = 50
     ps = 60
     ae = 70
+
+
+DEP = Enum(Dep, name='dep')

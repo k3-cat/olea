@@ -13,11 +13,10 @@
 
 ## properties
 
-| name | table            | meaning    |
-| ---- | ---------------- | ---------- |
-| ver  | ann, chat, mango | version    |
-| exp  | ann, lemon       | expiration |
-| cat  | proj             | catagory   |
+| name | table            | meaning  |
+| ---- | ---------------- | -------- |
+| ver  | ann, chat, mango | version  |
+| cat  | proj             | catagory |
 
 ## objects
 

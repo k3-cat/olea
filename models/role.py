@@ -1,8 +1,8 @@
 from sqlalchemy_ import (BaseModel, Column, ForeignKey, UniqueConstraint, hybrid_property,
                          relationship)
-from sqlalchemy_.types import Boolean, Enum, String, Text
+from sqlalchemy_.types import Enum, Boolean, String, Text
 
-from .common_enums import Dep
+from .common_enums import DEP
 from .pit import Pit
 
 __all__ = ['Role']
@@ -13,7 +13,7 @@ class Role(BaseModel):
 
     id = Column(String, primary_key=True)
     proj_id = Column(String, ForeignKey('proj.id', ondelete='CASCADE'))
-    dep = Column(Enum(Dep), index=True)
+    dep = Column(DEP, index=True)
     name = Column(String, unique=True)
     note = Column(Text, nullable=True)
     taken = Column(Boolean, default=False)

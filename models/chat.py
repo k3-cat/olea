@@ -1,5 +1,5 @@
 from sqlalchemy_ import BaseModel, Column, ForeignKey, relationship
-from sqlalchemy_.types import ARRAY, JSONB, Boolean, DateTime, Enum, Integer, String, Text
+from sqlalchemy_.types import ARRAY, JSONB, Boolean, DateTime, Integer, String, Text
 
 __all__ = ['Chat']
 

@@ -2,7 +2,7 @@ import enum
 
 from sqlalchemy_ import (BaseModel, Column, ForeignKey, UniqueConstraint, hybrid_property,
                          relationship)
-from sqlalchemy_.types import ARRAY, DateTime, Enum, Integer, String
+from sqlalchemy_.types import ARRAY, Enum, DateTime, Integer, String
 
 __all__ = ['Proj']
 
@@ -27,9 +27,9 @@ class Proj(BaseModel):
     id = Column(String, primary_key=True)
     title = Column(String, index=True)
     source = Column(String)
-    cat = Column(Enum(C))
+    cat = Column(Enum(C, name='proj_cat'))
     suff = Column(String)
-    state = Column(Enum(S), default=S.pre)
+    state = Column(Enum(S, name='proj_state'), default=S.pre)
     leader_id = Column(String, ForeignKey('pink.id', ondelete='SET NULL'))
     word_count = Column(Integer)
     url = Column(String, nullable=True)
@@ -53,8 +53,7 @@ class Proj(BaseModel):
         re_open = 'r'
         freeze = 'F'
         upload = 'U'
-        start = '+'
-        finish = '-'
+        start = '%'
 
     def add_track(self, info: 'Proj.T', now, by=''):
         base = f'{info.name} - {now}'

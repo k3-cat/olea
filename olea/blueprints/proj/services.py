@@ -29,6 +29,7 @@ class ProjMgr(BaseMgr):
         if proj := cls.model.query.filter_by(source=source, cat=cat, suff=suff):
             if proj.state == Proj.S.freezed:
                 proj.state = Proj.S.pre
+                proj.start_at = g.now
                 proj.leader_id = leader_id
                 proj.add_track(info=Proj.T.re_open, now=g.now, by=g.pink_id)
 
@@ -36,15 +37,14 @@ class ProjMgr(BaseMgr):
                 raise DuplicatedRecord(obj=proj)
 
         else:
-            proj = cls.model(
-                id=cls.gen_id(),
-                title=title,
-                source=source,
-                cat=cat,
-                suff=suff,
-                words_count=words_count,
-                leader_id=leader_id,
-            )
+            proj = cls.model(id=cls.gen_id(),
+                             title=title,
+                             cat=cat,
+                             source=source,
+                             suff=suff,
+                             leader_id=leader_id,
+                             words_count=words_count,
+                             start_at=g.now)
         db.session.add(proj)
 
         return proj
@@ -94,12 +94,12 @@ class ProjMgr(BaseMgr):
         self.o.finish_at = g.now
         self.o.state = Proj.S.fin
         self.o.url = url
-        self.o.add_track(info=Proj.T.finish, now=g.now)
 
         redis.delete(f'cAvbl-{self.o.id}', f'cPath-{self.o.id}', f'cTree-{self.o.id}')
 
     def freeze(self):
         self.o.state = Proj.S.freezed
+        self.o.start_at = None
         self.o.add_track(info=Proj.T.freeze, now=g.now)
 
     def post_chat(self, reply_to_id, content):
