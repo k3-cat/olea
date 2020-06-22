@@ -40,7 +40,6 @@ class Pit(BaseModel):
                           order_by='Mango.ver.desc()',
                           lazy='dynamic',
                           passive_deletes=True)
-    __table_args__ = (UniqueConstraint('role_id', 'pink_id', name='_pit_uc'), )
     __id_len__ = 13
 
     # Trace

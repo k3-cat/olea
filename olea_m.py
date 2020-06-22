@@ -1,3 +1,5 @@
+import os
+
 
 def register_commands(app):
     import click
@@ -25,13 +27,16 @@ def set_shellcontext(app):
     app.shell_context_processor(shell_context)
 
 
-def create_manager():
-    from olea import create_app
-    from olea.singleton import db
+def create_manager(env=os.getenv('FLASK_ENV', 'production')):
+    from flask import Flask
     from flask_migrate import Migrate
 
+    from configs import load_config
+    from olea.singleton import db
 
-    app = create_app()
+    app = Flask(__name__)
+
+    app.config.from_object(load_config(env))
 
     db.init_app(app)
     migrate = Migrate(app, db)

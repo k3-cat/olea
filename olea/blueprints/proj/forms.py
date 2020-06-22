@@ -1,5 +1,6 @@
-from flask_jsonform import BaseForm, FormError
-from jsonform.fields import DictField, EnumField, SetField, StringField
+from flask_jsonapi import BaseForm, Container
+from json_api.fields import List, Enum, Set, String
+from json_api.conditions import In
 
 from models import Dep, Proj
 
@@ -7,30 +8,30 @@ __all__ = ['Create', 'FullCreate', 'ModifyRoles']
 
 
 class Search(BaseForm):
-    states = SetField(EnumField(Proj.S), optional=True)
-    cats = SetField(EnumField(Proj.C), optional=True)
+    states = Set(Enum(Proj.S), required=False)
+    cats = Set(Enum(Proj.C), required=False)
 
 
 class FullCreate(BaseForm):
-    base = StringField()
-    cat = EnumField(Proj.C)
-    suff = StringField()
-    leader = StringField()
+    base = String
+    cat = Enum(Proj.C)
+    suff = String
+    leader = String
 
 
 class Create(BaseForm):
-    base = StringField()
-    cat = EnumField(Proj.C)
-
-    def check_cat(self, field):
-        if field not in (Proj.C.doc, Proj.C.sub):
-            raise FormError(f'cat, {field} is not acceptable')
+    base = String
+    cat = Enum(Proj.C, condition=In(Proj.C.doc, Proj.C.sub))
 
 
 class ModifyRoles(BaseForm):
-    # TODO: add note
-    add = DictField(EnumField(Dep), SetField(StringField()), optional=True)
-    remove = SetField(StringField(), optional=True)
+    class Role(Container):
+        dep = Enum(Dep, condition=In(Dep.au, Dep.ps, Dep.ae))
+        name = String
+        note = String
+
+    add = List(Role, required=False)
+    remove = Set(String(), required=False)
 
     def check_add(self, field):
         if self.test_empty('add') and self.test_empty('remove'):
@@ -40,21 +41,21 @@ class ModifyRoles(BaseForm):
 
 
 class Finish(BaseForm):
-    url = StringField()
+    url = String
 
 
 class Pick(BaseForm):
-    pink_id = StringField()
+    pink_id = String
 
 
 class PostChat(BaseForm):
-    reply_to_id = StringField()
-    content = StringField()
+    reply_to_id = String
+    content = String
 
 
 class Chats(BaseForm):
-    chats = SetField(StringField())
+    chats = Set(String)
 
 
 class Chat(BaseForm):
-    content = StringField()
+    content = String

@@ -58,7 +58,10 @@ class ProjMgr(BaseMgr):
         # add first, to prevent conflicts
         fails = dict()
         for dep, roles in add.items():
-            exists = Role.query.filter_by(dep=dep).filter(Role.name.in_(roles)).all()
+            exists = Role.query.filter_by(proj_id=self.o.id). \
+                filter_by(dep=dep). \
+                filter(Role.name.in_(roles)). \
+                all()
             fails[dep] = [role.name for role in exists]
             for name in roles - set(fails[dep]):
                 RoleMgr.create(self.o, dep, name)
@@ -135,6 +138,8 @@ class RoleMgr(BaseMgr):
 
     def pick(self):
         pink = Pink.query.get(g.pink_id)
+        if self.o.proj.state != Proj.S.pre:
+            raise ProjMetaLocked(state=Proj.S.pre)
         if self.o.dep not in pink.deps:
             raise NotQualifiedToPick(dep=self.o.dep)
 
@@ -179,8 +184,8 @@ class ChatMgr(BaseMgr):
         chat = cls.model(id=cls.gen_id(),
                          proj_id=proj.id,
                          pink_id=g.pink_id,
-                         content=content,
-                         timestamp=g.now)
+                         at=g.now,
+                         content=content)
         chat.set_order(proj_timestamp=proj.timestamp, now=g.now)
         chat.reply_to_id = reply_to_id  # can be none
         db.session.add(chat)

@@ -1,9 +1,8 @@
 import enum
 
-from flask_jsonform import BaseForm, FieldError, FormError, JsonForm
-from jsonform.conditions import InRange
-from jsonform.fields import (BooleanField, DictField, EnumField, IntegerField, ListField, SetField,
-                             StringField, SubForm)
+from flask_jsonapi import BaseForm, Container
+from json_api.fields import String, Set, Enum, Integer, List, Boolean
+from json_api.conditions import InRange
 
 from models import Dep
 
@@ -11,18 +10,18 @@ from .text_tools import measure_width
 
 
 class SetEmail(BaseForm):
-    token = StringField()
+    token = String
 
 
 class Search(BaseForm):
-    deps = SetField(EnumField(Dep), optional=True)
-    name = StringField(optional=True)
-    qq = IntegerField(optional=True)
+    deps = Set(Enum(Dep), default=set([dep.name for dep in Dep]))
+    name = String(required=False)
+    qq = Integer(required=False)
 
 
 class UpdateInfo(BaseForm):
-    qq = IntegerField(optional=True, condition=InRange(min_val=100_000_000, max_val=10_000_000_000))
-    other = ListField(StringField(), optional=True)
+    qq = Integer(required=False, condition=InRange(min_val=100_000_000, max_val=10_000_000_000))
+    other = String(required=False)
 
     def check(self):
         if self.test_empty('qq') and self.test_empty('other'):
@@ -30,16 +29,16 @@ class UpdateInfo(BaseForm):
 
 
 class AssignToken(BaseForm):
-    deps = SetField(EnumField(Dep))
-    amount = IntegerField()
+    deps = Set(Enum(Dep))
+    amount = Integer(condition=InRange(min_val=1))
 
 
 class SignUp(BaseForm):
-    name = StringField()
-    qq = IntegerField(optional=True, condition=InRange(min_val=100_000_000, max_val=10_000_000_000))
-    other = ListField(StringField(), optional=True)
-    token_dep = StringField()
-    token_email = StringField()
+    name = String
+    qq = Integer(required=False, condition=InRange(min_val=100_000_000, max_val=10_000_000_000))
+    other = List(String, required=False)
+    token_dep = String
+    token_email = String
 
     def check_name(self, field):
         if measure_width(field.data) > 16:
@@ -51,20 +50,20 @@ class SignUp(BaseForm):
 
 
 class SearchDuck():
-    pink_id = StringField(optional=True)
-    nodes = SetField(StringField(), optional=True)
-    scopes = SetField(StringField(), optional=True)
-    allow = BooleanField(optional=True)
-
-
-class Duck(JsonForm):
-    allow = BooleanField(optional=True)
-    scopes = SetField(StringField())
+    pink_id = String(required=False)
+    nodes = Set(String, required=False)
+    scopes = Set(String, required=False)
+    allow = Boolean(required=False)
 
 
 class AlterDuck(BaseForm):
-    add = DictField(StringField(), SubForm(Duck()), optional=True)
-    remove = SetField(StringField(), optional=True)
+    class Duck(Container):
+        node = String
+        allow = Boolean(required=False)
+        scopes = Set(String)
+
+    add = List(Duck, required=False)
+    remove = Set(String, required=False)
 
     def check(self):
         if self.test_empty('add') and self.test_empty('remove'):
@@ -78,9 +77,9 @@ class AlterScopes(BaseForm):
         diff = 'merge diffferences'
         full = 'overwrite full set'
 
-    method = EnumField(AlterScopes.Method)
-    positive = SetField(StringField(), optional=True)
-    negative = SetField(StringField(), optional=True)
+    method = Enum(Method)
+    positive = Set(String(), required=False)
+    negative = Set(String(), required=False)
 
     def check(self):
         if self.method == AlterScopes.Method.full:

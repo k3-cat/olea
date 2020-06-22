@@ -19,14 +19,14 @@ class Ann(BaseModel):
 
     id = Column(String, primary_key=True)
     level = Column(Enum(L))
-    deps = Column(ARRAY(Enum(Dep)))
+    deps = Column(ARRAY(Enum(Dep)), index=True)
     poster = Column(String, ForeignKey('pink.id', ondelete='SET NULL'))
     exp = Column(DateTime)
     deleted = Column(Boolean, default=False)
 
     ver = Column(Integer, default=0)
-    timestamp = Column(DateTime)
     content = Column(Text)
+    at = Column(DateTime)
 
     history = Column(JSONB, default=dict)
 
@@ -34,9 +34,9 @@ class Ann(BaseModel):
 
     def update(self, now, content):
         self.history[self.ver] = {
-            'timestamp': self.timestamp.timestamp(),
             'content': self.content,
+            'at': self.at.timestamp(),
         }
         self.ver += 1
-        self.timestamp = now
+        self.at = now
         self.content = content

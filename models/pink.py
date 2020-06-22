@@ -13,7 +13,7 @@ class Pink(BaseModel):
     __tablename__ = 'pink'
 
     id = Column(String, primary_key=True)
-    name = Column(String, unique=True)
+    name = Column(String, unique=True, index=True)
     email = Column(String, unique=True)
     qq = Column(String)
     other = Column(String, nullable=True)

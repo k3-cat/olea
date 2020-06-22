@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: fbec951a3be2
+Revision ID: 36f9001e7692
 Revises: init
-Create Date: 2020-06-20 22:27:01.132791
+Create Date: 2020-06-22 14:25:29.275395
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = 'fbec951a3be2'
+revision = '36f9001e7692'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -28,30 +28,32 @@ def upgrade():
     sa.Column('_pwd', sa.String(), nullable=False),
     sa.Column('active', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('email'),
-    sa.UniqueConstraint('name')
+    sa.UniqueConstraint('email')
     )
+    op.create_index(op.f('ix_pink_name'), 'pink', ['name'], unique=True)
     op.create_table('ann',
     sa.Column('id', sa.String(), nullable=False),
     sa.Column('level', sa.Enum('tips', 'normal', 'important', name='l'), nullable=False),
     sa.Column('deps', postgresql.ARRAY(sa.Enum('ld', 'tr', 'yt', 'au', 'ps', 'ae', name='dep')), nullable=False),
     sa.Column('poster', sa.String(), nullable=False),
-    sa.Column('expired_at', sa.DateTime(), nullable=False),
+    sa.Column('exp', sa.DateTime(), nullable=False),
     sa.Column('deleted', sa.Boolean(), nullable=False),
     sa.Column('ver', sa.Integer(), nullable=False),
-    sa.Column('timestamp', sa.DateTime(), nullable=False),
     sa.Column('content', sa.Text(), nullable=False),
+    sa.Column('at', sa.DateTime(), nullable=False),
     sa.Column('history', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
     sa.ForeignKeyConstraint(['poster'], ['pink.id'], ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_index(op.f('ix_ann_deps'), 'ann', ['deps'], unique=False)
     op.create_table('duck',
     sa.Column('pink_id', sa.String(), nullable=False),
     sa.Column('node', sa.String(), nullable=False),
     sa.Column('allow', sa.Boolean(), nullable=False),
     sa.Column('scopes', postgresql.ARRAY(sa.String()), nullable=False),
-    sa.ForeignKeyConstraint(['pink_id'], ['pink.id'], ondelete='CASADE'),
-    sa.PrimaryKeyConstraint('pink_id', 'node')
+    sa.ForeignKeyConstraint(['pink_id'], ['pink.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('pink_id', 'node'),
+    sa.UniqueConstraint('pink_id', 'node', name='_duck_uc')
     )
     op.create_table('lemon',
     sa.Column('id', sa.String(), nullable=False),
@@ -63,7 +65,7 @@ def upgrade():
     sa.Column('timestamp', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['pink_id'], ['pink.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('pink_id', 'device_id', name='_pit_uc')
+    sa.UniqueConstraint('pink_id', 'device_id', name='_lemon_uc')
     )
     op.create_table('proj',
     sa.Column('id', sa.String(), nullable=False),
@@ -75,6 +77,8 @@ def upgrade():
     sa.Column('leader_id', sa.String(), nullable=False),
     sa.Column('word_count', sa.Integer(), nullable=False),
     sa.Column('url', sa.String(), nullable=True),
+    sa.Column('start_at', sa.DateTime(), nullable=True),
+    sa.Column('finish_at', sa.DateTime(), nullable=True),
     sa.Column('timestamp', sa.DateTime(), nullable=False),
     sa.Column('track', postgresql.ARRAY(sa.String()), nullable=False),
     sa.ForeignKeyConstraint(['leader_id'], ['pink.id'], ondelete='SET NULL'),
@@ -91,13 +95,12 @@ def upgrade():
     sa.Column('deleted', sa.Boolean(), nullable=False),
     sa.Column('ver', sa.Integer(), nullable=False),
     sa.Column('content', sa.Text(), nullable=False),
-    sa.Column('timestamp', sa.DateTime(), nullable=False),
+    sa.Column('at', sa.DateTime(), nullable=False),
     sa.Column('history', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
     sa.ForeignKeyConstraint(['pink_id'], ['pink.id'], ondelete='SET NULL'),
     sa.ForeignKeyConstraint(['proj_id'], ['proj.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['reply_to_id'], ['chat.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('order')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('role',
     sa.Column('id', sa.String(), nullable=False),
@@ -124,8 +127,7 @@ def upgrade():
     sa.Column('track', postgresql.ARRAY(sa.String()), nullable=False),
     sa.ForeignKeyConstraint(['pink_id'], ['pink.id'], ondelete='SET NULL'),
     sa.ForeignKeyConstraint(['role_id'], ['role.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('role_id', 'pink_id', name='_pit_uc')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_pit_state'), 'pit', ['state'], unique=False)
     op.create_table('mango',
@@ -157,6 +159,8 @@ def downgrade():
     op.drop_table('proj')
     op.drop_table('lemon')
     op.drop_table('duck')
+    op.drop_index(op.f('ix_ann_deps'), table_name='ann')
     op.drop_table('ann')
+    op.drop_index(op.f('ix_pink_name'), table_name='pink')
     op.drop_table('pink')
     # ### end Alembic commands ###

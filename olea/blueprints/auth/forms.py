@@ -1,34 +1,34 @@
-from flask_jsonform import BaseForm, FormError
-from jsonform.fields import DictField, EnumField, SetField, StringField
+from flask_jsonapi import BaseForm
+from json_api.fields import String, Email
 
 from .custom_conditions import Email
 
 
 class Login(BaseForm):
-    name = StringField()
-    pwd = StringField()
-    device_id = StringField()
+    name = String
+    pwd = String
+    device_id = String
 
 
 class ForgetPwd(BaseForm):
-    name = StringField()
-    email = StringField()
+    name = String
+    email = String
 
 
 class ResetPwd(BaseForm):
-    token = StringField()
-    pwd = StringField()
+    token = String
+    pwd = String
 
 
 class SetPwd(BaseForm):
-    pwd = StringField()
+    pwd = String
 
 
 class VEmail(BaseForm):
-    email = StringField(condition=Email())
+    email = Email
 
 
 class Refresh(BaseForm):
-    id = StringField()
-    key = StringField()
-    device_id = StringField()
+    id = String
+    key = String
+    device_id = String

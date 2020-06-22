@@ -8,7 +8,7 @@ class Chat(BaseModel):
     __tablename__ = 'chat'
 
     id = Column(String, primary_key=True)
-    order = Column(Integer, unique=True)
+    order = Column(Integer)
     proj_id = Column(String, ForeignKey('proj.id', ondelete='CASCADE'))
     pink_id = Column(String, ForeignKey('pink.id', ondelete='SET NULL'))
     reply_to_id = Column(String, ForeignKey('chat.id', ondelete='CASCADE'), nullable=True)
@@ -16,7 +16,7 @@ class Chat(BaseModel):
 
     ver = Column(Integer, default=0)
     content = Column(Text)
-    timestamp = Column(DateTime)
+    at = Column(DateTime)
 
     history = Column(JSONB, default=dict)
 
@@ -31,11 +31,11 @@ class Chat(BaseModel):
 
     def update(self, now, content):
         self.history[self.ver] = {
-            'timestamp': self.timestamp.timestamp(),
             'content': self.content,
+            'at': self.at.timestamp(),
         }
         self.ver += 1
-        self.timestamp = now
+        self.at = now
         self.content = content
 
     def set_order(self, proj_timestamp, now):

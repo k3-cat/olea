@@ -87,8 +87,8 @@ class LemonMgr(BaseMgr):
             raise AccountDeactivated()
         if not pink or not pink.check_pwd(pwd):
             raise InvalidCredential(type=InvalidCredential.T.pwd)
-        if lemon := pink.lemons.filter_by(device_id=device_id):
-            db.session.delete(lemon)
+
+        pink.lemons.filter_by(device_id=device_id).delete()
 
         lemon = cls.model(id=cls.gen_id(),
                           key=random_b85(k=40),

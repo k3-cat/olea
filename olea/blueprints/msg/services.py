@@ -21,8 +21,8 @@ class AnnMgr(BaseMgr):
                         deps=deps,
                         exp=exp,
                         poster=g.pink_id,
-                        timestamp=g.now,
-                        content=content)
+                        content=content,
+                        at=g.now)
         db.session.add(ann)
 
         return ann

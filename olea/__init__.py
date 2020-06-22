@@ -6,7 +6,7 @@ from pathlib import Path
 from flask import Flask, g, request
 
 PATH = Path(__file__).parents[1] / 'site-packages'
-sys.path.append(str(PATH / 'jsonform'))
+sys.path.append(str(PATH / 'json_api'))
 sys.path.append(str(PATH / 'pypat'))
 sys.path.append(str(PATH))
 
