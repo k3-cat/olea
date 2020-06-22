@@ -6,10 +6,13 @@ def new_pink(email, name):
 
 
 def email_verification(email, token):
-    mailgun.send(subject='邮箱确认',
+    mailgun.send(subject='确认下邮箱. . 很快的. . .',
                  to=(email, ),
                  template='email_verification',
-                 values={'token': token})
+                 values={
+                     'email': email,
+                     'token': token
+                 })
 
 
 def pwd_reset(email, name, token):
