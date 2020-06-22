@@ -3,6 +3,7 @@ import enum
 from flask_jsonapi import BaseForm, Container
 from json_api.fields import String, Set, Enum, Integer, List, Boolean
 from json_api.conditions import InRange
+from json_api.logic_opt import OneOf, Has, If, Properties, Is
 
 from models import Dep
 
@@ -23,9 +24,7 @@ class UpdateInfo(BaseForm):
     qq = Integer(required=False, condition=InRange(min_val=100_000_000, max_val=10_000_000_000))
     other = String(required=False)
 
-    def check(self):
-        if self.test_empty('qq') and self.test_empty('other'):
-            raise FormError('must provide at least one contact method')
+    _condition = OneOf(Has('qq'), Has('other'))
 
 
 class AssignToken(BaseForm):
@@ -40,13 +39,11 @@ class SignUp(BaseForm):
     token_dep = String
     token_email = String
 
+    _condition = OneOf(Has('qq'), Has('other'))
+
     def check_name(self, field):
         if measure_width(field.data) > 16:
             raise FieldError('name is too long')
-
-    def check(self):
-        if self.test_empty('qq') and self.test_empty('other'):
-            raise FormError('must provide at least one contact method')
 
 
 class SearchDuck():
@@ -65,11 +62,7 @@ class AlterDuck(BaseForm):
     add = List(Duck, required=False)
     remove = Set(String, required=False)
 
-    def check(self):
-        if self.test_empty('add') and self.test_empty('remove'):
-            raise FormError('empty form')
-        if I := self.add & self.remove:
-            raise FormError(f'intersection between add and remove: {I}')
+    _condition = OneOf(Has('add'), Has('remove'))
 
 
 class AlterScopes(BaseForm):
@@ -81,12 +74,8 @@ class AlterScopes(BaseForm):
     positive = Set(String(), required=False)
     negative = Set(String(), required=False)
 
-    def check(self):
-        if self.method == AlterScopes.Method.full:
-            if self.test_empty('positive'):
-                raise FormError('empty form')
-        else:
-            if self.test_empty('positive') and self.test_empty('negative'):
-                raise FormError('empty form')
-            if I := self.positive & self.negative:
-                raise FormError(f'intersection between + and -: {I}')
+    _condition = If(
+        if_=Properties({'method': Is('diff')}),
+        then_=OneOf(Has('positive'), Has('negative')),
+        else_=Has('positive'),
+    )

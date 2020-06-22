@@ -1,6 +1,7 @@
 from flask_jsonapi import BaseForm, Container
 from json_api.fields import List, Enum, Set, String
 from json_api.conditions import In
+from json_api.logic_opt import OneOf, Has
 
 from models import Dep, Proj
 
@@ -33,11 +34,7 @@ class ModifyRoles(BaseForm):
     add = List(Role, required=False)
     remove = Set(String(), required=False)
 
-    def check_add(self, field):
-        if self.test_empty('add') and self.test_empty('remove'):
-            raise FormError('empty form')
-        if diff := field.data.keys() - {Dep.au, Dep.ps, Dep.ae}:
-            raise FormError(f'currently does not allow to add roles into these deps: {diff}')
+    _condition = OneOf(Has('add'), Has('remove'))
 
 
 class Finish(BaseForm):
