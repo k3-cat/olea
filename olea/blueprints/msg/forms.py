@@ -1,5 +1,5 @@
 from flask_jsonapi import BaseForm
-from json_api.fields import Set, String, Enum, DateTime
+from json_api.fields import Set, String, Enum, DateTime, Integer
 from models import Ann, Dep
 
 
@@ -16,6 +16,10 @@ class PostAnn(BaseForm):
 
 class Edit(BaseForm):
     content = String
+
+
+class ChatLogs(BaseForm):
+    offset = Integer
 
 
 class PostChat(BaseForm):

@@ -30,7 +30,7 @@ class AnnQuery():
 
 class ChatQuery():
     @staticmethod
-    def chat_index(proj_id, offset):
+    def chat_logs(proj_id, offset):
         logs = redis.zrange(f'cLog-{proj_id}', offset, -1)
 
         return logs

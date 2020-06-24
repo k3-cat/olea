@@ -3,7 +3,7 @@ from flask import jsonify, request
 from olea.auth import opt_perm, perm
 
 from . import bp
-from .forms import Edit, FetchAnn, FetchChat, PostAnn, PostChat
+from .forms import ChatLogs, Edit, FetchAnn, FetchChat, PostAnn, PostChat
 from .query import AnnQuery, ChatQuery
 from .services import AnnMgr, ChatMgr, ProjMgr
 
@@ -41,9 +41,10 @@ def delete_(ann_id):
     return jsonify({})
 
 
-@bp.route('/chats/<id_>/index', methods=['GET'])
-def chats_index(id_):
-    index = ChatQuery.chat_index(proj_id=id_)
+@bp.route('/chats/<proj_id>/logs', methods=['GET'])
+def chats_index(proj_id):
+    form = ChatLogs(data=request.args)
+    index = ChatQuery.chat_logs(proj_id=proj_id, offset=form.offset)
 
 
 @bp.route('/chats/', methods=['GET'])
