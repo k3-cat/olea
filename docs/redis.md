@@ -9,7 +9,7 @@
 | duckT-{user id}       | hash   | key: passwd permission<br>val: scopes string | untill permission changes |
 | duckF-{user id}       | hash   | key: banded permission<br>val: scopes string | untill permission changes |
 | --------------------- | ------ | -------------------------------------------- | ------------------------- |
-| pstate-{pit id}       | string | UNSET, delayed or past-due                   | untill pit finished       |
+| pStatus-{pit id}      | string | UNSET, delayed or past-due                   | untill pit finished       |
 | cLog-{project id}     | list   | chang log of chats of the project            | untill project finished   |
 | cPath-{project id}    | set    | all chats' path                              | untill project finished   |
 | cAvbl-{project id}    | set    | all chats' id                                | untill project finished   |

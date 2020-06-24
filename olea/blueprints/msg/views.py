@@ -15,7 +15,7 @@ def search():
     return jsonify({})
 
 
-@bp.route('/anns/post', methods=['Post'])
+@bp.route('/anns/post', methods=['POST'])
 @perm
 def post_():
     form = PostAnn()
@@ -26,7 +26,7 @@ def post_():
     return jsonify({})
 
 
-@bp.route('/anns/<ann_id>/edit', methods=['Post'])
+@bp.route('/anns/<ann_id>/edit', methods=['POST'])
 @perm
 def edit(ann_id):
     form = Edit()
@@ -41,7 +41,7 @@ def delete_(ann_id):
     return jsonify({})
 
 
-@bp.route('/chats/<proj_id>/logs', methods=['GET'])
+@bp.route('/chats/<proj_id>/', methods=['GET'])
 def chats_index(proj_id):
     form = ChatLogs(data=request.args)
     index = ChatQuery.chat_logs(proj_id=proj_id, offset=form.offset)

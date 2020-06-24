@@ -9,7 +9,7 @@ __all__ = ['Create', 'FullCreate', 'ModifyRoles']
 
 
 class Search(BaseForm):
-    states = Set(Enum(Proj.S), required=False)
+    status_set = Set(Enum(Proj.S), required=False)
     cats = Set(Enum(Proj.C), required=False)
 
 

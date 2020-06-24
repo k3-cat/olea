@@ -15,8 +15,8 @@ class BadOpt(BaseError, ABC):
 class ProjMetaLocked(BadOpt):
     code = 'I4HX'
 
-    def __init__(self, state):
-        super().__init__(state=state)
+    def __init__(self, status):
+        super().__init__(status=status)
 
 
 class InvalidSource(BadOpt):
@@ -75,7 +75,7 @@ class WeekPwd(BadOpt):
 # ------------------- pit ---------------------
 
 
-class StateLocked(BadOpt):
+class PitStatusLocked(BadOpt):
     code = 'L5OM'
 
     def __init__(self, current, required: Iterable):

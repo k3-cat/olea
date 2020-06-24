@@ -27,8 +27,8 @@ class ProjMgr(BaseMgr):
     def create(cls, base: str, cat, suff, leader_id):
         title, source, words_count = build_info(base=base, cat=cat)
         if proj := cls.model.query.filter_by(source=source, cat=cat, suff=suff):
-            if proj.state == Proj.S.freezed:
-                proj.state = Proj.S.pre
+            if proj.status == Proj.S.freezed:
+                proj.status = Proj.S.pre
                 proj.start_at = g.now
                 proj.leader_id = leader_id
                 proj.add_track(info=Proj.T.re_open, now=g.now, by=g.pink_id)
@@ -52,8 +52,8 @@ class ProjMgr(BaseMgr):
     def modify_roles(self, add: dict, remove: list):
         if g.pink_id != self.o.leader_id:
             raise AccessDenied(obj=self.o)
-        if self.o.state != Proj.S.pre:
-            raise ProjMetaLocked(state=self.o.state)
+        if self.o.status != Proj.S.pre:
+            raise ProjMetaLocked(status=self.o.status)
 
         # add first, to prevent conflicts
         fails = dict()
@@ -74,31 +74,31 @@ class ProjMgr(BaseMgr):
     def start(self):
         if g.pink_id != self.o.leader_id:
             raise AccessDenied(obj=self.o)
-        if self.o.state != Proj.S.pre:
-            raise ProjMetaLocked(state=self.o.state)
+        if self.o.status != Proj.S.pre:
+            raise ProjMetaLocked(status=self.o.status)
 
         self.o.start_at = g.now
-        self.o.state = Proj.S.working
+        self.o.status = Proj.S.working
         self.o.add_track(info=Proj.T.start, now=g.now)
 
         pits: List[Pit] = Pit.query.join(Role). \
             filter(Role.proj_id == self.o.id). \
-            filter(Pit.state == Pit.S.init). \
+            filter(Pit.status == Pit.S.init). \
             all()
         for pit in pits:
             pit.start_at = dep_graph.get_start_time(base=g.now, dep=pit.role.dep)
             pit.due = pit.start_at + dep_graph.DURATION[pit.role.dep]
-            pit.state = Pit.S.working if pit.start_at == g.now else Pit.S.pending
+            pit.status = Pit.S.working if pit.start_at == g.now else Pit.S.pending
 
     def finish(self, url):
         self.o.finish_at = g.now
-        self.o.state = Proj.S.fin
+        self.o.status = Proj.S.fin
         self.o.url = url
 
         redis.delete(f'cAvbl-{self.o.id}', f'cPath-{self.o.id}', f'cLog-{self.o.id}')
 
     def freeze(self):
-        self.o.state = Proj.S.freezed
+        self.o.status = Proj.S.freezed
         self.o.start_at = None
         self.o.add_track(info=Proj.T.freeze, now=g.now)
 
@@ -134,8 +134,8 @@ class RoleMgr(BaseMgr):
 
     def pick(self):
         pink = Pink.query.get(g.pink_id)
-        if self.o.proj.state != Proj.S.pre:
-            raise ProjMetaLocked(state=Proj.S.pre)
+        if self.o.proj.status != Proj.S.pre:
+            raise ProjMetaLocked(status=Proj.S.pre)
         if self.o.dep not in pink.deps:
             raise NotQualifiedToPick(dep=self.o.dep)
 

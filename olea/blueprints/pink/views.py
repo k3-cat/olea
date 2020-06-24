@@ -30,7 +30,7 @@ def update_info():
     return 'True'
 
 
-@bp.route('/assign_token', methods=['POST'])
+@bp.route('/assign-token', methods=['POST'])
 @perm
 def assign_token():
     form = AssignToken()
@@ -70,7 +70,7 @@ def list_ducks():
     return jsonify()
 
 
-@bp.route('/<id_>/alter-ducks', methods=['POST'])
+@bp.route('/<id_>/ducks/alter', methods=['POST'])
 @perm(node='auth.duck')
 def alter_ducks(id_):
     form = AlterDuck()
@@ -87,11 +87,11 @@ def alter_ducks(id_):
     return jsonify()
 
 
-@bp.route('/<pink>:<node>/alter-scopes', methods=['POST'])
+@bp.route('/<id_>/ducks/<node>/alter', methods=['POST'])
 @perm(node='auth.duck')
-def alter_scopes(pink, node):
+def alter_scopes(id_, node):
     form = AlterScopes()
-    duck = DuckMgr(pink, node)
+    duck = DuckMgr(id_, node)
     if form.method == AlterScopes.Method.diff:
         duck.add_scopes(scopes=form.positive)
         final = duck.remove_scopes(scopes=form.negative)

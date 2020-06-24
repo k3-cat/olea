@@ -2,7 +2,7 @@
 UPDATE
     pit
 SET
-    state = 'working'
+    status = 'working'
 WHERE
-    state == 'pending'
+    status == 'pending'
     AND start_at < now() :: timestamp

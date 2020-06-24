@@ -10,7 +10,7 @@ __all__ = ['Proj']
 class Proj(BaseModel):
     __tablename__ = 'proj'
 
-    # State
+    # Status
     class S(enum.Enum):
         pre = 'pre-process'
         freezed = 'freezed'
@@ -29,7 +29,7 @@ class Proj(BaseModel):
     source = Column(String)
     cat = Column(Enum(C, name='proj_cat'))
     suff = Column(String)
-    state = Column(Enum(S, name='proj_state'), default=S.pre)
+    status = Column(Enum(S, name='proj_status'), default=S.pre)
     leader_id = Column(String, ForeignKey('pink.id', ondelete='SET NULL'))
     word_count = Column(Integer)
     url = Column(String, nullable=True)

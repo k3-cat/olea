@@ -19,7 +19,7 @@ def single(id_):
 @perm(node='pit.in_dep.all')
 def in_dep():
     form = InDep(data=request.args)
-    pits = PitQuery.in_dep(dep=form.dep, status=form.states)
+    pits = PitQuery.in_dep(dep=form.dep, status=form.status_set)
     return jsonify({})
 
 
@@ -35,7 +35,7 @@ def checks():
 @opt_perm
 def search():
     form = Search(data=request.args)
-    pits = PitQuery.search(deps=form.deps, states=form.states, pink_id=form.pink_id)
+    pits = PitQuery.search(deps=form.deps, status_set=form.status_set, pink_id=form.pink_id)
     return jsonify({})
 
 
@@ -52,11 +52,11 @@ def submit(id_):
     return jsonify({'id': pit.id})
 
 
-@bp.route('/f-submit', methods=['POST'])
+@bp.route('/<id_>/f-submit', methods=['POST'])
 @perm
-def force_submit():
+def force_submit(id_):
     form = ForceSubmit()
-    pit = PitMgr.force_submit(token=form.token)
+    pit = PitMgr(id_).force_submit(token=form.token)
     return jsonify({'id': pit.id})
 
 

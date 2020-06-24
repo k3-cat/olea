@@ -7,13 +7,13 @@ from models import Dep, Pit
 
 class InDep(BaseForm):
     dep = Set(Enum(Dep))
-    states = Set(Enum(Pit.S),
-                 condition=In(Pit.S.working, Pit.S.past_due, Pit.S.delayed, Pit.S.auditing))
+    status_set = Set(Enum(Pit.S),
+                     condition=In(Pit.S.working, Pit.S.past_due, Pit.S.delayed, Pit.S.auditing))
 
 
 class Search(BaseForm):
     deps = Set(Enum(Dep), default={Dep.ae, Dep.au, Dep.ps})
-    states = Set(Enum(Pit.S), required=False)
+    status_set = Set(Enum(Pit.S), required=False)
     pink_id = String(required=False)
 
 

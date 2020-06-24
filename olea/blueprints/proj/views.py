@@ -19,14 +19,14 @@ def single(id_):
 @opt_perm
 def search():
     form = Search(request.args)
-    projs = ProjQuery.search(states=form.states, cats=form.cats)
+    projs = ProjQuery.search(status_set=form.status_set, cats=form.cats)
     return jsonify({})
 
 
 @bp.route('/create', methods=['POST'])
 def create():
     form = Create()
-    proj = ProjMgr.create(base=form.base, cat=form.cat, suff='', leader_id=g.pink_id)
+    proj = ProjMgr.create(form.base, cat=form.cat, suff='', leader_id=g.pink_id)
     return jsonify({'id': proj.id})
 
 

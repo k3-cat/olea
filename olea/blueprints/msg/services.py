@@ -46,8 +46,8 @@ class ProjMgr(BaseMgr):
         super().__init__(obj_or_id)
 
     def post_chat(self, reply_to_id, content):
-        if self.o.state != Proj.S.working:
-            raise ProjMetaLocked(state=self.o.state)
+        if self.o.status != Proj.S.working:
+            raise ProjMetaLocked(status=self.o.status)
 
         # TODO: permission check
         return ChatMgr.post(self, reply_to_id, content)

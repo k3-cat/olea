@@ -10,7 +10,7 @@ __all__ = ['Pit']
 class Pit(BaseModel):
     __tablename__ = 'pit'
 
-    # State
+    # Status
     class S(enum.Enum):
         init = 'initialized'
         pending = 'pending'
@@ -25,7 +25,7 @@ class Pit(BaseModel):
     id = Column(String, primary_key=True)
     role_id = Column(String, ForeignKey('role.id', ondelete='CASCADE'))
     pink_id = Column(String, ForeignKey('pink.id', ondelete='SET NULL'))
-    state = Column(Enum(S, name='pit_state'), default=S.init, index=True)
+    status = Column(Enum(S, name='pit_status'), default=S.init, index=True)
     start_at = Column(DateTime, nullable=True)
     finish_at = Column(DateTime, nullable=True)
     due = Column(DateTime, nullable=True)
@@ -48,6 +48,8 @@ class Pit(BaseModel):
         drop = 'd'
         shift = '<-'
         cascade = '->'
+        mark_past_due = '>>'
+        fake_past_due = '<<'
         past_due = '<>'
         submit = 's'
         submit_f = 'S'

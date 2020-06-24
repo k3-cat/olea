@@ -77,17 +77,17 @@
 
 ## pit
 
-| name      | type            | changes when                                               | used for                                        |
-| --------- | --------------- | ---------------------------------------------------------- | ----------------------------------------------- |
-| id        | b67 str         | never                                                      |                                                 |
-| role_id   | role id         | never                                                      |                                                 |
-| pink_id   | user id         | never                                                      |                                                 |
-| state     | Pit.S           | state changes<br>pits from pervios department are all done |                                                 |
-| start_at  | datetime        | pit shift                                                  |                                                 |
-| finish_at | datetime        | never                                                      | find if following pits need to shift ot cascade |
-| due       | datetime        | pit shift / cascade                                        | deadline                                        |
-| timestamp | datetime        | never                                                      | record picked time                              |
-| track     | array of string | state changes, shift, cascade                              | record state history                            |
+| name      | type            | changes when                                                | used for                                        |
+| --------- | --------------- | ----------------------------------------------------------- | ----------------------------------------------- |
+| id        | b67 str         | never                                                       |                                                 |
+| role_id   | role id         | never                                                       |                                                 |
+| pink_id   | user id         | never                                                       |                                                 |
+| status    | Pit.S           | status changes<br>pits from pervios department are all done |                                                 |
+| start_at  | datetime        | pit shift                                                   |                                                 |
+| finish_at | datetime        | never                                                       | find if following pits need to shift ot cascade |
+| due       | datetime        | pit shift / cascade                                         | deadline                                        |
+| timestamp | datetime        | never                                                       | record picked time                              |
+| track     | array of string | status changes, shift, cascade                              | record status history                           |
 
 ## proj
 
@@ -98,14 +98,14 @@
 | source     | str             | never                                  |                                                                                                                         |
 | cat        | Proj.C          | never                                  |                                                                                                                         |
 | suff       | str             | never                                  | allow diff version of same source under the same cat                                                                    |
-| state      | Proj.S          | start, freeze, finish, ready to upload |                                                                                                                         |
+| status     | Proj.S          | start, freeze, finish, ready to upload |                                                                                                                         |
 | leader_id  | user id         | re-open with different user            |                                                                                                                         |
 | word_count | int             | never                                  |                                                                                                                         |
 | url        | str             | finish                                 |                                                                                                                         |
-| start_at   | datetime        | enter pre and working state            | calculate schecdual of pits<br>find if following pits need to shift ot cascade<br>freeze project that prepared too long |
+| start_at   | datetime        | enter pre and working status           | calculate schecdual of pits<br>find if following pits need to shift ot cascade<br>freeze project that prepared too long |
 | finish_at  | datetime        | finish                                 |                                                                                                                         |
 | timestamp  | datetime        | never                                  | record project creation                                                                                                 |
-| track      | array of string | state changes                          | record state changes                                                                                                    |
+| track      | array of string | status changes                         | record status changes                                                                                                   |
 
 ## role
 

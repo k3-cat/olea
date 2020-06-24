@@ -1,15 +1,15 @@
 from .auth_fail import (AccessDenied, AccountDeactivated, InvalidCredential, InvalidRefreshToken,
                         PermissionDenied)
 from .bad_opt import (DoesNotMeetRequirements, InvalidReply, InvalidSource, NotQualifiedToPick,
-                      ProjMetaLocked, RoleIsTaken, StateLocked, UnallowedType, WeekPwd)
+                      PitStatusLocked, ProjMetaLocked, RoleIsTaken, UnallowedType, WeekPwd)
 from .base_error import BaseError
 from .data_conflict import DuplicatedRecord, FileExist, FileVerConflict, RecordNotFound
 
 __all__ = [
     'AccessDenied', 'AccountDeactivated', 'BaseError', 'DoesNotMeetRequirements',
     'DuplicatedRecord', 'FileExist', 'FileVerConflict', 'InvalidCredential', 'InvalidRefreshToken',
-    'InvalidReply', 'InvalidSource', 'NotQualifiedToPick', 'PermissionDenied', 'ProjMetaLocked',
-    'RecordNotFound', 'RoleIsTaken', 'StateLocked', 'UnallowedType', 'WeekPwd',
+    'InvalidReply', 'InvalidSource', 'NotQualifiedToPick', 'PermissionDenied', 'PitStatusLocked',
+    'ProjMetaLocked', 'RecordNotFound', 'RoleIsTaken', 'UnallowedType', 'WeekPwd',
     'register_error_handlers'
 ]
 
