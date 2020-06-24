@@ -29,6 +29,7 @@ class Ann(BaseModel):
     at = Column(DateTime)
 
     history = Column(JSONB, default=dict)
+    readers = Column(JSONB, default=dict)
 
     __id_len__ = 8
 

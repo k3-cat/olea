@@ -1,9 +1,8 @@
 from flask import g
 
-from models import Proj, Chat
+from models import Proj
 from olea.base import single_query
 from olea.errors import AccessDenied
-from olea.singleton import redis
 
 
 class ProjQuery():
@@ -24,16 +23,3 @@ class ProjQuery():
         if cats:
             query.filter(Proj.cat.in_(cats))
         return query.all()
-
-
-class ChatQuery():
-    @staticmethod
-    def chat_index(proj_id):
-        available = redis.smembers(f'cAvbl-{proj_id}')
-        index = dict(zip(available, redis.hmget(f'cTree-{proj_id}', *available)))
-
-        return index
-
-    @staticmethod
-    def chats(chats):
-        return Chat.query.filter(Chat.id.in_(chats)).all()

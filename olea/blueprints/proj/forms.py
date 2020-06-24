@@ -43,16 +43,3 @@ class Finish(BaseForm):
 
 class Pick(BaseForm):
     pink_id = String
-
-
-class PostChat(BaseForm):
-    reply_to_id = String
-    content = String
-
-
-class Chats(BaseForm):
-    chats = Set(String)
-
-
-class Chat(BaseForm):
-    content = String

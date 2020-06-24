@@ -95,16 +95,12 @@ class ProjMgr(BaseMgr):
         self.o.state = Proj.S.fin
         self.o.url = url
 
-        redis.delete(f'cAvbl-{self.o.id}', f'cPath-{self.o.id}', f'cTree-{self.o.id}')
+        redis.delete(f'cAvbl-{self.o.id}', f'cPath-{self.o.id}', f'cLog-{self.o.id}')
 
     def freeze(self):
         self.o.state = Proj.S.freezed
         self.o.start_at = None
         self.o.add_track(info=Proj.T.freeze, now=g.now)
-
-    def post_chat(self, reply_to_id, content):
-        # TODO: permission check
-        return ChatMgr.post(self, reply_to_id, content)
 
 
 class RoleMgr(BaseMgr):
@@ -161,91 +157,3 @@ class PitMgr(BaseMgr):
         db.session.add(pit)
 
         return pit
-
-
-class ChatMgr(BaseMgr):
-    module = Chat
-
-    def __init__(self, obj_or_id):
-        self.o: Chat = None
-        super().__init__(obj_or_id)
-
-    @staticmethod
-    def _is_visible(proj_id, id_):
-        if not redis.sismember(f'cAvbl-{proj_id}', id_):
-            raise InvalidReply()
-
-    @staticmethod
-    def _get_path(proj_id, id_):
-        return redis.sscan(f'cPath-{proj_id}', f'*/{id_}')
-
-    @classmethod
-    def post(cls, proj: Proj, reply_to_id: str, content: str):
-        chat = cls.model(id=cls.gen_id(),
-                         proj_id=proj.id,
-                         pink_id=g.pink_id,
-                         at=g.now,
-                         content=content)
-        chat.set_order(proj_timestamp=proj.timestamp, now=g.now)
-        chat.reply_to_id = reply_to_id  # can be none
-        db.session.add(chat)
-
-        if reply_to_id:
-            cls._is_visible(proj.id, reply_to_id)
-
-            path = cls._get_path(proj.id, reply_to_id)
-            father = reply_to_id
-
-        else:
-            path = '/'
-            father = proj.id
-
-        replys_s = redis.hget(f'cTree-{proj.id}', father)
-        with redis.pipeline(transaction=True) as p:
-            p.hset(f'cTree-{proj.id}', chat.id, '')
-            p.sadd(f'cAvbl-{proj.id}', chat.id)
-            p.sadd(f'cPath-{proj.id}', path)
-
-            if not replys_s:
-                p.hset(f'cTree-{proj.id}', father, chat.id)
-            else:
-                replys = replys_s.split(';')
-                replys.append(chat.id)
-                p.hset(f'cTree-{proj.id}', father, ';'.join(replys))
-
-            p.execute()
-
-        return chat
-
-    def edit(self, content):
-        if self.o.pink_id != g.pink_id:
-            raise AccessDenied(obj=self.o)
-        self._is_visible(self.o.proj_id, self.o.id)
-
-        self.o.update(now=g.now, content=content)
-
-    def delete(self):
-        self._is_visible(self.o.proj_id, self.o.id)
-
-        self.o.delete = True
-
-        path_ = self._get_path(self.o.proj_id, self.o.id).split('/')
-        replys = redis.hget(f'cTree-{self.o.proj_id}', path_[-2]).split(';').delete(self.o.id)
-        queue = [redis.sscan_iter(f'cPath-{self.o.proj_id}', f'{"/".join(path_)}*')]
-        with redis.pipeline(transaction=True) as p:
-            p.hset(f'cTree-{self.o.proj_id}', path_[-2], ';'.join(replys))
-            p.srem(f'cAvbl-{self.o.proj_id}', *[cpath.split('/')[-1] for cpath in queue])
-
-            p.execute()
-
-    def restore(self):
-        self.o.delete = False
-
-        path_ = self._get_path(self.o.proj_id, self.o.id).split('/')
-        replys = redis.hget(f'cTree-{self.o.proj_id}', path_[-2]).split(';').append(self.o.id)
-        queue = [redis.sscan_iter(f'cPath-{self.o.proj_id}', f'{"/".join(path_)}*')]
-        with redis.pipeline(transaction=True) as p:
-            p.hset(f'cTree-{self.o.proj_id}', path_[-2], ';'.join(replys))
-            p.sadd(f'cAvbl-{self.o.proj_id}', *[cpath.split('/')[-1] for cpath in queue])
-
-            p.execute()

@@ -3,11 +3,11 @@ from json_api.fields import Set, String, Enum, DateTime
 from models import Ann, Dep
 
 
-class Search(BaseForm):
+class FetchAnn(BaseForm):
     deps = Set(Enum(Dep), default=set([dep.name for dep in Dep]))
 
 
-class Post(BaseForm):
+class PostAnn(BaseForm):
     level = Enum(Ann.L)
     deps = Set(Enum(Dep))
     expiration = DateTime
@@ -16,3 +16,12 @@ class Post(BaseForm):
 
 class Edit(BaseForm):
     content = String
+
+
+class PostChat(BaseForm):
+    reply_to_id = String
+    content = String
+
+
+class FetchChat(BaseForm):
+    chats = Set(String)

@@ -1,7 +1,8 @@
 from flask import g
 
-from models import Ann, Pink
+from models import Ann, Pink, Chat
 from olea.errors import AccessDenied
+from olea.singleton import redis
 
 
 class AnnQuery():
@@ -14,4 +15,26 @@ class AnnQuery():
         if deps:
             query = query.filter(Ann.deps.in_(deps))
 
-        return query.all()
+        anns = query.all()
+        for ann in anns:
+            ann.readers.set_default(g.pink_id, list())
+
+            trace = ann.readers[g.pink_id]
+            if len(trace) == ann.ver:
+                continue
+
+            trace.append(g.now)
+
+        return anns
+
+
+class ChatQuery():
+    @staticmethod
+    def chat_index(proj_id, offset):
+        logs = redis.zrange(f'cLog-{proj_id}', offset, -1)
+
+        return logs
+
+    @staticmethod
+    def chats(chats):
+        return Chat.query.filter(Chat.id.in_(chats)).all()
