@@ -53,10 +53,10 @@ class Proj(BaseModel):
         re_open = 'r'
         freeze = 'F'
         upload = 'U'
-        start = '%'
+        start = 's'
 
     def add_track(self, info: 'Proj.T', now, by=''):
-        base = f'{info.name} - {now}'
+        base = f'{info.value} - {now}'
         if info == Proj.T.re_open:
             self.track.append(f'{base} by:{by}')
         else:

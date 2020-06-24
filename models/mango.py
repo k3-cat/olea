@@ -9,7 +9,7 @@ class Mango(BaseModel):
 
     id = Column(String, primary_key=True)
     pit_id = Column(String, ForeignKey('pit.id', ondelete='CASCADE'))
-    ver = Column(Integer)
+    ver = Column(Integer, default=1)
     mime = Column(String)
     sha1 = Column(String, unique=True)
     modified_at = Column(DateTime)

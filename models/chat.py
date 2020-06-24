@@ -14,7 +14,7 @@ class Chat(BaseModel):
     reply_to_id = Column(String, ForeignKey('chat.id', ondelete='CASCADE'), nullable=True)
     deleted = Column(Boolean, default=False)
 
-    ver = Column(Integer, default=0)
+    ver = Column(Integer, default=1)
     content = Column(Text)
     at = Column(DateTime)
 

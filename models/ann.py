@@ -24,7 +24,7 @@ class Ann(BaseModel):
     expiration = Column(DateTime)
     deleted = Column(Boolean, default=False)
 
-    ver = Column(Integer, default=0)
+    ver = Column(Integer, default=1)
     content = Column(Text)
     at = Column(DateTime)
 
@@ -33,7 +33,20 @@ class Ann(BaseModel):
 
     __id_len__ = 8
 
-    def update(self, now, content):
+    def read(self, by, now):
+        try:
+            trace = self.readers[by]
+        except KeyError:
+            trace = list()
+            self.readers[by] = trace
+
+        if len(trace) == self.ver:
+            return
+        if skiped := self.ver - len(trace) > 1:
+            trace.extend([0] * skiped - 1)
+        trace.append(now.timestamp())
+
+    def update(self, content, now):
         self.history[self.ver] = {
             'content': self.content,
             'at': self.at.timestamp(),

@@ -17,13 +17,7 @@ class AnnQuery():
 
         anns = query.all()
         for ann in anns:
-            ann.readers.set_default(g.pink_id, list())
-
-            trace = ann.readers[g.pink_id]
-            if len(trace) == ann.ver:
-                continue
-
-            trace.append(g.now)
+            ann.read(by=g.pink_id, now=g.now)
 
         return anns
 

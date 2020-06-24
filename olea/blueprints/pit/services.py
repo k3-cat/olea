@@ -241,7 +241,7 @@ class MangoMgr(BaseMgr):
 
         mango = cls.model(id=ref,
                           pit_id=pit.id,
-                          ver=1 if not last else last.ver + 1,
+                          ver=last.ver + 1 if last else None,
                           mime=i['mime'],
                           sha1=i['sha1'],
                           modified_at=i['last_modify'],
