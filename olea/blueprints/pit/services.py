@@ -37,7 +37,10 @@ class PitMgr(BaseMgr):
 
         self.o.status = Pit.S.droped
         self.o.add_track(info=Pit.T.drop, now=g.now)
+
+        redis.delete(f'pStatus-{self.o.id}')
         RoleMgr(self.o.role).drop()
+
         return True
 
     @check_owner
@@ -70,8 +73,9 @@ class PitMgr(BaseMgr):
 
     def past_due(self):
         redis.set(f'pStatus-{self.o.id}', 'past-due')
-        self.o.status = Pit.S.past_due
-        self.o.add_track(info=Pit.T.past_due, now=g.now)
+        if self.o.status != Pit.S.past_due:
+            self.o.status = Pit.S.past_due
+            self.o.add_track(info=Pit.T.past_due, now=g.now)
 
     def _resume_status(self):
         status = redis.get(f'pStatus-{self.o.id}')
@@ -116,11 +120,11 @@ class PitMgr(BaseMgr):
 
     @check_status({Pit.S.auditing})
     def check_fail(self):
-        if 0 < (self.o.due - g.now).days < 3:
+        if 0 < (self.o.due - g.now).days < 2:
             redis.set(f'pStatus-{self.o.id}', 'delayed')
             # sequence of the following two statements MUST NOT BE CHANGED
             self.o.add_track(info=Pit.T.extend, now=g.now)
-            self.o.due = g.now + datetime.timedelta(days=3)
+            self.o.due = g.now + datetime.timedelta(days=2)
 
         self._resume_status()
         self.o.add_track(info=Pit.T.check_fail, now=g.now, by=g.pink_id)

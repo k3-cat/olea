@@ -12,15 +12,15 @@ class Pit(BaseModel):
 
     # Status
     class S(enum.Enum):
-        init = 'initialized'
-        pending = 'pending'
-        working = 'working'
-        delayed = 'delayed'
-        past_due = 'past due'
-        auditing = 'auditing'
-        fin = 'finished'
-        fin_p = 'finished (past due)'
-        droped = 'droped'
+        init = 'I'
+        pending = 'P'
+        working = 'w'
+        delayed = 'd'
+        past_due = 'p'
+        auditing = 'a'
+        fin = 'F'
+        fin_p = 'Fp'
+        droped = 'D'
 
     id = Column(String, primary_key=True)
     role_id = Column(String, ForeignKey('role.id', ondelete='CASCADE'))
@@ -48,9 +48,8 @@ class Pit(BaseModel):
         drop = 'd'
         shift = '<-'
         cascade = '->'
-        mark_past_due = '>>'
-        fake_past_due = '<<'
         past_due = '<>'
+        fake_past_due = '><'
         submit = 's'
         submit_f = 'S'
         redo = 'r'

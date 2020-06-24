@@ -12,11 +12,11 @@ class Proj(BaseModel):
 
     # Status
     class S(enum.Enum):
-        pre = 'pre-process'
-        freezed = 'freezed'
-        working = 'working'
-        upload = 'pending upload'
-        fin = 'finished'
+        pre = 'p'
+        freezed = 'FF'
+        working = 'w'
+        upload = 'u'
+        fin = 'F'
 
     # Category
     class C(enum.Enum):
