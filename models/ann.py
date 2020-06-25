@@ -1,9 +1,7 @@
-import enum
-
 from sqlalchemy_ import BaseModel, Column, ForeignKey
-from sqlalchemy_.types import ARRAY, Enum, JSONB, Boolean, DateTime, Integer, String, Text
+from sqlalchemy_.types import ARRAY, JSONB, Boolean, DateTime, Enum, Integer, String, Text
 
-from .common_enums import DEP
+from .common_enums import DEP, ZEnum
 
 __all__ = ['Ann']
 
@@ -12,10 +10,13 @@ class Ann(BaseModel):
     __tablename__ = 'ann'
 
     # Level
-    class L(enum.Enum):
+    class L(ZEnum):
         tips = 'tips'
         normal = 'normal'
         important = 'important'
+
+        def __str__(self):
+            return self.name
 
     id = Column(String, primary_key=True)
     level = Column(Enum(L, name='ann_level'))
@@ -54,3 +55,15 @@ class Ann(BaseModel):
         self.ver += 1
         self.at = now
         self.content = content
+
+    def __json__(self):
+        return {
+            'id': self.id,
+            'level': self.level,
+            'deps': self.deps,
+            'poster_id': self.poster_id,
+            'exp': self.expiration,
+            'ver': self.ver,
+            'content': self.content,
+            'at': self.at
+        }

@@ -18,3 +18,6 @@ class Lemon(BaseModel):
     pink = relationship('Pink', back_populates='lemons')
     __table_args__ = (UniqueConstraint('pink_id', 'device_id', name='_lemon_uc'), )
     __id_len__ = 10
+
+    def __json__(self):
+        return {'id': self.id, 'ip': self.ip, 'exp': self.expiration}

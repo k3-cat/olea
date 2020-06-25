@@ -45,7 +45,7 @@ class NotQualifiedToPick(BadOpt):
     code = 'CWAI'
 
     def __init__(self, dep):
-        super().__init__(dep=dep.name)
+        super().__init__(dep=dep)
 
 
 class InvalidReply(BadOpt):

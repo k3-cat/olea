@@ -111,7 +111,7 @@ class LemonMgr(BaseMgr):
             self.revoke()
             raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.exp, at=self.o.expiration)
 
-        last = redis.hget('lass_access', g.pink_id)
+        last = redis.hget('last_access', g.pink_id)
         if last and g.now.timestamp() - last > 86400:
             self.o.expiration = g.now + self.r_life
 

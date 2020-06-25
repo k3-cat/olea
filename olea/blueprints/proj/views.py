@@ -1,4 +1,5 @@
-from flask import g, jsonify, request
+from flask import g, request
+from flask_json import json_response
 
 from olea.auth import opt_perm, perm
 
@@ -12,7 +13,7 @@ from .services import ProjMgr, RoleMgr
 @opt_perm
 def single(id_):
     proj = ProjQuery.single(id_)
-    return jsonify({'id': proj.id})
+    return json_response(data_=proj)
 
 
 @bp.route('/', methods=['GET'])
@@ -20,14 +21,14 @@ def single(id_):
 def search():
     form = Search(request.args)
     projs = ProjQuery.search(status_set=form.status_set, cats=form.cats)
-    return jsonify({})
+    return json_response(data_=projs)
 
 
 @bp.route('/create', methods=['POST'])
 def create():
     form = Create()
     proj = ProjMgr.create(form.base, cat=form.cat, suff='', leader_id=g.pink_id)
-    return jsonify({'id': proj.id})
+    return json_response(data_=proj)
 
 
 @bp.route('/f-create', methods=['POST'])
@@ -35,20 +36,20 @@ def create():
 def full_create():
     form = FullCreate()
     proj = ProjMgr.create(base=form.base, cat=form.cat, suff=form.suff, leader_id=form.leader)
-    return jsonify({'id': proj.id})
+    return json_response(data_=proj)
 
 
 @bp.route('/<id_>/modify-roles', methods=['POST'])
 def modify_roles(id_: str):
     form = ModifyRoles()
     roles = ProjMgr(id_).modify_roles(add=form.add, remove=form.remove)
-    return jsonify({role.id: {'name': role.name, 'dep': role.dep.name} for role in roles})
+    return json_response(data_=roles)
 
 
 @bp.route('/<id_>/start', methods=['POST'])
 def start(id_):
     ProjMgr(id_).start()
-    return jsonify()
+    return json_response()
 
 
 @bp.route('/<id_>/finish', methods=['POST'])
@@ -56,13 +57,13 @@ def start(id_):
 def finish(id_):
     form = Finish()
     ProjMgr(id_).finish(url=form.url)
-    return jsonify()
+    return json_response()
 
 
 @bp.route('/roles/<role_id>/pick', methods=['POST'])
 def pick(role_id):
     pit = RoleMgr(role_id).pick()
-    return jsonify({'id': pit.id})
+    return json_response(data_=pit)
 
 
 @bp.route('/roles/<role_id>/f-pick', methods=['POST'])
@@ -70,4 +71,4 @@ def pick(role_id):
 def full_pick(role_id):
     form = Pick()
     pit = RoleMgr(role_id).full_pick(pink_id=form.pink_id)
-    return jsonify({'id': pit.id})
+    return json_response(data_=pit)

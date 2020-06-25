@@ -97,7 +97,8 @@ class DuckMgr(BaseMgr):
 
         return duck
 
-    def alter_scopes(self, scopes: set):
+
+    def modi_scopes(self, scopes: set):
         self.o.scopes = list(scopes)
 
         authorization.clean_cache(self.o.pink_id)
@@ -105,7 +106,7 @@ class DuckMgr(BaseMgr):
         return scopes
 
     def add_scopes(self, scopes):
-        return self.alter_scopes(set(self.o.scopes) | scopes)
+        return self.modi_scopes(set(self.o.scopes) | scopes)
 
     def remove_scopes(self, scopes):
-        return self.alter_scopes(set(self.o.scopes) - scopes)
+        return self.modi_scopes(set(self.o.scopes) - scopes)

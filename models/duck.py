@@ -14,3 +14,11 @@ class Duck(BaseModel):
 
     pink = relationship('Pink', back_populates='lemons')
     __table_args__ = (UniqueConstraint('pink_id', 'node', name='_duck_uc'), )
+
+    def __json__(self):
+        return {
+            'pink_id': self.pink_id,
+            'node': self.node,
+            'allow': self.allow,
+            'scopes': self.scopes
+        }

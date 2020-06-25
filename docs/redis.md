@@ -14,4 +14,4 @@
 | cPath-{project id}    | set    | all chats' path                              | untill project finished   |
 | cAvbl-{project id}    | set    | all chats' id                                | untill project finished   |
 | --------------------- | ------ | -------------------------------------------- | ------------------------- |
-| lass_access           | hash   | key: user id<br>val: last access time (unix) | untill next access        |
+| last_access           | hash   | key: user id<br>val: last access time (unix) | untill next access        |

@@ -40,3 +40,15 @@ class Chat(BaseModel):
 
     def set_order(self, proj_timestamp, now):
         self.order = (now.timestamp() - proj_timestamp.timestamp()) * 10
+
+    def __json__(self):
+        return {
+            'id': self.id,
+            'order': self.order,
+            'deps': self.deps,
+            'pink_id': self.pink_id,
+            'reply_to_id': self.reply_to_id,
+            'ver': self.ver,
+            'content': self.content,
+            'at': self.at
+        }

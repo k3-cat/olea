@@ -1,8 +1,8 @@
-import enum
-
 from sqlalchemy_ import (BaseModel, Column, ForeignKey, UniqueConstraint, hybrid_property,
                          relationship)
-from sqlalchemy_.types import ARRAY, Enum, DateTime, String
+from sqlalchemy_.types import ARRAY, DateTime, Enum, String
+
+from .common_enums import ZEnum, enum
 
 __all__ = ['Pit']
 
@@ -11,7 +11,7 @@ class Pit(BaseModel):
     __tablename__ = 'pit'
 
     # Status
-    class S(enum.Enum):
+    class S(ZEnum):
         init = 'I'
         pending = 'P'
         working = 'w'
@@ -68,3 +68,16 @@ class Pit(BaseModel):
             self.track.append(f'{base} from:{self.due}')
         else:
             self.track.append(base)
+
+    def __json__(self):
+        return {
+            'id': self.id,
+            'role_id': self.role_id,
+            'dep': self.role.dep,
+            'role': self.role.name,
+            'pink_id': self.pink_id,
+            'status': self.status,
+            'start_at': self.start_at,
+            'finish_at': self.finish_at,
+            'due': self.due
+        }

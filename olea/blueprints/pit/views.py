@@ -1,4 +1,5 @@
-from flask import jsonify, request
+from flask import request
+from flask_json import json_response
 
 from olea.auth import opt_perm, perm
 
@@ -12,7 +13,7 @@ from .services import PitMgr
 @opt_perm
 def single(id_):
     pit = PitQuery.single(id_)
-    return jsonify({'id': pit.id})
+    return json_response(data_=pit)
 
 
 @bp.route('/in_dep/', methods=['GET'])
@@ -20,7 +21,7 @@ def single(id_):
 def in_dep():
     form = InDep(data=request.args)
     pits = PitQuery.in_dep(dep=form.dep, status=form.status_set)
-    return jsonify({})
+    return json_response(data_=pits)
 
 
 @bp.route('/checks/', methods=['GET'])
@@ -28,7 +29,7 @@ def in_dep():
 def checks():
     form = Checks(data=request.args)
     pits = PitQuery.check_list(deps=form.deps)
-    return jsonify({})
+    return json_response(data_=pits)
 
 
 @bp.route('/', methods=['GET'])
@@ -36,57 +37,59 @@ def checks():
 def search():
     form = Search(data=request.args)
     pits = PitQuery.search(deps=form.deps, status_set=form.status_set, pink_id=form.pink_id)
-    return jsonify({})
+    return json_response(data_=pits)
 
 
 @bp.route('/<id_>/drop', methods=['POST'])
 def drop(id_):
-    pit = PitMgr(id_).drop()
-    return jsonify({})
+    PitMgr(id_).drop()
+    return json_response()
 
 
 @bp.route('/<id_>/submit', methods=['POST'])
 def submit(id_):
     form = Submit()
-    pit = PitMgr(id_).submit(share_id=form.share_id)
-    return jsonify({'id': pit.id})
+    PitMgr(id_).submit(share_id=form.share_id)
+    return json_response()
 
 
 @bp.route('/<id_>/f-submit', methods=['POST'])
 @perm
 def force_submit(id_):
     form = ForceSubmit()
-    pit = PitMgr(id_).force_submit(token=form.token)
-    return jsonify({'id': pit.id})
+    PitMgr(id_).force_submit(token=form.token)
+    return json_response()
 
 
 @bp.route('/<id_>/redo', methods=['POST'])
 def redo(id_):
-    pit = PitMgr(id_).redo()
-    return jsonify({'id': pit.id})
+    PitMgr(id_).redo()
+    return json_response()
 
 
 @bp.route('/<id_>/download', methods=['GET'])
 @opt_perm
 def download(id_):
-    return jsonify({'share_id': PitMgr(id_).download()})
+    share_id = PitMgr(id_).download()
+    return json_response(share_id=share_id)
 
 
 @bp.route('/<id_>/c-download', methods=['GET'])
 @perm(node='pit.check')
 def checker_download(id_):
-    return jsonify({'share_id': PitMgr(id_).checker_download()})
+    share_id = PitMgr(id_).checker_download()
+    return json_response(share_id=share_id)
 
 
 @bp.route('/<id_>/check-pass', methods=['POST'])
 @perm(node='pit.check')
 def check_pass(id_):
     PitMgr(id_).check_pass()
-    return jsonify({})
+    return json_response()
 
 
 @bp.route('/<id_>/check-fail', methods=['POST'])
 @perm(node='pit.check')
 def check_fail(id_):
     PitMgr(id_).check_fail()
-    return jsonify({})
+    return json_response()

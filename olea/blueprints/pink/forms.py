@@ -15,7 +15,7 @@ class SetEmail(BaseForm):
 
 
 class Search(BaseForm):
-    deps = Set(Enum(Dep), default=set([dep.name for dep in Dep]))
+    deps = Set(Enum(Dep), default=set(Dep))
     name = String(required=False)
     qq = Integer(required=False)
 

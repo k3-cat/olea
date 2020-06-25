@@ -1,8 +1,8 @@
-import enum
-
 from sqlalchemy_ import (BaseModel, Column, ForeignKey, UniqueConstraint, hybrid_property,
                          relationship)
-from sqlalchemy_.types import ARRAY, Enum, DateTime, Integer, String
+from sqlalchemy_.types import ARRAY, DateTime, Enum, Integer, String
+
+from .common_enums import ZEnum, enum
 
 __all__ = ['Proj']
 
@@ -11,7 +11,7 @@ class Proj(BaseModel):
     __tablename__ = 'proj'
 
     # Status
-    class S(enum.Enum):
+    class S(ZEnum):
         pre = 'p'
         freezed = 'FF'
         working = 'w'
@@ -19,7 +19,7 @@ class Proj(BaseModel):
         fin = 'F'
 
     # Category
-    class C(enum.Enum):
+    class C(ZEnum):
         doc = 'documentary'
         sub = 'sub-content'
         ani = 'animation'
@@ -32,9 +32,9 @@ class Proj(BaseModel):
     status = Column(Enum(S, name='proj_status'), default=S.pre)
     leader_id = Column(String, ForeignKey('pink.id', ondelete='SET NULL'))
     word_count = Column(Integer)
-    url = Column(String, nullable=True)
     start_at = Column(DateTime, nullable=True)
     finish_at = Column(DateTime, nullable=True)
+    url = Column(String, nullable=True)
     timestamp = Column(DateTime)
 
     track = Column(ARRAY(String), default=list)
@@ -61,3 +61,15 @@ class Proj(BaseModel):
             self.track.append(f'{base} by:{by}')
         else:
             self.track.append(base)
+
+    def __json__(self):
+        return {
+            'id': self.id,
+            'title': self.display_title,
+            'source': self.source,
+            'cat': self.cat,
+            'status': self.status,
+            'leader_id': self.leader_id,
+            'word_count': self.word_count,
+            'start_at': self.start_at
+        }

@@ -1,4 +1,5 @@
-from flask import g, jsonify, request
+from flask import g, request
+from flask_json import json_response
 
 from olea.auth import allow_anonymous, opt_perm, perm
 
@@ -12,7 +13,7 @@ from .query import PinkQuery
 @opt_perm
 def single(id_):
     pink = PinkQuery.single(id_)
-    return jsonify({})
+    return json_response(data_=pink)
 
 
 @bp.route('/', methods=['GET'])
@@ -27,15 +28,15 @@ def search():
 def update_info():
     form = UpdateInfo()
     PinkMgr(g.pink_id).update_info(qq=form.qq, other=form.other, email=form.email)
-    return 'True'
+    return json_response()
 
 
 @bp.route('/assign-token', methods=['POST'])
 @perm
 def assign_token():
     form = AssignToken()
-    token = PinkMgr.assign_token(deps=form.deps, amount=form.amount)
-    return jsonify({'token': token})
+    tokens = PinkMgr.assign_token(deps=form.deps, amount=form.amount)
+    return json_response(data_=tokens)
 
 
 @bp.route('/sign-up', methods=['POST'])
@@ -49,14 +50,14 @@ def sign_up():
         email_token=form.token_email,
         deps_token=form.token_dep,
     )
-    return jsonify({'id': pink.id})
+    return json_response(id=pink.id)
 
 
 @bp.route('/<id_>/deactive', methods=['POST'])
 @perm
 def deactive(id_):
     PinkMgr(id_).deactive()
-    return jsonify({})
+    return json_response()
 
 
 @bp.route('/ducks/', methods=['GET'])
@@ -67,7 +68,7 @@ def list_ducks():
                             node=form.node,
                             nodes=form.nodes,
                             allow=form.allow)
-    return jsonify()
+    return json_response(data_=ducks)
 
 
 @bp.route('/<id_>/ducks/alter', methods=['POST'])
@@ -75,16 +76,7 @@ def list_ducks():
 def alter_ducks(id_):
     form = AlterDuck()
     ducks, confilcts = PinkMgr(id_).alter_ducks(add=form.add, remove=form.remove)
-    res = {'ducks': {duck.id: {'node': duck.node, 'scope': duck.scopes} for duck in ducks}}
-    if confilcts:
-        res['conflicts'] = {
-            duck.id: {
-                'node': duck.node,
-                'scope': duck.scopes
-            }
-            for duck in confilcts
-        }
-    return jsonify()
+    return json_response(ducks=ducks, confilcts=confilcts)
 
 
 @bp.route('/<id_>/ducks/<node>/alter', methods=['POST'])
@@ -96,5 +88,5 @@ def alter_scopes(id_, node):
         duck.add_scopes(scopes=form.positive)
         final = duck.remove_scopes(scopes=form.negative)
     else:
-        final = duck.alter_scopes(scopes=form.positive)
+        final = duck.modi_scopes(scopes=form.positive)
     return jsonify({'new_scopes': final})

@@ -22,3 +22,11 @@ class Role(BaseModel):
     pits = relationship('Pit', back_populates='role', lazy='dynamic', passive_deletes=True)
     __table_args__ = (UniqueConstraint('proj_id', 'dep', 'name', name='_role_uc'), )
     __id_len__ = 12
+
+    def __json__(self):
+        return {
+            'id': self.id,
+            'dep': self.dep,
+            'name': self.name,
+            'note': self.note,
+        }

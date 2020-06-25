@@ -4,7 +4,7 @@ from models import Ann, Dep
 
 
 class FetchAnn(BaseForm):
-    deps = Set(Enum(Dep), default=set([dep.name for dep in Dep]))
+    deps = Set(Enum(Dep), default=set(Dep))
 
 
 class PostAnn(BaseForm):

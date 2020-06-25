@@ -28,7 +28,7 @@ class Pink(BaseModel):
 
     @property
     def pwd(self):
-        raise AttributeError('shold not read pwd')
+        raise AttributeError('SHOLD NOT READ PWD')
 
     @pwd.setter
     def pwd(self, new_pwd):
@@ -36,3 +36,12 @@ class Pink(BaseModel):
 
     def check_pwd(self, pwd):
         return pwd_hasher.verify(self._pwd, pwd)
+
+    def __json__(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'qq': self.qq,
+            'other': self.other,
+            'deps': self.deps
+        }
