@@ -1,42 +1,35 @@
 from functools import wraps
 
-from flask import current_app, g, request
+from flask import g, request
 
 from models import Lemon, Pink
 from olea import email_mgr
 from olea.auth.authentication import revoke_all_lemons
 from olea.base import BaseMgr
 from olea.errors import AccountDeactivated, InvalidCredential, InvalidRefreshToken, RecordNotFound
-from olea.singleton import db, ip2loc, redis, pat
-from olea.utils import random_b85
+from olea.singleton import db, ip2loc, pat, redis
+from olea.utils import FromConf, random_b85
 
 from .pwd_tools import check_pwd
-
-
-def _verify_email():
-    ve_life = current_app.config['EMAIL_VERIFICATION_LIFE']
-
-    def verify_email(email):
-        token = pat.encode(exp=(g.now + ve_life).timestamp(),
-                           payload={
-                               'old': Pink.query.get(g.pink_id) if g.pink_id else None,
-                               'new': email
-                           })
-
-    return wraps(verify_email)
-
-
-verify_email = _verify_email()
 
 
 class PinkMgr(BaseMgr):
     module = Pink
 
-    t_life = current_app.config['PWD_RESET_TOKEN_LIFE'].seconds
+    t_life = FromConf('PWD_RESET_TOKEN_LIFE')
+    ve_life = FromConf('EMAIL_VERIFICATION_LIFE')
 
     def __init__(self, obj_or_id):
         self.o: Pink = None
         super().__init__(obj_or_id)
+
+    @classmethod
+    def verify_email(cls, email):
+        token = pat.encode(exp=(g.now + ve_life).timestamp(),
+                           payload={
+                               'old': Pink.query.get(g.pink_id) if g.pink_id else None,
+                               'new': email
+                           })
 
     @classmethod
     def forget_pwd(cls, name, email):
@@ -44,7 +37,7 @@ class PinkMgr(BaseMgr):
         if pink and pink.email != email:
             return
         token = random_b85(k=20)
-        redis.set(f'rst-{token}', pink.id, ex=cls.t_life)
+        redis.set(f'rst-{token}', pink.id, ex=t_life.seconds)
         email_mgr.pwd_reset(email=pink.email, name=pink.name, token=token)
 
     @staticmethod
@@ -68,8 +61,8 @@ class PinkMgr(BaseMgr):
 class LemonMgr(BaseMgr):
     model = Lemon
 
-    a_life = current_app.config['ACCESS_TOKEN_LIFE']
-    r_life = current_app.config['REFRESH_TOKEN_LIFE']
+    a_life = 'ACCESS_TOKEN_LIFE'
+    r_life = 'REFRESH_TOKEN_LIFE'
 
     def __init__(self, obj_or_id):
         self.o: Lemon = None

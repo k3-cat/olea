@@ -5,7 +5,7 @@ from olea.auth import allow_anonymous
 
 from . import bp
 from .forms import ForgetPwd, Login, Refresh, ResetPwd, SetPwd, VEmail
-from .services import LemonMgr, PinkMgr, verify_email
+from .services import LemonMgr, PinkMgr
 
 
 @bp.route('/login', methods=['POST'])
@@ -43,7 +43,7 @@ def reset_pwd():
 @allow_anonymous
 def email_verification():
     form = VEmail()
-    verify_email(email=form.email)
+    PinkMgr.verify_email(email=form.email)
     return json_response()
 
 

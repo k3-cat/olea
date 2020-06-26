@@ -3,8 +3,6 @@ from json_api.fields import Email, String
 
 from olea.singleton import mailgun
 
-from .custom_conditions import Email
-
 
 class Login(BaseForm):
     name = String

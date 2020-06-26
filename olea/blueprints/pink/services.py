@@ -1,4 +1,4 @@
-from flask import current_app, g
+from flask import g
 
 from models import Duck, Pink
 from olea import email_mgr
@@ -7,13 +7,13 @@ from olea.auth.authentication import revoke_all_lemons
 from olea.base import BaseMgr
 from olea.errors import InvalidCredential, RecordNotFound
 from olea.singleton import db, pat, redis
-from olea.utils import random_b85
+from olea.utils import FromConf, random_b85
 
 
 class PinkMgr(BaseMgr):
     model = Pink
 
-    t_life = current_app.config['DEPS_TOKEN_LIFE'].seconds
+    t_life = FromConf('DEPS_TOKEN_LIFE')
 
     def __init__(self, obj_or_id):
         self.o: Pink = None
@@ -24,7 +24,7 @@ class PinkMgr(BaseMgr):
         g.check_scopes(deps)
         deps_s = ','.join(deps)
         tokens = [random_b85(k=20) for __ in range(amount)]
-        redis.mset({f'deps-{token}': deps_s for token in tokens}, ex=cls.t_life)
+        redis.mset({f'deps-{token}': deps_s for token in tokens}, ex=cls.t_life.seconds)
         return tokens
 
     @classmethod

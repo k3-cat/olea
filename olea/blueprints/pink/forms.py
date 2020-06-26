@@ -75,7 +75,7 @@ class AlterScopes(BaseForm):
     negative = Set(String(), required=False)
 
     _condition = If(
-        if_=Properties({'method': Is('diff')}),
+        if_=Properties(method=Is('diff')),
         then_=OneOf(Has('positive'), Has('negative')),
         else_=Has('positive'),
     )
