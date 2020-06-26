@@ -10,14 +10,14 @@ from .services import ProjMgr, RoleMgr
 
 
 @bp.route('/<id_>', methods=['GET'])
-@opt_perm
+@opt_perm()
 def single(id_):
     proj = ProjQuery.single(id_)
     return json_response(data_=proj)
 
 
 @bp.route('/', methods=['GET'])
-@opt_perm
+@opt_perm()
 def search():
     form = Search()
     projs = ProjQuery.search(status_set=form.status_set, cats=form.cats)
@@ -32,7 +32,7 @@ def create():
 
 
 @bp.route('/f-create', methods=['POST'])
-@perm
+@perm()
 def full_create():
     form = FullCreate()
     proj = ProjMgr.create(base=form.base, cat=form.cat, suff=form.suff, leader_id=form.leader)
@@ -53,7 +53,7 @@ def start(id_):
 
 
 @bp.route('/<id_>/finish', methods=['POST'])
-@perm
+@perm()
 def finish(id_):
     form = Finish()
     ProjMgr(id_).finish(url=form.url)
@@ -67,7 +67,7 @@ def pick(role_id):
 
 
 @bp.route('/roles/<role_id>/f-pick', methods=['POST'])
-@perm
+@perm()
 def full_pick(role_id):
     form = Pick()
     pit = RoleMgr(role_id).full_pick(pink_id=form.pink_id)

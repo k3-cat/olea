@@ -13,8 +13,11 @@ def random_b85(k):
 
 
 class FromConf():
-    def __init__(self, name):
-        self.name = name
+    app = None
 
-    def bind(self, app):
-        return app.config[self.name]
+    @classmethod
+    def init_app(cls, app):
+        cls.app = app
+
+    def __new__(cls, name):
+        return cls.app.config[name]

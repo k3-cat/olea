@@ -3,21 +3,16 @@ import random
 from math import log2
 from typing import Set
 
-from flask import current_app
-from singleton import Singleton
-
 from olea.errors import WeekPwd
+from olea.utils import FromConf
+
+common_pwd: Set[str] = set()
+with FromConf('PWDDB_PATH').open('rb') as f:
+    common_pwd = pickle.load(f)
 
 
-class CommonPwd(metaclass=Singleton):
-    common_pwd: Set[str] = set()
-
-    def __init__(self):
-        with current_app.config['PWDDB_PATH'].open('rb') as f:
-            self.common_pwd = pickle.load(f)
-
-    def is_common_pwd(self, pwd: str) -> bool:
-        return pwd in self.common_pwd
+def is_common_pwd(pwd: str) -> bool:
+    return pwd in common_pwd
 
 
 # about pwd stength
@@ -64,7 +59,7 @@ def measure_strength(pwd: str) -> float:
 
 
 def check_pwd(pwd):
-    if CommonPwd().is_common_pwd(pwd):
+    if is_common_pwd(pwd):
         raise WeekPwd(rsn=WeekPwd.Rsn.common)
     strength = measure_strength(pwd)
     if strength < WEAK_MAX:

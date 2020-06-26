@@ -10,14 +10,14 @@ from .query import PinkQuery
 
 
 @bp.route('/<id_>', methods=['GET'])
-@opt_perm
+@opt_perm()
 def single(id_):
     pink = PinkQuery.single(id_)
     return json_response(data_=pink)
 
 
 @bp.route('/', methods=['GET'])
-@opt_perm
+@opt_perm()
 def search():
     form = Search()
     pinks = PinkQuery.search(deps=form.deps, name=form.name, qq=form.qq)
@@ -32,7 +32,7 @@ def update_info():
 
 
 @bp.route('/assign-token', methods=['POST'])
-@perm
+@perm()
 def assign_token():
     form = AssignToken()
     tokens = PinkMgr.assign_token(deps=form.deps, amount=form.amount)
@@ -54,7 +54,7 @@ def sign_up():
 
 
 @bp.route('/<id_>/deactive', methods=['POST'])
-@perm
+@perm()
 def deactive(id_):
     PinkMgr(id_).deactive()
     return json_response()

@@ -60,7 +60,7 @@ def optional_permission(node=''):
             check_scopes(False, scopes)
         return passed
 
-    def decorate(f):
+    def decorated(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
             g.check_opt_duck = check_opt_duck
@@ -68,11 +68,11 @@ def optional_permission(node=''):
 
         return wrapper
 
-    return decorate
+    return decorated
 
 
 def permission_required(default_pass=False, node=''):
-    def decorate(f):
+    def decorated(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
             check_duck(default_pass, node)
@@ -81,4 +81,4 @@ def permission_required(default_pass=False, node=''):
 
         return wrapper
 
-    return decorate
+    return decorated

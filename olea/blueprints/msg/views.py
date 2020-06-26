@@ -17,8 +17,8 @@ def search():
 
 
 @bp.route('/anns/post', methods=['POST'])
-@perm
-def post_():
+@perm()
+def post_ann():
     form = PostAnn()
     ann = AnnMgr.post(cat=form.cat,
                       deps=form.deps,
@@ -28,16 +28,16 @@ def post_():
 
 
 @bp.route('/anns/<ann_id>/edit', methods=['POST'])
-@perm
-def edit(ann_id):
+@perm()
+def edit_ann(ann_id):
     form = Edit()
     ann = AnnMgr(ann_id).edit(content=form.content)
     return json_response()
 
 
 @bp.route('/anns/<ann_id>/delete', methods=['Post'])
-@perm
-def delete_(ann_id):
+@perm()
+def delete_ann(ann_id):
     pits = AnnMgr(ann_id).delete()
     return json_response()
 

@@ -10,7 +10,7 @@ from .services import PitMgr
 
 
 @bp.route('/<id_>', methods=['GET'])
-@opt_perm
+@opt_perm()
 def single(id_):
     pit = PitQuery.single(id_)
     return json_response(data_=pit)
@@ -33,7 +33,7 @@ def checks():
 
 
 @bp.route('/', methods=['GET'])
-@opt_perm
+@opt_perm()
 def search():
     form = Search()
     pits = PitQuery.search(deps=form.deps, status_set=form.status_set, pink_id=form.pink_id)
@@ -54,7 +54,7 @@ def submit(id_):
 
 
 @bp.route('/<id_>/f-submit', methods=['POST'])
-@perm
+@perm()
 def force_submit(id_):
     form = ForceSubmit()
     PitMgr(id_).force_submit(token=form.token)
@@ -68,7 +68,7 @@ def redo(id_):
 
 
 @bp.route('/<id_>/download', methods=['GET'])
-@opt_perm
+@opt_perm()
 def download(id_):
     share_id = PitMgr(id_).download()
     return json_response(share_id=share_id)

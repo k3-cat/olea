@@ -2,14 +2,14 @@ import re
 
 import requests
 from bs4 import BeautifulSoup
-from flask import current_app
 
 from models import Proj
 from olea.errors import InvalidSource
 from olea.singleton import redis
+from olea.utils import FromConf
 
 CN_SITE_URL = 'http://scp-wiki-cn.wikidot.com'
-web_exp = current_app.config['WEB_EXP']
+web_exp = FromConf('WEB_EXP')
 
 
 def fetch_web(url):
