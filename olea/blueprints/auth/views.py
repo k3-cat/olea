@@ -12,15 +12,15 @@ from .services import LemonMgr, PinkMgr
 @allow_anonymous
 def login():
     form = Login()
-    lemon = LemonMgr.grante(name=form.name, pwd=form.pwd, device_id=form.device_id)
+    lemon = LemonMgr.login(name=form.name, pwd=form.pwd, device_id=form.device_id)
     return json_response(id=lemon.id, key=lemon.key, exp=lemon.expiration)
 
 
 @bp.route('/set-pwd', methods=['POST'])
 def set_pwd():
     form = SetPwd()
-    PinkMgr(g.pink_id).set_pwd(form.pwd)
-    return json_response()
+    lemon = PinkMgr(g.pink_id).set_pwd(pwd=form.pwd, device_id=form.device_id)
+    return json_response(id=lemon.id, key=lemon.key, exp=lemon.expiration)
 
 
 @bp.route('/forget-pwd', methods=['POST'])
@@ -35,8 +35,8 @@ def reset_pwd_i():
 @allow_anonymous
 def reset_pwd():
     form = ResetPwd()
-    PinkMgr.reset_pwd(token=form.token, pwd=form.pwd)
-    return json_response()
+    lemon = PinkMgr.reset_pwd(token=form.token, pwd=form.pwd, device_id=form.device_id)
+    return json_response(id=lemon.id, key=lemon.key, exp=lemon.expiration)
 
 
 @bp.route('/email-verification', methods=['POST'])

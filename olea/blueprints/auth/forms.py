@@ -18,10 +18,12 @@ class ForgetPwd(BaseForm):
 class ResetPwd(BaseForm):
     token = String
     pwd = String
+    device_id = String
 
 
 class SetPwd(BaseForm):
     pwd = String
+    device_id = String
 
 
 class VEmail(BaseForm):

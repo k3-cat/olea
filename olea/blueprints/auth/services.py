@@ -41,18 +41,22 @@ class PinkMgr(BaseMgr):
         email_mgr.pwd_reset(email=pink.email, name=pink.name, token=token)
 
     @staticmethod
-    def reset_pwd(token, pwd):
+    def reset_pwd(token, pwd, device_id):
         if not (pink_id := redis.get(f'rst-{token}')):
             raise InvalidCredential(type=InvalidCredential.T.rst)
 
-        PinkMgr(pink_id).set_pwd(pwd)
-        revoke_all_lemons(pink_or_id=pink_id)
-
+        lemon = PinkMgr(pink_id).set_pwd(pwd, device_id)
         redis.delete(token)
 
-    def set_pwd(self, pwd):
+        return lemon
+
+    def set_pwd(self, pwd, device_id):
         check_pwd(pwd)
         self.o.pwd = pwd
+
+        revoke_all_lemons(pink_or_id=self.o.id)
+
+        return LemonMgr._grante(self.o, device_id)
 
     def all_lemons(self):
         return self.o.lemons
@@ -73,14 +77,18 @@ class LemonMgr(BaseMgr):
         except RecordNotFound:
             raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.non)
 
-    @classmethod
-    def grante(cls, name, pwd, device_id):
+    @staticmethod
+    def login(name, pwd, device_id):
         pink: Pink = Pink.query.filter_by(name=name).one()
         if not pink.active:
             raise AccountDeactivated()
         if not pink or not pink.check_pwd(pwd):
             raise InvalidCredential(type=InvalidCredential.T.pwd)
 
+        return LemonMgr._grante(pink, device_id)
+
+    @classmethod
+    def _grante(cls, pink, device_id):
         pink.lemons.filter_by(device_id=device_id).delete()
 
         lemon = cls.model(id=cls.gen_id(),
