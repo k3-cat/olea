@@ -1,5 +1,7 @@
 from flask_jsonapi import BaseForm
-from json_api.fields import String, Email
+from json_api.fields import Email, String
+
+from olea.singleton import mailgun
 
 from .custom_conditions import Email
 
@@ -26,6 +28,11 @@ class SetPwd(BaseForm):
 
 class VEmail(BaseForm):
     email = Email
+
+    def check_email(self, data):
+        result = mailgun.check_adr(data)
+        if result['risk'] in ('high', 'medium'):
+            return f'{result["risk"]}-risk|{", ".join(result["reason"])}'
 
 
 class Refresh(BaseForm):

@@ -19,7 +19,7 @@ def single(id_):
 @bp.route('/in_dep/', methods=['GET'])
 @perm(node='pit.in_dep.all')
 def in_dep():
-    form = InDep(data=request.args)
+    form = InDep()
     pits = PitQuery.in_dep(dep=form.dep, status=form.status_set)
     return json_response(data_=pits)
 
@@ -27,7 +27,7 @@ def in_dep():
 @bp.route('/checks/', methods=['GET'])
 @perm(node='pit.check')
 def checks():
-    form = Checks(data=request.args)
+    form = Checks()
     pits = PitQuery.check_list(deps=form.deps)
     return json_response(data_=pits)
 
@@ -35,7 +35,7 @@ def checks():
 @bp.route('/', methods=['GET'])
 @opt_perm
 def search():
-    form = Search(data=request.args)
+    form = Search()
     pits = PitQuery.search(deps=form.deps, status_set=form.status_set, pink_id=form.pink_id)
     return json_response(data_=pits)
 

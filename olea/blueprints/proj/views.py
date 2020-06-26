@@ -19,7 +19,7 @@ def single(id_):
 @bp.route('/', methods=['GET'])
 @opt_perm
 def search():
-    form = Search(request.args)
+    form = Search()
     projs = ProjQuery.search(status_set=form.status_set, cats=form.cats)
     return json_response(data_=projs)
 

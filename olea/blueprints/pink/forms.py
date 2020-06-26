@@ -41,9 +41,9 @@ class SignUp(BaseForm):
 
     _condition = OneOf(Has('qq'), Has('other'))
 
-    def check_name(self, field):
-        if measure_width(field.data) > 16:
-            raise FieldError('name is too long')
+    def check_name(self, data):
+        if width := measure_width(data) > 16:
+            return f'name of width {width} is too long'
 
 
 class SearchDuck():

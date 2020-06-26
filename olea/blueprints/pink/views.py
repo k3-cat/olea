@@ -19,7 +19,7 @@ def single(id_):
 @bp.route('/', methods=['GET'])
 @opt_perm
 def search():
-    form = Search(request.args)
+    form = Search()
     pinks = PinkQuery.search(deps=form.deps, name=form.name, qq=form.qq)
     return pinks
 
@@ -63,7 +63,7 @@ def deactive(id_):
 @bp.route('/ducks/', methods=['GET'])
 @opt_perm(node='auth.duck')
 def list_ducks():
-    form = SearchDuck(request.args)
+    form = SearchDuck()
     ducks = PinkQuery.ducks(pink_id=form.pink_id,
                             node=form.node,
                             nodes=form.nodes,

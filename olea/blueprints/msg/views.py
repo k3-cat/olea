@@ -11,7 +11,7 @@ from .services import AnnMgr, ChatMgr, ProjMgr
 
 @bp.route('/anns/', methods=['GET'])
 def search():
-    form = FetchAnn(data=request.args)
+    form = FetchAnn()
     anns = AnnQuery.search(deps=form.deps)
     return json_response(data_=anns)
 
@@ -44,14 +44,14 @@ def delete_(ann_id):
 
 @bp.route('/chats/<proj_id>/', methods=['GET'])
 def chats_index(proj_id):
-    form = ChatLogs(data=request.args)
+    form = ChatLogs()
     index = ChatQuery.chat_logs(proj_id=proj_id, offset=form.offset)
     return json_response(data_=index)
 
 
 @bp.route('/chats/', methods=['GET'])
 def chats():
-    form = FetchChat(data=request.args)
+    form = FetchChat()
     chats = ChatQuery.chats(chats=form.chats)
     return json_response(data_=chats)
 
