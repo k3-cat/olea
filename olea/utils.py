@@ -1,4 +1,8 @@
 import random
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Any
 
 # from base64 import _b85alphabet
 _b85alphabet = ('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -13,11 +17,11 @@ def random_b85(k):
 
 
 class FromConf():
-    app = None
+    app: Any = None
 
     @classmethod
     def init_app(cls, app):
         cls.app = app
 
-    def __new__(cls, name):
+    def __new__(cls, name) -> Any:
         return cls.app.config[name]

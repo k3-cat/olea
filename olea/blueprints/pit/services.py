@@ -7,6 +7,7 @@ from olea.base import BaseMgr
 from olea.dep_graph import DepGraph
 from olea.errors import AccessDenied, DoesNotMeetRequirements, FileExist, FileVerConflict
 from olea.singleton import db, onedrive, pat, redis
+from olea.utils import FromConf
 
 from .quality_control import CheckFailed, check_file_meta
 from .utils import check_owner, check_status
@@ -147,6 +148,8 @@ class PitMgr(BaseMgr):
 class ProjMgr(BaseMgr):
     model = Proj
 
+    shift_buffer = FromConf('PIT_SHIFT_BUFFER')
+
     def __init__(self, obj_or_id):
         self.o: Proj = None
         super().__init__(obj_or_id)
@@ -172,16 +175,16 @@ class ProjMgr(BaseMgr):
             pit_.status = Pit.S.working
 
             # sequence of the following block MUST NOT BE CHANGED
-            if (extended_seconds := extended.seconds) < -86400:
+            if extended < -self.shift_buffer:
                 # finished before 1 day prior to due
                 pit_.add_track(info=Pit.T.shift, by=pit.id)
-                pit_.start_at += extended_seconds
-                pit_.due += extended_seconds
+                pit_.start_at += extended
+                pit_.due += extended
 
             elif extended.seconds > 0:
                 # pit is extended
                 pit_.add_track(info=Pit.T.cascade, by=pit.id)
-                pit_.due += extended_seconds
+                pit_.due += extended
 
         # check if proj can upload
         if not pits:

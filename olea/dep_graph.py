@@ -6,37 +6,34 @@ from typing import Dict, Set
 from singleton import Singleton
 
 from models import Dep
+from olea.utils import FromConf
 
 
 class DepGraph(metaclass=Singleton):
-    RULE: Dict[Dep, Set[Dep]] = {
-        Dep.ae: {Dep.au, Dep.ps},
-    }
+    RULE: Dict[Dep, Set[Dep]] = FromConf('RULE')
     I_RULE: Dict[Dep, Set[Dep]] = dict()
-
-    DURATION = {
-        Dep.au: timedelta(days=7),
-        Dep.ps: timedelta(days=7),
-        Dep.ae: timedelta(days=14),
-    }
+    DURATION = FromConf('DURATION')
 
     def __new__(cls):
+        def dfs_check(dep, target):
+            deps = cls.RULE.get(dep, None)
+            if not deps:
+                return
+
+            if target in deps:
+                raise Exception('Circular Dependence')
+            for dep_ in deps:
+                dfs_check(dep_, target)
+
         for dep, dependences in cls.RULE.items():
             # check circular dependence
-            queue = deque([dep])
-            chain = set()
-            while queue:
-                deps = cls.RULE.get(queue.popleft(), set())
-                queue.extend(deps)
-                chain = chain | deps
-                if dep in chain:
-                    raise Exception('Circular Dependence')
+            dfs_check(dep, dep)
 
             # build inverse rule
             for _dep in dependences:
-                if _dep in cls.I_RULE:
+                try:
                     cls.I_RULE[_dep].add(dep)
-                else:
+                except KeyError:
                     cls.I_RULE[_dep] = {dep}
 
         return super().__new__(cls)
