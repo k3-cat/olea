@@ -25,8 +25,9 @@ def build_import_statement(module):
     for module_name in find_modules(module):
         all_in_module = list()
         for name, obj in inspect.getmembers(import_string(module_name), inspect.isclass):
-            if name == 'ABC' or getattr(obj, 'code', '') == '':
+            if getattr(obj.__base__.__base__, '__name__', None) != 'BaseError':
                 continue
+
             all_in_module.append(name)
         if not all_in_module:
             all_in_module.append('BaseError')

@@ -13,7 +13,7 @@ from olea.utils import FromConf, random_b85
 class PinkMgr(BaseMgr):
     model = Pink
 
-    t_life = FromConf('DEPS_TOKEN_LIFE')
+    t_life = FromConf('TL_NEW_PINK')
 
     def __init__(self, obj_or_id):
         self.o: Pink = None

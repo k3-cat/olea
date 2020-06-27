@@ -34,11 +34,12 @@ class Config():
     WEB_EXP = timedelta(minutes=30)
 
     # --- token life --------------------------------
-    DEPS_TOKEN_LIFE = timedelta(days=3)
-    EMAIL_VERIFICATION_LIFE = timedelta(hours=1)
-    ACCESS_TOKEN_LIFE = timedelta(minutes=10)
-    REFRESH_TOKEN_LIFE = timedelta(days=90)
-    PWD_RESET_TOKEN_LIFE = timedelta(minutes=30)
+    TL_ACCESS_TOKEN = timedelta(minutes=10)
+    TL_EMAIL_VERIFICATION = timedelta(hours=1)
+    TL_NEW_PINK = timedelta(days=3)
+    TL_PIT_SUMBIT = timedelta(days=2)
+    TL_PWD_RESET = timedelta(minutes=30)
+    TL_REFRESH_TOKEN = timedelta(days=90)
 
     # --- sqlalchemy --------------------------------
     SQLALCHEMY_TRACK_MODIFICATIONS = False

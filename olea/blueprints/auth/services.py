@@ -16,8 +16,8 @@ from .pwd_tools import check_pwd
 class PinkMgr(BaseMgr):
     module = Pink
 
-    t_life = FromConf('PWD_RESET_TOKEN_LIFE')
-    ve_life = FromConf('EMAIL_VERIFICATION_LIFE')
+    t_life = FromConf('TL_PWD_RESET')
+    ve_life = FromConf('TL_EMAIL_VERIFICATION')
 
     def __init__(self, obj_or_id):
         self.o: Pink = None
@@ -65,8 +65,8 @@ class PinkMgr(BaseMgr):
 class LemonMgr(BaseMgr):
     model = Lemon
 
-    a_life = 'ACCESS_TOKEN_LIFE'
-    r_life = 'REFRESH_TOKEN_LIFE'
+    a_life = 'TL_ACCESS_TOKEN'
+    r_life = 'TL_REFRESH_TOKEN'
 
     def __init__(self, obj_or_id):
         self.o: Lemon = None

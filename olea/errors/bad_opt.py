@@ -13,14 +13,14 @@ class BadOpt(BaseError, ABC):
 
 
 class ProjMetaLocked(BadOpt):
-    code = 'I4HX'
+    code = 'CUGMS'
 
     def __init__(self, status):
         super().__init__(status=status)
 
 
 class InvalidSource(BadOpt):
-    code = '4JZE'
+    code = 'M1CDO'
 
     class Rsn(enum.Enum):
         inp = 'invalid input'
@@ -35,21 +35,21 @@ class InvalidSource(BadOpt):
 
 
 class RoleIsTaken(BadOpt):
-    code = '4J67'
+    code = 'IFHK2'
 
     def __init__(self, by):
         super().__init__(pink_id=by.id, pink_name=by.name)
 
 
 class NotQualifiedToPick(BadOpt):
-    code = 'CWAI'
+    code = 'E9QVS'
 
     def __init__(self, dep):
         super().__init__(dep=dep)
 
 
 class InvalidReply(BadOpt):
-    code = 'abcd'
+    code = 'GAQNX'
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -59,7 +59,7 @@ class InvalidReply(BadOpt):
 
 
 class WeekPwd(BadOpt):
-    code = 'cdef'
+    code = '4SPSN'
 
     class Rsn(enum.Enum):
         common = 'common pwd'
@@ -76,7 +76,7 @@ class WeekPwd(BadOpt):
 
 
 class PitStatusLocked(BadOpt):
-    code = 'L5OM'
+    code = '2VCI9'
 
     def __init__(self, current, required: Iterable):
         required_list = [req.name for req in required]
@@ -87,14 +87,14 @@ class PitStatusLocked(BadOpt):
 
 
 class UnallowedType(BadOpt):
-    code = 'C3D8'
+    code = 'YP3OM'
 
     def __init__(self, mime: str, required: str):
         super().__init__(mime=mime, required=required)
 
 
 class DoesNotMeetRequirements(BadOpt):
-    code = '84RX'
+    code = 'Y42HF'
 
     def __init__(self, confl: Dict[str, str], required: Dict[str, str], token):
         super().__init__(confl=confl, required=required, token=token)

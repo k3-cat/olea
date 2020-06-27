@@ -199,17 +199,19 @@ class ProjMgr(BaseMgr):
 class MangoMgr(BaseMgr):
     model = Mango
 
+    t_life = FromConf('TL_PIT_SUMBIT')
+
     def __init__(self, obj_or_id):
         self.o: Mango = None
         super().__init__(obj_or_id)
 
-    @staticmethod
-    def create(pit, share_id):
+    @classmethod
+    def create(cls, pit, share_id):
         i = onedrive.get_shared_item_info(share_id=share_id)
         try:
             check_file_meta(pit.role.dep, i)
         except CheckFailed as e:
-            token = pat.encode(exp=86400 * 3,
+            token = pat.encode(exp=(g.now + cls.t_life).timestamp(),
                                payload={
                                    'id': share_id,
                                    'sha1': i['sha1'],

@@ -1,8 +1,5 @@
 import random
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from typing import Any
+from typing import Any
 
 # from base64 import _b85alphabet
 _b85alphabet = ('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'

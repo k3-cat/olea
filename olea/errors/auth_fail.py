@@ -14,7 +14,7 @@ class AuthFail(BaseError, ABC):
 
 
 class AccessDenied(AuthFail):
-    code = 'UJCB'
+    code = 'HJESU'
 
     def __init__(self, obj=None, cls_=None):
         if obj:
@@ -24,7 +24,7 @@ class AccessDenied(AuthFail):
 
 
 class PermissionDenied(AuthFail):
-    code = 'abcd'
+    code = 'XUZ19'
 
     def __init__(self, scope: set = None):
         if scope:
@@ -34,28 +34,34 @@ class PermissionDenied(AuthFail):
 
 
 class AccountDeactivated(AuthFail):
-    code = 'ssss'
+    code = '7UCDA'
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
 
 class InvalidCredential(AuthFail):
-    code = '516O'
+    code = 'R6WET'
 
     class T(enum.Enum):
         pwd = 'pwd'
-        acc = 'access token'
         rst = 'reset token'
-        deps = 'creation token'
+        new = 'creation token'
         email = 'email verification token'
 
     def __init__(self, type_: 'InvalidCredential.T'):
         super().__init__(type=type_)
 
 
+class InvalidAccessToken(AuthFail):
+    code = 'G1PP5'
+
+    def __init__(self):
+        super().__init__()
+
+
 class InvalidRefreshToken(AuthFail):
-    code = '516O'
+    code = 'TICTK'
 
     class Rsn(enum.Enum):
         exp = 'expired'
