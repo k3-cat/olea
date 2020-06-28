@@ -1,13 +1,15 @@
 import inspect
 import re
 
-from ..file_helpers import py_rw
+from ..file_helpers import read, add_module, write
 from .error_code import check_err_code, generate_err_code
 
 statement = lambda: f"    code = '{generate_err_code()}'\n"
 
 
-@py_rw
+@write
+@read
+@add_module
 def fix_error_code(module, file_):
     offset = 0
     contains = set()

@@ -1,11 +1,11 @@
 import inspect
 import re
 
-from ..file_helpers import py_rw
+from ..file_helpers import add_module
 
 
-@py_rw
-def detect_classes(module, file_):
+@add_module
+def detect_classes(module):
     contains = set()
     for name, obj in inspect.getmembers(module, inspect.isclass):
         if getattr(obj.__base__, '__name__', None) not in ('BaseModel', 'ZEnum'):
@@ -13,4 +13,4 @@ def detect_classes(module, file_):
 
         contains.add(name)
 
-    return file_, contains
+    return contains

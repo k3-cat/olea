@@ -1,11 +1,27 @@
 import inspect
 import json
 import re
+from functools import wraps
 
-from .file_helpers import py_rw
+from .file_helpers import add_module, read, write
+from .g import DIR
 
 
-@py_rw
+def add_filepath(fun):
+    @wraps(fun)
+    def wrapper(*args, **kwargs):
+        target = kwargs.pop('target')
+        kwargs['filepath'] = DIR / target.replace('.', '/') / '__init__.py'
+
+        return fun(*args, **kwargs)
+
+    return wrapper
+
+
+@add_filepath
+@write
+@read
+@add_module
 def fix_init(module, file_, current):
     file_text = ''.join(file_)
     imports = re.findall(r'^(?:from .*? )?import \(.*?\)$', file_text, flags=re.DOTALL | re.M)

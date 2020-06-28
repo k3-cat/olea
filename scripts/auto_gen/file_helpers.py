@@ -8,7 +8,7 @@ from yapf.yapflib.yapf_api import FormatFile
 from .g import DIR
 
 
-def py_rw(fun):
+def read(fun):
     @wraps(fun)
     def wrapper(*args, **kwargs):
         path = kwargs['filepath']
@@ -18,7 +18,16 @@ def py_rw(fun):
 
         kwargs['file_'] = file_
 
+        return fun(*args, **kwargs)
+
+    return wrapper
+
+
+def add_module(fun):
+    @wraps(fun)
+    def wrapper(*args, **kwargs):
         flag = False
+        path = kwargs['filepath']
         init_path = path.parent / '__init__.py'
         if path != init_path:
             flag = True
@@ -32,27 +41,38 @@ def py_rw(fun):
             kwargs['module'] = import_string(module_str)
             kwargs.pop('filepath')
 
-            new_file_, ext = fun(*args, **kwargs)
-
-            try:
-                alt_path = path.parent / f'{path.name}_backup'
-                path.replace(alt_path)
-
-                with path.open('w') as f:
-                    f.writelines(new_file_)
-
-                SortImports(path)
-                FormatFile(str(path), in_place=True)
-
-                alt_path.unlink()
-
-            except:
-                alt_path.replace(path)
-                raise
+            result = fun(*args, **kwargs)
 
         finally:
             if flag:
                 init_alt_path.replace(init_path)
+
+        return result
+
+    return wrapper
+
+
+def write(fun):
+    @wraps(fun)
+    def wrapper(*args, **kwargs):
+        new_file_, ext = fun(*args, **kwargs)
+
+        path = kwargs['filepath']
+        alt_path = path.parent / f'{path.name}_backup'
+        path.replace(alt_path)
+
+        try:
+            with path.open('w') as f:
+                f.writelines(new_file_)
+
+            SortImports(path)
+            FormatFile(str(path), in_place=True)
+
+            alt_path.unlink()
+
+        except:
+            alt_path.replace(path)
+            raise
 
         return ext
 

@@ -1,5 +1,5 @@
 from ..fix_init import fix_init
-from ..g import DIR, MAIN_PACKAGE
+from ..g import MAIN_PACKAGE
 from .fix_error_code import fix_error_code
 
 TARGET = f'{MAIN_PACKAGE}.errors'
@@ -15,4 +15,4 @@ def run(changed):
     if 'base_error' in current:
         current['base_error'] = {'BaseError'}
 
-    fix_init(filepath=DIR / MAIN_PACKAGE / 'errors/__init__.py', current=current)
+    fix_init(target=TARGET, current=current)
