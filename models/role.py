@@ -1,6 +1,6 @@
 from sqlalchemy_ import (BaseModel, Column, ForeignKey, UniqueConstraint, hybrid_property,
                          relationship)
-from sqlalchemy_.types import Enum, Boolean, String, Text
+from sqlalchemy_.types import Boolean, Enum, String, Text
 
 from .common_enums import DEP
 from .pit import Pit

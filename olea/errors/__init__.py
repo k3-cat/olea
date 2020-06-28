@@ -3,6 +3,7 @@ from .auth_fail import (AccessDenied, AccountDeactivated, InvalidAccessToken, In
 from .bad_opt import (DoesNotMeetRequirements, InvalidReply, InvalidSource, NotQualifiedToPick,
                       PitStatusLocked, ProjMetaLocked, RoleIsTaken, UnallowedType, WeekPwd)
 from .base_error import BaseError
+from .common_enums import Dep
 from .data_conflict import DuplicatedRecord, FileExist, FileVerConflict, RecordNotFound
 
 __all__ = [

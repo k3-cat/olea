@@ -1,4 +1,5 @@
 import enum
+
 from sqlalchemy_.types import Enum
 
 __all__ = ['Dep']
