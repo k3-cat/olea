@@ -9,8 +9,14 @@ from .query import AnnQuery, ChatQuery
 from .services import AnnMgr, ChatMgr, ProjMgr
 
 
+@bp.route('/anns/<id_>', methods=['GET'])
+def ann(id_):
+    ann = AnnQuery.single(id_=id_)
+    return json_response(data_=ann)
+
+
 @bp.route('/anns/', methods=['GET'])
-def search():
+def anns():
     form = FetchAnn()
     anns = AnnQuery.search(deps=form.deps)
     return json_response(data_=anns)

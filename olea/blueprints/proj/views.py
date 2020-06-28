@@ -11,14 +11,14 @@ from .services import ProjMgr, RoleMgr
 
 @bp.route('/<id_>', methods=['GET'])
 @opt_perm()
-def single(id_):
+def proj(id_):
     proj = ProjQuery.single(id_)
     return json_response(data_=proj)
 
 
 @bp.route('/', methods=['GET'])
 @opt_perm()
-def search():
+def projs():
     form = Search()
     projs = ProjQuery.search(status_set=form.status_set, cats=form.cats)
     return json_response(data_=projs)

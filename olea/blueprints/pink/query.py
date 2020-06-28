@@ -9,6 +9,9 @@ def pink_serilizer(pink, pinks=None):
     if not pinks:
         result = pink.__json__()
         result['last_access'] = redis.hget('last_access', g.pink_id)
+        if pink.id == g.pink_id:
+            user, host = pink.email.split('@')
+            result['email'] = f'{user[0:3]}@{host}'
 
     else:
         result = list()

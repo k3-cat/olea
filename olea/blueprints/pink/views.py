@@ -11,14 +11,14 @@ from .query import PinkQuery
 
 @bp.route('/<id_>', methods=['GET'])
 @opt_perm()
-def single(id_):
+def pink(id_):
     pink = PinkQuery.single(id_)
     return json_response(data_=pink)
 
 
 @bp.route('/', methods=['GET'])
 @opt_perm()
-def search():
+def pinks():
     form = Search()
     pinks = PinkQuery.search(deps=form.deps, name=form.name, qq=form.qq)
     return pinks
@@ -89,4 +89,4 @@ def alter_scopes(id_, node):
         final = duck.remove_scopes(scopes=form.negative)
     else:
         final = duck.modi_scopes(scopes=form.positive)
-    return jsonify({'new_scopes': final})
+    return json_response(new_scopes=final)

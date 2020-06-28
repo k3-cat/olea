@@ -11,7 +11,7 @@ from .services import PitMgr
 
 @bp.route('/<id_>', methods=['GET'])
 @opt_perm()
-def single(id_):
+def pit(id_):
     pit = PitQuery.single(id_)
     return json_response(data_=pit)
 
@@ -34,7 +34,7 @@ def checks():
 
 @bp.route('/', methods=['GET'])
 @opt_perm()
-def search():
+def pits():
     form = Search()
     pits = PitQuery.search(deps=form.deps, status_set=form.status_set, pink_id=form.pink_id)
     return json_response(data_=pits)
