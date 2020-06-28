@@ -45,3 +45,6 @@ def create_manager(env=os.getenv('FLASK_ENV', 'production')):
     register_commands(app)
 
     return app
+
+
+application = create_manager()

@@ -34,7 +34,7 @@ pre-commit = "^2.3.0"
 [tool.isort]
 force_to_top = "false"
 line_length = 100
-known_third_party = ["IP2Location", "alembic", "bs4", "cryptography", "flask", "flask_json", "flask_jsonform", "flask_redis", "flask_sqlalchemy", "ip2loc", "jsonform", "mailgun", "msal", "onedrive", "passlib", "pypat", "requests", "sentry_sdk", "singleton", "sqlalchemy", "sqlalchemy_", "toml", "werkzeug"]
+known_third_party = ["IP2Location", "alembic", "auto_gen", "bs4", "cryptography", "flask", "flask_json", "flask_jsonapi", "flask_redis", "flask_sqlalchemy", "gevent", "ip2loc", "isort", "json_api", "jsonschema", "mailgun", "msal", "onedrive", "passlib", "pypat", "requests", "sentry_sdk", "singleton", "sqlalchemy", "sqlalchemy_", "toml", "werkzeug", "yapf"]
 
 [tool.pylint.messages_control]
 disable = """,

@@ -2,9 +2,10 @@ import random
 import string
 
 CHARS = string.digits + string.ascii_uppercase
+ERROR_CODE_LEN = 5
 
 
-def generate_err_code(k):
+def generate_err_code(k=ERROR_CODE_LEN):
     result = []
     for i in range(k - 1):
         result.append(random.randint(0, 35))
@@ -14,7 +15,7 @@ def generate_err_code(k):
         sum_ += order
         code += CHARS[order]
     code += CHARS[(36 - (sum_ % 36)) % 36]
-    print(code)
+    return code
 
 
 def check_err_code(code):
@@ -25,8 +26,9 @@ def check_err_code(code):
     for order in result:
         sum_ += order
     if sum_ % 36 != 0:
-        print('invaid')
+        return False
+    return True
 
 
 if __name__ == '__main__':
-    generate_err_code(5)
+    print(generate_err_code())
