@@ -10,7 +10,7 @@ class AuthFail(BaseError):
 
 
 class AccessDenied(AuthFail):
-    code = 'HJESU'
+    code = 'VIPKE'
 
     def __init__(self, obj=None, cls_=None):
         if obj:

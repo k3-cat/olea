@@ -26,14 +26,11 @@ def read(fun):
 def add_module(fun):
     @wraps(fun)
     def wrapper(*args, **kwargs):
-        flag = False
         path = kwargs['filepath']
         init_path = path.parent / '__init__.py'
-        if path != init_path:
-            flag = True
-            init_alt_path = path.parent / f'{init_path.name}_backup'
-            init_path.replace(init_alt_path)
-            init_path.open('w').close()
+        init_alt_path = path.parent / '__init__.py_backup'
+        init_path.replace(init_alt_path)
+        init_path.open('w').close()
 
         try:
             relative_path = path.relative_to(DIR)
@@ -44,8 +41,7 @@ def add_module(fun):
             result = fun(*args, **kwargs)
 
         finally:
-            if flag:
-                init_alt_path.replace(init_path)
+            init_alt_path.replace(init_path)
 
         return result
 

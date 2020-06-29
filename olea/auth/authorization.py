@@ -37,6 +37,7 @@ def check_duck(default_pass, node):
     cache_ducks(g.pink_id)
     if (not default_pass and not redis.hexists(f'duckT-{g.pink_id}', node)) or \
         (default_pass and redis.hexists(f'duckF-{g.pink_id}', node)):
+
         raise PermissionDenied()
 
 
@@ -46,6 +47,7 @@ def check_scopes(default_pass, scopes):
     # when scope_set is empty, it means ANY SCOPE
     if (default_pass and (diff := scopes - scope_set)) or \
         (not default_pass and (diff := scopes & scope_set if scope_set else scopes)):
+
         raise PermissionDenied(scope=diff)
 
 
@@ -53,12 +55,13 @@ def optional_permission(node=''):
     def check_opt_duck(scopes=None):
         try:
             check_duck(False, node)
-            passed = True
+            if scopes:
+                check_scopes(False, scopes)
+
         except PermissionDenied:
-            passed = False
-        if passed and scopes:
-            check_scopes(False, scopes)
-        return passed
+            return False
+
+        return True
 
     def decorated(f):
         @wraps(f)

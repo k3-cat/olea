@@ -8,6 +8,9 @@ from .g import DIR
 from .version import Version
 
 sys.path.append(str(DIR))
+sys.path.append(str(DIR / 'site-packages/json_api'))
+sys.path.append(str(DIR / 'site-packages/pypat'))
+sys.path.append(str(DIR / 'site-packages'))
 
 
 def main():
@@ -30,5 +33,3 @@ def main():
             raise
         else:
             version.save(relative_path)
-
-    version.write()

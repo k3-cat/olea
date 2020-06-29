@@ -106,17 +106,22 @@ class LemonMgr(BaseMgr):
     def grante_access_token(self, key, device_id):
         if self.o.key != key or self.o.device_id != device_id:
             raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.key)
+
         if self.o.ip != request.remote_addr \
             and ip2loc.get_city(self.o.ip) != ip2loc.get_city(request.remote_addr):
+
             raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.ip)
+
         if self.o.expiration < g.now:
             self.revoke()
             raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.exp, at=self.o.expiration)
 
+        # buffer
         last = redis.hget('last_access', g.pink_id)
         if last and g.now.timestamp() - last > 86400:
             self.o.expiration = g.now + self.r_life
 
+        # assign token
         token = random_b85(k=20)
         with redis.pipeline(transaction=False) as p:
             p.hset('last_access', g.pink_id, g.now.timestamp())

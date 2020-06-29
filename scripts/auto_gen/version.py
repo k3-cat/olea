@@ -53,6 +53,5 @@ class Version():
         self.ver.setdefault(path, dict())
         self.ver[path].update(self.temp[path])
 
-    def write(self):
         with self.file_path.open('w') as f:
             json.dump(self.ver, f, indent=2)

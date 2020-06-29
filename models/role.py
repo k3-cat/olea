@@ -5,7 +5,6 @@ from sqlalchemy_ import (BaseModel, Column, ForeignKey, UniqueConstraint, hybrid
 from sqlalchemy_.types import Boolean, Enum, String, Text
 
 from .common_enums import DEP
-from .pit import Pit
 
 
 class Role(BaseModel):
