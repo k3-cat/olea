@@ -1,11 +1,10 @@
 import enum
-from abc import ABC
 from typing import Dict, Iterable
 
 from .base_error import BaseError
 
 
-class BadOpt(BaseError, ABC):
+class BadOpt(BaseError):
     http_code = 403
 
 
@@ -50,9 +49,6 @@ class NotQualifiedToPick(BadOpt):
 
 class InvalidReply(BadOpt):
     code = 'GAQNX'
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
 
 
 # ------------------- pink ---------------------

@@ -1,11 +1,11 @@
+__all__ = ['Role']
+
 from sqlalchemy_ import (BaseModel, Column, ForeignKey, UniqueConstraint, hybrid_property,
                          relationship)
 from sqlalchemy_.types import Boolean, Enum, String, Text
 
 from .common_enums import DEP
 from .pit import Pit
-
-__all__ = ['Role']
 
 
 class Role(BaseModel):

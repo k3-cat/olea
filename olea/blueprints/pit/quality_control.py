@@ -1,27 +1,28 @@
+__all__ = ['CheckFailed', 'check_file_meta']
+
 from fractions import Fraction
 from math import sqrt
 
 from models import Dep
-
-__all__ = ['CheckFailed', 'check_file_meta']
 
 
 class CheckFailed(BaseException):
     def __init__(self, metainfo, required):
         self.confl = {key: metainfo[key] for key in required}
         self.required = required
+        super().__init__()
 
 
-def ps_checks(i):
+def _ps_checks(i):
     if 'image' not in i['mime']:
-        raise CheckFailed({'mime': 'image'})
+        raise CheckFailed(metainfo=i, required={'mime': 'image'})
 
-    return None
+    return dict()
 
 
-def au_checks(i):
+def _au_checks(i):
     if 'audio' not in i['mime']:
-        raise CheckFailed({'mime': 'audio'})
+        raise CheckFailed(metainfo=i, required={'mime': 'audio'})
 
     required = dict()
     j = i['metainfo']
@@ -32,9 +33,9 @@ def au_checks(i):
     return required
 
 
-def ae_checks(i):
+def _ae_checks(i):
     if 'video' not in i['mime']:
-        raise CheckFailed({'mime': 'video'})
+        raise CheckFailed(metainfo=i, required={'mime': 'video'})
 
     required = dict()
     j = i['metainfo']
@@ -60,13 +61,13 @@ def ae_checks(i):
 def check_file_meta(dep, i):
 
     if dep == Dep.ps:
-        required = ps_checks(i)
+        required = _ps_checks(i)
 
     elif dep == Dep.au:
-        required = au_checks(i)
+        required = _au_checks(i)
 
     elif dep == Dep.ae:
-        required = ae_checks(i)
+        required = _ae_checks(i)
 
     else:
         # prevent unexpected file uploading, should never be called

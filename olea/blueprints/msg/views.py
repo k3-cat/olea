@@ -1,4 +1,3 @@
-from flask import request
 from flask_json import json_response
 
 from olea.auth import opt_perm, perm
@@ -10,13 +9,13 @@ from .services import AnnMgr, ChatMgr, ProjMgr
 
 
 @bp.route('/anns/<id_>', methods=['GET'])
-def ann(id_):
+def get_id(id_):
     ann = AnnQuery.single(id_=id_)
     return json_response(data_=ann)
 
 
 @bp.route('/anns/', methods=['GET'])
-def anns():
+def search_anns():
     form = FetchAnn()
     anns = AnnQuery.search(deps=form.deps)
     return json_response(data_=anns)
@@ -38,13 +37,13 @@ def post_ann():
 def edit_ann(ann_id):
     form = Edit()
     ann = AnnMgr(ann_id).edit(content=form.content)
-    return json_response()
+    return json_response(data_=ann)
 
 
 @bp.route('/anns/<ann_id>/delete', methods=['Post'])
 @perm()
 def delete_ann(ann_id):
-    pits = AnnMgr(ann_id).delete()
+    AnnMgr(ann_id).delete()
     return json_response()
 
 
@@ -56,7 +55,7 @@ def chats_index(proj_id):
 
 
 @bp.route('/chats/', methods=['GET'])
-def chats():
+def get_chats():
     form = FetchChat()
     chats = ChatQuery.chats(chats=form.chats)
     return json_response(data_=chats)
@@ -73,7 +72,7 @@ def post_chat(proj_id):
 def edit_chat(chat_id):
     form = Edit()
     chat = ChatMgr(chat_id).edit(content=form.content)
-    return json_response()
+    return json_response(data_=chat)
 
 
 @bp.route('/chats/<chat_id>/delete', methods=['POST'])

@@ -6,19 +6,18 @@ from olea.errors import AccessDenied
 from olea.singleton import redis
 
 
-def ann_serilizer(ann, anns=None):
+def ann_serilizer(ann=None, anns=None):
     if not anns:
         result = ann.__json__()
-        readers = list()
         result['readers'] = ann.readers
 
     else:
         result = list()
-        for ann in anns:
-            info = ann.__json__()
+        for a in anns:
+            info = a.__json__()
             count = 0
-            for read_time_track in ann.readers.values():
-                if len(read_time_track) >= ann.ver:
+            for read_time_track in a.readers.values():
+                if len(read_time_track) >= a.ver:
                     count += 1
             info['readers'] = count
             result.append(info)
@@ -45,7 +44,7 @@ class AnnQuery():
         for ann in anns:
             ann.read(by=g.pink_id, now=g.now)
 
-        return ann_serilizer(anns)
+        return ann_serilizer(anns=anns)
 
 
 class ChatQuery():

@@ -56,7 +56,7 @@ def refresh():
 
 
 @bp.route('/lemons/', methods=['GET'])
-def lemons():
+def sessions():
     lemons = PinkMgr(g.pink_id).all_lemons()
     return json_response(data_=lemons)
 

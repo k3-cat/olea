@@ -1,11 +1,3 @@
-from .auth_fail import (AccessDenied, AccountDeactivated, InvalidAccessToken, InvalidCredential,
-                        InvalidRefreshToken, PermissionDenied)
-from .bad_opt import (DoesNotMeetRequirements, InvalidReply, InvalidSource, NotQualifiedToPick,
-                      PitStatusLocked, ProjMetaLocked, RoleIsTaken, UnallowedType, WeekPwd)
-from .base_error import BaseError
-from .common_enums import Dep
-from .data_conflict import DuplicatedRecord, FileExist, FileVerConflict, RecordNotFound
-
 __all__ = [
     'AccessDenied', 'AccountDeactivated', 'BaseError', 'DoesNotMeetRequirements',
     'DuplicatedRecord', 'FileExist', 'FileVerConflict', 'InvalidAccessToken', 'InvalidCredential',
@@ -13,6 +5,14 @@ __all__ = [
     'PermissionDenied', 'PitStatusLocked', 'ProjMetaLocked', 'RecordNotFound', 'RoleIsTaken',
     'UnallowedType', 'WeekPwd', 'register_error_handlers'
 ]
+
+from .auth_fail import (AccessDenied, AccountDeactivated, InvalidAccessToken, InvalidCredential,
+                        InvalidRefreshToken, PermissionDenied)
+from .bad_opt import (DoesNotMeetRequirements, InvalidReply, InvalidSource, NotQualifiedToPick,
+                      PitStatusLocked, ProjMetaLocked, RoleIsTaken, UnallowedType, WeekPwd)
+from .base_error import BaseError
+from .common_enums import Dep
+from .data_conflict import DuplicatedRecord, FileExist, FileVerConflict, RecordNotFound
 
 
 def register_error_handlers(app):

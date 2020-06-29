@@ -1,24 +1,24 @@
-from flask import g, request
+from flask import g
 from flask_json import json_response
 
 from olea.auth import allow_anonymous, opt_perm, perm
 
 from . import bp
-from .forms import AlterDuck, AlterScopes, AssignToken, SignUp, Search, SearchDuck, UpdateInfo
+from .forms import AlterDuck, AlterScopes, AssignToken, Search, SearchDuck, SignUp, UpdateInfo
+from .query import DuckQuery, PinkQuery
 from .services import DuckMgr, PinkMgr
-from .query import PinkQuery
 
 
 @bp.route('/<id_>', methods=['GET'])
 @opt_perm()
-def pink(id_):
+def get_id(id_):
     pink = PinkQuery.single(id_)
     return json_response(data_=pink)
 
 
 @bp.route('/', methods=['GET'])
 @opt_perm()
-def pinks():
+def search():
     form = Search()
     pinks = PinkQuery.search(deps=form.deps, name=form.name, qq=form.qq)
     return pinks
@@ -27,7 +27,7 @@ def pinks():
 @bp.route('/update-info', methods=['POST'])
 def update_info():
     form = UpdateInfo()
-    PinkMgr(g.pink_id).update_info(qq=form.qq, other=form.other, email=form.email)
+    PinkMgr(g.pink_id).update_info(qq=form.qq, other=form.other)
     return json_response()
 
 
@@ -45,6 +45,7 @@ def sign_up():
     form = SignUp()
     pink = PinkMgr.sign_up(
         name=form.name,
+        pwd=form.pwd,
         qq=form.qq,
         other=form.other,
         email_token=form.token_email,
@@ -64,7 +65,7 @@ def deactive(id_):
 @opt_perm(node='auth.duck')
 def list_ducks():
     form = SearchDuck()
-    ducks = PinkQuery.ducks(pink_id=form.pink_id,
+    ducks = DuckQuery.ducks(pink_id=form.pink_id,
                             node=form.node,
                             nodes=form.nodes,
                             allow=form.allow)
@@ -73,7 +74,7 @@ def list_ducks():
 
 @bp.route('/<id_>/ducks/alter', methods=['POST'])
 @perm(node='auth.duck')
-def alter_ducks(id_):
+def alter_duck(id_):
     form = AlterDuck()
     ducks, confilcts = PinkMgr(id_).alter_ducks(add=form.add, remove=form.remove)
     return json_response(ducks=ducks, confilcts=confilcts)

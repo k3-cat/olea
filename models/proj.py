@@ -1,10 +1,10 @@
+__all__ = ['Proj']
+
 from sqlalchemy_ import (BaseModel, Column, ForeignKey, UniqueConstraint, hybrid_property,
                          relationship)
 from sqlalchemy_.types import ARRAY, DateTime, Enum, Integer, String
 
 from .common_enums import ZEnum, enum
-
-__all__ = ['Proj']
 
 
 class Proj(BaseModel):

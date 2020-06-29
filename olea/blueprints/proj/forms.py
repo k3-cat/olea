@@ -1,11 +1,11 @@
+__all__ = ['Create', 'FullCreate', 'ModifyRoles']
+
 from flask_jsonapi import BaseForm, Container
-from json_api.fields import List, Enum, Set, String
 from json_api.conditions import In
-from json_api.logic_opt import OneOf, Has
+from json_api.fields import Enum, List, Set, String
+from json_api.logic_opt import Has, OneOf
 
 from models import Dep, Proj
-
-__all__ = ['Create', 'FullCreate', 'ModifyRoles']
 
 
 class Search(BaseForm):

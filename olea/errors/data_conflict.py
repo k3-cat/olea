@@ -1,9 +1,7 @@
-from abc import ABC
-
 from .base_error import BaseError
 
 
-class DataConflict(BaseError, ABC):
+class DataConflict(BaseError):
     http_code = 400
 
 

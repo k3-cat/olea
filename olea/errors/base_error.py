@@ -1,10 +1,9 @@
 import re
-from abc import ABC, abstractmethod
 
 from flask import g
 
 
-class BaseError(Exception, ABC):
+class BaseError(Exception):
     http_code = 500
     code = ''
 
@@ -12,7 +11,6 @@ class BaseError(Exception, ABC):
         cls.pre = re.sub(r'(?!^)([A-Z])', r' \1', cls.__name__) + ' - '
         return super().__init_subclass__()
 
-    @abstractmethod
     def __init__(self, **kwargs):
         self.parms = kwargs
         super().__init__()

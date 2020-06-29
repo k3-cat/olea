@@ -12,7 +12,7 @@ from olea.utils import FromConf
 from .quality_control import CheckFailed, check_file_meta
 from .utils import check_owner, check_status
 
-dep_graph = DepGraph()
+_dep_graph = DepGraph()
 
 
 class RoleMgr(BaseMgr):
@@ -66,7 +66,7 @@ class PitMgr(BaseMgr):
         elif submit_time > self.o.due or self.o.status == Pit.S.past_due:
             self.past_due()
 
-        self.status = Pit.S.auditing
+        self.o.status = Pit.S.auditing
         self.o.add_track(info=Pit.T.submit_f, now=submit_time, by=g.pink_id)
         mango = MangoMgr.f_create(self, share_id=payload['share_id'], sha1=payload['sha1'])
 
@@ -110,7 +110,7 @@ class PitMgr(BaseMgr):
             filter(Role.proj_id == self.o.role.proj_id). \
             all()
 
-        if not dep_graph.is_depend_on(own={role.dep for role in roles}, target=self.o.role.dep):
+        if not _dep_graph.is_depend_on(own={role.dep for role in roles}, target=self.o.role.dep):
             raise AccessDenied(obj=self.o.mango)
 
         return self._download()
@@ -142,7 +142,7 @@ class PitMgr(BaseMgr):
         self.o.finish_at = g.now
         self.o.add_track(info=Pit.T.check_pass, now=g.now, by=g.pink_id)
 
-        ProjMgr(self.o.role.pink_id).post_works()
+        ProjMgr(self.o.role.proj_id).post_works(pit=self.o)
 
 
 class ProjMgr(BaseMgr):
@@ -166,9 +166,9 @@ class ProjMgr(BaseMgr):
 
         # alter start and due for the subsequent departments
         extended = pit.finish_at \
-            - dep_graph.get_finish_time(base=self.o.start_at, dep=pit.role.dep)
+            - _dep_graph.get_finish_time(base=self.o.start_at, dep=pit.role.dep)
         pits = Pit.query.join(Role). \
-            filter(Role.dep.in_(dep_graph.I_RULE[pit.role.dep])). \
+            filter(Role.dep.in_(_dep_graph.I_RULE[pit.role.dep])). \
             filter(Role.proj_id == self.o.id). \
             all()
         for pit_ in pits:

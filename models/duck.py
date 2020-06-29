@@ -1,7 +1,7 @@
+__all__ = ['Duck']
+
 from sqlalchemy_ import BaseModel, Column, ForeignKey, UniqueConstraint, relationship
 from sqlalchemy_.types import ARRAY, Boolean, String
-
-__all__ = ['Duck']
 
 
 class Duck(BaseModel):

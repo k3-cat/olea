@@ -1,10 +1,10 @@
+__all__ = ['Pink']
+
 from passlib.hash import argon2
 from sqlalchemy_ import BaseModel, Column, hybrid_property, orm, relationship
 from sqlalchemy_.types import ARRAY, JSONB, Boolean, String
 
 from .common_enums import DEP
-
-__all__ = ['Pink']
 
 pwd_hasher = argon2.using(time_cost=50, memory_cost=1024 * 16, parallelism=2)
 

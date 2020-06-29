@@ -1,6 +1,6 @@
 from flask import g
 
-from models import Dep, Pit, Role
+from models import Pit, Role
 from olea.base import single_query
 from olea.errors import AccessDenied
 

@@ -1,9 +1,9 @@
+__all__ = ['Ann']
+
 from sqlalchemy_ import BaseModel, Column, ForeignKey
 from sqlalchemy_.types import ARRAY, JSONB, Boolean, DateTime, Enum, Integer, String, Text
 
 from .common_enums import DEP, ZEnum
-
-__all__ = ['Ann']
 
 
 class Ann(BaseModel):

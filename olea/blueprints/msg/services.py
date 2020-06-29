@@ -33,6 +33,8 @@ class AnnMgr(BaseMgr):
 
         self.o.update(now=g.now, content=content)
 
+        return self.o
+
     def delete(self):
         if self.o.poster_id != g.pink_id:
             raise AccessDenied(obj=self.o)
@@ -84,11 +86,9 @@ class ChatMgr(BaseMgr):
             cls._is_visible(proj.id, reply_to_id)
 
             path = cls._get_path(proj.id, reply_to_id)
-            father = reply_to_id
 
         else:
             path = '/'
-            father = proj.id
 
         with redis.pipeline(transaction=True) as p:
             p.zadd(f'cLog-{proj.id}', f'+ {chat.id}')
@@ -105,8 +105,9 @@ class ChatMgr(BaseMgr):
         self._is_visible(self.o.proj_id, self.o.id)
 
         self.o.update(now=g.now, content=content)
-
         redis.zadd(f'cLog-{self.o.proj_id}', f'e {self.o.id}')
+
+        return self.o
 
     def delete(self):
         self._is_visible(self.o.proj_id, self.o.id)

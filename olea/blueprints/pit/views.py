@@ -1,17 +1,16 @@
-from flask import request
 from flask_json import json_response
 
 from olea.auth import opt_perm, perm
 
 from . import bp
-from .forms import Checks, ForceSubmit, Search, InDep, Submit
+from .forms import Checks, ForceSubmit, InDep, Search, Submit
 from .query import PitQuery
 from .services import PitMgr
 
 
 @bp.route('/<id_>', methods=['GET'])
 @opt_perm()
-def pit(id_):
+def get_id(id_):
     pit = PitQuery.single(id_)
     return json_response(data_=pit)
 
@@ -28,13 +27,13 @@ def in_dep():
 @perm(node='pit.check')
 def checks():
     form = Checks()
-    pits = PitQuery.check_list(deps=form.deps)
+    pits = PitQuery.checks(deps=form.deps)
     return json_response(data_=pits)
 
 
 @bp.route('/', methods=['GET'])
 @opt_perm()
-def pits():
+def search():
     form = Search()
     pits = PitQuery.search(deps=form.deps, status_set=form.status_set, pink_id=form.pink_id)
     return json_response(data_=pits)

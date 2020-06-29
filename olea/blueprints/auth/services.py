@@ -1,5 +1,3 @@
-from functools import wraps
-
 from flask import g, request
 
 from models import Lemon, Pink
@@ -31,11 +29,14 @@ class PinkMgr(BaseMgr):
                                'new': email
                            })
 
+        email_mgr.email_verification(email=email, token=token)
+
     @classmethod
     def forget_pwd(cls, name, email):
         pink = cls.model.query.filter_by(name=name).one()
         if pink and pink.email != email:
             return
+
         token = random_b85(k=20)
         redis.set(f'rst-{token}', pink.id, ex=t_life.seconds)
         email_mgr.pwd_reset(email=pink.email, name=pink.name, token=token)
@@ -43,7 +44,7 @@ class PinkMgr(BaseMgr):
     @staticmethod
     def reset_pwd(token, pwd, device_id):
         if not (pink_id := redis.get(f'rst-{token}')):
-            raise InvalidCredential(type=InvalidCredential.T.rst)
+            raise InvalidCredential(type_=InvalidCredential.T.rst)
 
         lemon = PinkMgr(pink_id).set_pwd(pwd, device_id)
         redis.delete(token)
@@ -83,7 +84,7 @@ class LemonMgr(BaseMgr):
         if not pink.active:
             raise AccountDeactivated()
         if not pink or not pink.check_pwd(pwd):
-            raise InvalidCredential(type=InvalidCredential.T.pwd)
+            raise InvalidCredential(type_=InvalidCredential.T.pwd)
 
         return LemonMgr._grante(pink, device_id)
 
@@ -127,5 +128,6 @@ class LemonMgr(BaseMgr):
     def revoke(self):
         db.session.delete(self.o)
 
-    def revoke_all(self):
+    @staticmethod
+    def revoke_all():
         revoke_all_lemons(pink_or_id=g.pink_id)

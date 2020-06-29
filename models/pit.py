@@ -1,10 +1,10 @@
+__all__ = ['Pit']
+
 from sqlalchemy_ import (BaseModel, Column, ForeignKey, UniqueConstraint, hybrid_property,
                          relationship)
 from sqlalchemy_.types import ARRAY, DateTime, Enum, String
 
 from .common_enums import ZEnum, enum
-
-__all__ = ['Pit']
 
 
 class Pit(BaseModel):

@@ -1,7 +1,7 @@
+__all__ = ['Chat']
+
 from sqlalchemy_ import BaseModel, Column, ForeignKey, relationship
 from sqlalchemy_.types import ARRAY, JSONB, Boolean, DateTime, Integer, String, Text
-
-__all__ = ['Chat']
 
 
 class Chat(BaseModel):

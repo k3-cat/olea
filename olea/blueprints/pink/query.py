@@ -5,7 +5,7 @@ from olea.base import single_query
 from olea.singleton import redis
 
 
-def pink_serilizer(pink, pinks=None):
+def pink_serilizer(pink=None, pinks=None):
     if not pinks:
         result = pink.__json__()
         result['last_access'] = redis.hget('last_access', g.pink_id)
@@ -16,9 +16,9 @@ def pink_serilizer(pink, pinks=None):
     else:
         result = list()
         queue = list()
-        for pink in pinks:
-            result.append(pink.__json__())
-            queue.append(pink.id)
+        for p in pinks:
+            result.append(p.__json__())
+            queue.append(p.id)
 
         last_access = redis.hmget('last_access', *queue)
         for info, access_time in zip(result, last_access):

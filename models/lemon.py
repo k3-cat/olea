@@ -1,7 +1,7 @@
+__all__ = ['Lemon']
+
 from sqlalchemy_ import BaseModel, Column, ForeignKey, UniqueConstraint, relationship
 from sqlalchemy_.types import UUID, DateTime, String
-
-__all__ = ['Lemon']
 
 
 class Lemon(BaseModel):

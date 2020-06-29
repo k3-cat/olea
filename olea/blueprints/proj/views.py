@@ -1,4 +1,4 @@
-from flask import g, request
+from flask import g
 from flask_json import json_response
 
 from olea.auth import opt_perm, perm
@@ -11,14 +11,14 @@ from .services import ProjMgr, RoleMgr
 
 @bp.route('/<id_>', methods=['GET'])
 @opt_perm()
-def proj(id_):
+def get_id(id_):
     proj = ProjQuery.single(id_)
     return json_response(data_=proj)
 
 
 @bp.route('/', methods=['GET'])
 @opt_perm()
-def projs():
+def search():
     form = Search()
     projs = ProjQuery.search(status_set=form.status_set, cats=form.cats)
     return json_response(data_=projs)

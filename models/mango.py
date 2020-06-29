@@ -1,7 +1,7 @@
+__all__ = ['Mango']
+
 from sqlalchemy_ import BaseModel, Column, ForeignKey, UniqueConstraint, relationship
 from sqlalchemy_.types import JSONB, DateTime, Integer, String
-
-__all__ = ['Mango']
 
 
 class Mango(BaseModel):

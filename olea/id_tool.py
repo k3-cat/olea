@@ -2,6 +2,8 @@ from random import randint
 
 from singleton import Singleton
 
+_ALPHABET = '0123456789aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ_-()!'
+
 
 class CircleList():
     def __init__(self, iterable):
@@ -14,7 +16,7 @@ class CircleList():
 
 class Alphabet():
     def __init__(self, alphabet):
-        self.alphabet = [char for char in alphabet]
+        self.alphabet = list(alphabet)
         self.anti_alphabet = {char: i for i, char in enumerate(alphabet)}
 
     def int_to_str(self, list_):
@@ -24,16 +26,13 @@ class Alphabet():
         return [self.anti_alphabet[char] for char in string]
 
 
-def shape_in_range(k, max_):
+def _shape_in_range(k, max_):
     return (max_ - (k % max_) + 1) % max_
-
-
-ALPHABET = '0123456789aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ_-()!'
 
 
 class IdTool(metaclass=Singleton):
     def __init__(self):
-        self.alphabet = Alphabet(ALPHABET)
+        self.alphabet = Alphabet(_ALPHABET)
         self.weight = CircleList((11**i) % 67 for i in range(67 - 1))
 
     def generate(self, length: int) -> str:
@@ -42,7 +41,7 @@ class IdTool(metaclass=Singleton):
         for i, k in enumerate(pre_id):
             # length + 1 - (i + 1)
             sum_ += self.weight[length - i] * k
-        pre_id.append(shape_in_range(sum_, 67))
+        pre_id.append(_shape_in_range(sum_, 67))
         return self.alphabet.int_to_str(pre_id)
 
     def verify(self, id_: str) -> bool:

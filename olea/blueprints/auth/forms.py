@@ -33,6 +33,7 @@ class VEmail(BaseForm):
         result = mailgun.check_adr(data)
         if result['risk'] in ('high', 'medium'):
             return f'{result["risk"]}-risk|{", ".join(result["reason"])}'
+        return None
 
 
 class Refresh(BaseForm):

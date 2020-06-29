@@ -1,5 +1,3 @@
-from abc import ABC
-
 from flask import g
 from sqlalchemy_ import BaseModel
 
@@ -27,7 +25,7 @@ def single_query(model, id_or_obj, condiction):
         raise AccessDenied(obj=obj)
 
 
-class BaseMgr(ABC):
+class BaseMgr():
     model = BaseModel
 
     def __init__(self, obj_or_id):

@@ -1,19 +1,17 @@
-import json
 from typing import List
-from collections import deque
 
 from flask import g
 
-from models import Chat, Dep, Pink, Pit, Proj, Role
+from models import Dep, Pink, Pit, Proj, Role
 from olea.base import BaseMgr
 from olea.dep_graph import DepGraph
-from olea.errors import (AccessDenied, DuplicatedRecord, InvalidReply, NotQualifiedToPick,
-                         ProjMetaLocked, RoleIsTaken)
+from olea.errors import (AccessDenied, DuplicatedRecord, NotQualifiedToPick, ProjMetaLocked,
+                         RoleIsTaken)
 from olea.singleton import db, redis
 
 from .info_builder import build_info
 
-dep_graph = DepGraph()
+_dep_graph = DepGraph()
 
 
 class ProjMgr(BaseMgr):
@@ -86,8 +84,8 @@ class ProjMgr(BaseMgr):
             filter(Pit.status == Pit.S.init). \
             all()
         for pit in pits:
-            pit.start_at = dep_graph.get_start_time(base=g.now, dep=pit.role.dep)
-            pit.due = pit.start_at + dep_graph.DURATION[pit.role.dep]
+            pit.start_at = _dep_graph.get_start_time(base=g.now, dep=pit.role.dep)
+            pit.due = pit.start_at + _dep_graph.DURATION[pit.role.dep]
             pit.status = Pit.S.working if pit.start_at == g.now else Pit.S.pending
 
     def finish(self, url):

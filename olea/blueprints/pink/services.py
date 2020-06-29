@@ -28,11 +28,11 @@ class PinkMgr(BaseMgr):
         return tokens
 
     @classmethod
-    def sign_up(cls, name: str, qq: int, other: str,pwd, email_token: str, deps_token: list):
+    def sign_up(cls, name: str, pwd, qq: int, other: str, email_token: str, deps_token: list):
         if not (deps_s := redis.get(f'deps-{deps_token}')):
-            raise InvalidCredential(type_=InvalidCredential.T.deps)
+            raise InvalidCredential(type_=InvalidCredential.T.new)
 
-        pink = cls.model(id=cls.gen_id(), name=name,email=None, qq=str(qq), other=other)
+        pink = cls.model(id=cls.gen_id(), name=name, email=None, qq=str(qq), other=other)
         pink.pwd = pwd
         pink.deps = deps_s.split(',')
         PinkMgr(pink).set_email(email_token)
@@ -65,15 +65,15 @@ class PinkMgr(BaseMgr):
 
         for node in add.keys() - {conflict.node for conflict in conflicts}:
             info = add[node]
-            duck = DuckMgr.grante(pink_id=self.o.id,
-                    node=node,
-                    allow=info['allow'],
-                    scopes=list(info['scopes']))
+            DuckMgr.grante(pink_id=self.o.id,
+                           node=node,
+                           allow=info['allow'],
+                           scopes=list(info['scopes']))
 
         if remove:
             self.o.ducks.filter(Duck.node.in_(remove)).delete()
 
-        authorization.clean_cache()
+        authorization.clean_cache(pink_id=self.o.id)
 
         return (self.o.ducks.all(), conflicts)
 
@@ -84,15 +84,15 @@ class DuckMgr(BaseMgr):
     def __init__(self, /, pink_id, node):
         self.o: Duck = None
         if not (obj := self.model.query.get((pink_id, node))):
-            raise RecordNotFound(cls=self.model, id=(','.join((pink_id, node))))
+            raise RecordNotFound(cls_=self.model, id_=(','.join((pink_id, node))))
         self.o = obj
 
     @classmethod
     def grante(cls, pink_id, node, allow, scopes):
         duck = cls.model(pink_id=pink_id,
-                    node=node,
-                    allow=allow,
-                    scopes=scopes)
+                         node=node,
+                         allow=allow,
+                         scopes=scopes)
         db.session.add(duck)
 
         return duck

@@ -8,18 +8,18 @@ from olea.errors import InvalidSource
 from olea.singleton import redis
 from olea.utils import FromConf
 
-CN_SITE_URL = 'http://scp-wiki-cn.wikidot.com'
-web_exp = FromConf('WEB_EXP')
+_CN_SITE_URL = 'http://scp-wiki-cn.wikidot.com'
+_web_exp = FromConf('WEB_EXP')
 
 
 def fetch_web(url):
     if not (web_page_t := redis.get(f'web-{url}')):
-        web_page = requests.get(f'{CN_SITE_URL}/{url}')
+        web_page = requests.get(f'{_CN_SITE_URL}/{url}')
         if web_page.status_code == 404:
             raise InvalidSource(rsn=InvalidSource.Rsn.web, url=url)
 
         web_page_t = web_page.text
-        redis.set(f'web-{url}', web_page_t, ex=web_exp)
+        redis.set(f'web-{url}', web_page_t, ex=_web_exp)
 
     soup = BeautifulSoup(web_page_t, 'lxml')
 

@@ -1,16 +1,12 @@
 import enum
-from abc import ABC
 
 from flask import g
 
 from .base_error import BaseError
 
 
-class AuthFail(BaseError, ABC):
+class AuthFail(BaseError):
     http_code = 401
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
 
 
 class AccessDenied(AuthFail):
@@ -36,9 +32,6 @@ class PermissionDenied(AuthFail):
 class AccountDeactivated(AuthFail):
     code = '7UCDA'
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
 
 class InvalidCredential(AuthFail):
     code = 'R6WET'
@@ -55,9 +48,6 @@ class InvalidCredential(AuthFail):
 
 class InvalidAccessToken(AuthFail):
     code = 'G1PP5'
-
-    def __init__(self):
-        super().__init__()
 
 
 class InvalidRefreshToken(AuthFail):

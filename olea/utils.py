@@ -1,11 +1,11 @@
+__all__ = ['FromConf', 'random_b85']
+
 import random
 from typing import Any
 
 # from base64 import _b85alphabet
 _b85alphabet = ('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
                 'abcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~')
-
-__all__ = ['FromConf', 'random_b85']
 
 
 def random_b85(k):
