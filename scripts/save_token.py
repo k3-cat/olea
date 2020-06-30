@@ -62,8 +62,12 @@ def _build_msal_app(cache=None):
 
 if __name__ == '__main__':
     sys.path.append(str(Path(__file__).parents[1]))
-    from config.default import ONEDRIVE_TOKEN_PATH as TOKEN_PATH
-    from config.default import ONEDRIVE_CLIENT_ID as CLIENT_ID
-    from config.instance import ONEDRIVE_CLIENT_SECRET as CLIENT_SECRET
+
+    from configs import load_config
+
+    config = load_config()
+    TOKEN_PATH = config['ONEDRIVE_DATA_DIR'] / 'token.json'
+    CLIENT_ID = config['ONEDRIVE_CLIENT_ID']
+    CLIENT_SECRET = config['ONEDRIVE_CLIENT_SECRET']
 
     app.run()

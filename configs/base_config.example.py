@@ -15,7 +15,6 @@ class Config():
 
     # --- path --------------------------------------
     DATA_FOLDER = DIR / 'data'
-    IPDB_PATH = DATA_FOLDER / 'ipdb.bin'
     PWDDB_PATH = DATA_FOLDER / 'pwddb'
 
     # --- dep-graph ---------------------------------------
@@ -65,4 +64,5 @@ class Config():
     ONEDRIVE_ROOT_FOLDER = ''
 
     # --- ip2loc ------------------------------------
+    IP2LOC_IPDB_PATH = DATA_FOLDER / 'ipdb.bin'
     IP2LOC_DOWNLOAD_TOKEN = '< - secret - >'
