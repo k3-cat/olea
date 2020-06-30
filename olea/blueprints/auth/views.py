@@ -25,7 +25,7 @@ def set_pwd():
 
 @bp.route('/forget-pwd', methods=['POST'])
 @allow_anonymous
-def reset_pwd_i():
+def forget_pwd():
     form = ForgetPwd()
     PinkMgr.forget_pwd(name=form.name, email=form.email)
     return json_response()

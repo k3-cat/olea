@@ -5,13 +5,13 @@ from models import Pink
 from olea.errors import InvalidAccessToken
 from olea.singleton import redis
 
-anonymous_endpoints = set()
+_anonymous_paths = set()
 
 
 def init_app(app):
     @app.before_request
     def login():
-        if request.endpoint not in anonymous_endpoints:
+        if request.path not in _anonymous_paths:
             check_lemon()
 
 
@@ -30,7 +30,7 @@ def check_lemon():
 
 
 def allow_anonymous(f):
-    anonymous_endpoints.add(f'auth.{f.__name__}')
+    _anonymous_paths.add(f'/auth/{f.__name__}'.replace('_', '-'))
     return f
 
 
