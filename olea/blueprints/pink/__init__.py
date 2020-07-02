@@ -1,3 +1,4 @@
 from flask import Blueprint
 
-bp = Blueprint('pink', __name__, url_prefix='/pink')
+_name = __name__.split('.')[-1]
+bp = Blueprint(_name, __name__, url_prefix=f'/{_name}')

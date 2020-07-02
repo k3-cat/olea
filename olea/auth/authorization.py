@@ -30,9 +30,9 @@ class Node():
 
     @classmethod
     def register(cls, func, default_pass, node):
-        endpoint = f'{func.__module__}.{func.__name__}'
+        endpoint = f'{func.__module__.split(".")[-2]}.{func.__name__}'
 
-        index[endpoint] = node if node else endpoint
+        cls.index[endpoint] = node if node else endpoint
 
         if default_pass:
             cls.dpass.add(endpoint)
