@@ -20,7 +20,7 @@ class Pit(BaseModel):
         auditing = 'a'
         fin = 'F'
         fin_p = 'Fp'
-        droped = 'D'
+        dropped = 'D'
 
     id = Column(String, primary_key=True)
     role_id = Column(String, ForeignKey('role.id', ondelete='CASCADE'))

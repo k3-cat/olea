@@ -1,6 +1,7 @@
 from flask import g
 
 from models import Proj
+from olea.auth import check_opt_duck
 from olea.base import single_query
 from olea.errors import AccessDenied
 
@@ -17,7 +18,7 @@ class ProjQuery():
 
     @classmethod
     def search(cls, status_set=None, cats=None):
-        if status_set - cls.PUBLIC_STATE and not g.check_opt_perm:
+        if status_set - cls.PUBLIC_STATE and not check_opt_duck():
             raise AccessDenied(cls_=Proj)
         query = Proj.query.filter(Proj.status.in_(status_set))
         if cats:

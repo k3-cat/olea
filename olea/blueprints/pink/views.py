@@ -54,10 +54,10 @@ def sign_up():
     return json_response(id=pink.id)
 
 
-@bp.route('/<id_>/deactive', methods=['POST'])
+@bp.route('/<id_>/deactivate', methods=['POST'])
 @perm()
-def deactive(id_):
-    PinkMgr(id_).deactive()
+def deactivate(id_):
+    PinkMgr(id_).deactivate()
     return json_response()
 
 
@@ -76,8 +76,8 @@ def list_ducks():
 @perm(node='auth.duck')
 def alter_duck(id_):
     form = AlterDuck()
-    ducks, confilcts = PinkMgr(id_).alter_ducks(add=form.add, remove=form.remove)
-    return json_response(ducks=ducks, confilcts=confilcts)
+    ducks, conflicts = PinkMgr(id_).alter_ducks(add=form.add, remove=form.remove)
+    return json_response(ducks=ducks, conflicts=conflicts)
 
 
 @bp.route('/<id_>/ducks/<node>/alter', methods=['POST'])

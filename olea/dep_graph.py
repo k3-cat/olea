@@ -10,9 +10,9 @@ from olea.utils import FromConf
 
 
 class DepGraph(metaclass=Singleton):
-    RULE: Dict[Dep, Set[Dep]] = FromConf('RULE')
+    RULE: Dict[Dep, Set[Dep]] = FromConf.load('RULE')
     I_RULE: Dict[Dep, Set[Dep]] = dict()
-    DURATION = FromConf('DURATION')
+    DURATION = FromConf.load('DURATION')
 
     def __new__(cls):
         def dfs_check(dep, target):

@@ -9,7 +9,7 @@ from olea.singleton import redis
 from olea.utils import FromConf
 
 _CN_SITE_URL = 'http://scp-wiki-cn.wikidot.com'
-_web_exp = FromConf('WEB_EXP')
+_web_exp = FromConf.load('WEB_EXP')
 
 
 def fetch_web(url):

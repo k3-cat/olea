@@ -14,8 +14,8 @@ from .pwd_tools import check_pwd
 class PinkMgr(BaseMgr):
     module = Pink
 
-    t_life = FromConf('TL_PWD_RESET')
-    ve_life = FromConf('TL_EMAIL_VERIFICATION')
+    t_life = FromConf.load('TL_PWD_RESET')
+    ve_life = FromConf.load('TL_EMAIL_VERIFICATION')
 
     def __init__(self, obj_or_id):
         self.o: Pink = None

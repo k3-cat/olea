@@ -6,7 +6,7 @@ from olea.errors import WeekPwd
 from olea.utils import FromConf
 
 common_pwd: Set[str] = set()
-with FromConf('PWDDB_PATH').open('rb') as f:
+with FromConf.load('PWDDB_PATH').open('rb') as f:
     common_pwd = pickle.load(f)
 
 

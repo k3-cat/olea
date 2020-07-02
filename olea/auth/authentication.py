@@ -8,14 +8,7 @@ from olea.singleton import redis
 _anonymous_paths = set()
 
 
-def init_app(app):
-    @app.before_request
-    def login():
-        if request.path not in _anonymous_paths:
-            check_lemon()
-
-
-def check_lemon():
+def _check_lemon():
     try:
         token = request.headers['Authorization']
     except (KeyError, ValueError):
@@ -30,7 +23,7 @@ def check_lemon():
 
 
 def allow_anonymous(f):
-    _anonymous_paths.add(f'/auth/{f.__name__}'.replace('_', '-'))
+    _anonymous_paths.add(f'/{f.__module__}/{f.__name__}'.replace('_', '-'))
     return f
 
 

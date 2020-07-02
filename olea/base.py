@@ -1,7 +1,8 @@
 from flask import g
 from sqlalchemy_ import BaseModel
 
-from olea.errors import AccessDenied, PermissionDenied, RecordNotFound
+from olea.auth import check_opt_duck
+from olea.errors import AccessDenied, RecordNotFound
 from olea.id_tool import IdTool
 
 id_tool = IdTool()
@@ -16,13 +17,10 @@ def single_query(model, id_or_obj, condiction):
     else:
         obj = id_or_obj
 
-    if condiction(obj):
+    if condiction(obj) or check_opt_duck():
         return obj
-    try:
-        g.check_opt_duck()
-        return obj
-    except PermissionDenied():
-        raise AccessDenied(obj=obj)
+
+    raise AccessDenied(obj=obj)
 
 
 class BaseMgr():

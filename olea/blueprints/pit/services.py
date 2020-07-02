@@ -3,6 +3,7 @@ import datetime
 from flask import g
 
 from models import Mango, Pit, Proj, Role
+from olea.auth import check_opt_duck
 from olea.base import BaseMgr
 from olea.dep_graph import DepGraph
 from olea.errors import AccessDenied, DoesNotMeetRequirements, FileExist, FileVerConflict
@@ -30,13 +31,13 @@ class PitMgr(BaseMgr):
         super().__init__(obj_or_id)
 
     @check_owner
-    @check_status(set(Pit.S) - {Pit.S.droped, Pit.S.auditing, Pit.S.fin, Pit.S.fin_p})
+    @check_status(set(Pit.S) - {Pit.S.dropped, Pit.S.auditing, Pit.S.fin, Pit.S.fin_p})
     def drop(self):
         if self.o.status == Pit.S.init:
             db.session.delete(self.o)
             return True
 
-        self.o.status = Pit.S.droped
+        self.o.status = Pit.S.dropped
         self.o.add_track(info=Pit.T.drop, now=g.now)
 
         redis.delete(f'pStatus-{self.o.id}')
@@ -101,7 +102,7 @@ class PitMgr(BaseMgr):
 
     @check_status({Pit.S.fin, Pit.S.fin_p})
     def download(self):
-        if self.o.pink_id == g.pink_id or g.check_opt_duck(scopes={self.o.role.dep}):
+        if self.o.pink_id == g.pink_id or check_opt_duck(scopes={self.o.role.dep}):
             return self._download()
 
         roles = Role.query.join(Pit). \
@@ -148,7 +149,7 @@ class PitMgr(BaseMgr):
 class ProjMgr(BaseMgr):
     model = Proj
 
-    shift_buffer = FromConf('PIT_SHIFT_BUFFER')
+    shift_buffer = FromConf.load('PIT_SHIFT_BUFFER')
 
     def __init__(self, obj_or_id):
         self.o: Proj = None
@@ -159,7 +160,7 @@ class ProjMgr(BaseMgr):
         exists = Pit.query.join(Role). \
             filter(Role.dep == pit.role.dep). \
             filter(Role.proj_id == self.o.id). \
-            filter(~Pit.status.in_({Pit.S.fin, Pit.S.fin_p, Pit.S.droped})). \
+            filter(~Pit.status.in_({Pit.S.fin, Pit.S.fin_p, Pit.S.dropped})). \
             exists()
         if not db.session.query(exists).scalar():
             return
@@ -199,7 +200,7 @@ class ProjMgr(BaseMgr):
 class MangoMgr(BaseMgr):
     model = Mango
 
-    t_life = FromConf('TL_PIT_SUMBIT')
+    t_life = FromConf.load('TL_PIT_SUMBIT')
 
     def __init__(self, obj_or_id):
         self.o: Mango = None

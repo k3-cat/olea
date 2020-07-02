@@ -5,8 +5,8 @@ Revises: init
 Create Date: 2020-06-22 18:10:50.479240
 
 """
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
@@ -21,7 +21,7 @@ dep = postgresql.ENUM('ld', 'tr', 'yt', 'au', 'ps', 'ae', name='dep', create_typ
 ann_level = postgresql.ENUM('tips', 'normal', 'important', name='ann_level', create_type=False)
 proj_cat = postgresql.ENUM('doc', 'sub', 'ani', name='proj_cat', create_type=False)
 proj_status = postgresql.ENUM('pre', 'freezed', 'working', 'upload', 'fin', name='proj_status', create_type=False)
-pit_status = postgresql.ENUM('init', 'pending', 'working', 'delayed', 'past_due', 'auditing', 'fin', 'fin_p', 'droped', name='pit_status', create_type=False)
+pit_status = postgresql.ENUM('init', 'pending', 'working', 'delayed', 'past_due', 'auditing', 'fin', 'fin_p', 'dropped', name='pit_status', create_type=False)
 
 
 def upgrade():

@@ -2,8 +2,9 @@ from flask import g
 
 from models import Duck, Pink
 from olea import email_mgr
-from olea.auth import authorization
+from olea.auth import check_scopes
 from olea.auth.authentication import revoke_all_lemons
+from olea.auth.authorization import DuckCache
 from olea.base import BaseMgr
 from olea.errors import InvalidCredential, RecordNotFound
 from olea.singleton import db, pat, redis
@@ -13,7 +14,7 @@ from olea.utils import FromConf, random_b85
 class PinkMgr(BaseMgr):
     model = Pink
 
-    t_life = FromConf('TL_NEW_PINK')
+    t_life = FromConf.load('TL_NEW_PINK')
 
     def __init__(self, obj_or_id):
         self.o: Pink = None
@@ -21,7 +22,7 @@ class PinkMgr(BaseMgr):
 
     @classmethod
     def assign_token(cls, deps, amount):
-        g.check_scopes(deps)
+        check_scopes(deps)
         deps_s = ','.join(deps)
         tokens = [random_b85(k=20) for __ in range(amount)]
         redis.mset({f'deps-{token}': deps_s for token in tokens}, ex=cls.t_life.seconds)
@@ -55,7 +56,7 @@ class PinkMgr(BaseMgr):
 
         self.o.email = payload['new']
 
-    def deactive(self):
+    def deactivate(self):
         self.o.active = False
 
         revoke_all_lemons(self.o)
@@ -65,43 +66,39 @@ class PinkMgr(BaseMgr):
 
         for node in add.keys() - {conflict.node for conflict in conflicts}:
             info = add[node]
-            DuckMgr.grante(pink_id=self.o.id,
-                           node=node,
-                           allow=info['allow'],
-                           scopes=list(info['scopes']))
+            DuckMgr.grant(pink_id=self.o.id,
+                          node=node,
+                          allow=info['allow'],
+                          scopes=list(info['scopes']))
 
         if remove:
             self.o.ducks.filter(Duck.node.in_(remove)).delete()
 
-        authorization.clean_cache(pink_id=self.o.id)
+        DuckCache.clean(pink_id=self.o.id)
 
         return (self.o.ducks.all(), conflicts)
 
 
 class DuckMgr(BaseMgr):
-    modle = Duck
+    model = Duck
 
-    def __init__(self, /, pink_id, node):
+    def __init__(self, pink_id, node):
         self.o: Duck = None
         if not (obj := self.model.query.get((pink_id, node))):
             raise RecordNotFound(cls_=self.model, id_=(','.join((pink_id, node))))
         self.o = obj
 
     @classmethod
-    def grante(cls, pink_id, node, allow, scopes):
-        duck = cls.model(pink_id=pink_id,
-                         node=node,
-                         allow=allow,
-                         scopes=scopes)
+    def grant(cls, pink_id, node, allow, scopes):
+        duck = cls.model(pink_id=pink_id, node=node, allow=allow, scopes=scopes)
         db.session.add(duck)
 
         return duck
 
-
     def modi_scopes(self, scopes: set):
         self.o.scopes = list(scopes)
 
-        authorization.clean_cache(self.o.pink_id)
+        DuckCache.clean(self.o.pink_id)
 
         return scopes
 

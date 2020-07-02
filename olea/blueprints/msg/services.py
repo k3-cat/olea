@@ -1,6 +1,7 @@
 from flask import g
 
 from models import Ann, Chat, Proj
+from olea.auth import check_scopes
 from olea.base import BaseMgr
 from olea.errors import AccessDenied, InvalidReply, ProjMetaLocked
 from olea.singleton import db, redis
@@ -15,7 +16,7 @@ class AnnMgr(BaseMgr):
 
     @classmethod
     def post(cls, cat, deps, expiration, content):
-        g.check_scopes(deps)
+        check_scopes(deps)
         ann = cls.model(id=cls.gen_id(),
                         cat=cat,
                         deps=deps,

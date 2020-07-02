@@ -1,6 +1,7 @@
 from flask import g
 
 from models import Pit, Role
+from olea.auth import check_opt_duck, check_scopes
 from olea.base import single_query
 from olea.errors import AccessDenied
 
@@ -14,7 +15,7 @@ class PitQuery():
 
     @classmethod
     def checks(cls, deps):
-        if not g.check_scopes(scopes=deps):
+        if not check_scopes(scopes=deps):
             raise AccessDenied(cls_=Pit)
 
         pits = Pit.query.join(Role). \
@@ -25,7 +26,7 @@ class PitQuery():
 
     @classmethod
     def in_dep(cls, dep, status):
-        if not g.check_scopes(scopes=dep):
+        if not check_scopes(scopes=dep):
             raise AccessDenied(cls_=Pit)
 
         pits = Pit.query.join(Role). \
@@ -36,7 +37,7 @@ class PitQuery():
 
     @classmethod
     def search(cls, deps, status_set, pink_id=''):
-        if (not pink_id or pink_id != g.pink_id) and not g.check_opt_duck(scopes=deps):
+        if (not pink_id or pink_id != g.pink_id) and not check_opt_duck(scopes=deps):
             raise AccessDenied(cls_=Pit)
 
         query = Pit.query.join(Role)

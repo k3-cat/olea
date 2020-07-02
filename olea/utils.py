@@ -20,5 +20,6 @@ class FromConf():
     def init_app(cls, app):
         cls.app = app
 
-    def __new__(cls, name) -> Any:
+    @classmethod
+    def load(cls, name) -> Any:
         return cls.app.config[name]
