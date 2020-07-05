@@ -1,10 +1,12 @@
 import inspect
 import re
 
-from ..file_helpers import read, add_module, write
+from ..file_helpers import add_module, read, write
 from .error_code import check_err_code, generate_err_code
 
-statement = lambda: f"    code = '{generate_err_code()}'\n"
+
+def gen_statement():
+    return f"    code = '{generate_err_code()}'\n"
 
 
 @write
@@ -21,7 +23,7 @@ def fix_error_code(module, file_):
 
         lines, base_no = inspect.getsourcelines(obj)
         if not obj.code:
-            file_.insert(offset + base_no + 1, statement())
+            file_.insert(offset + base_no + 1, gen_statement())
             file_.insert(offset + base_no + 2, '\n')
             offset += 2
 
@@ -32,6 +34,6 @@ def fix_error_code(module, file_):
             for i, line in enumerate(lines):
                 if re.match(r"^    code = '.*'\n$", line):
                     break
-            file_[offset + base_no + i] = statement()
+            file_[offset + base_no + i] = gen_statement()
 
     return file_, contains

@@ -19,8 +19,8 @@ class PitQuery():
             raise AccessDenied(cls_=Pit)
 
         pits = Pit.query.join(Role). \
-            filter(Pit.status == Pit.S.auditing). \
-            filter(Role.dep.in_(deps)).all()
+          filter(Pit.status == Pit.S.auditing). \
+          filter(Role.dep.in_(deps)).all()
 
         return pits
 
@@ -30,8 +30,8 @@ class PitQuery():
             raise AccessDenied(cls_=Pit)
 
         pits = Pit.query.join(Role). \
-            filter(Role.dep == dep). \
-            filter(Pit.status.in_(status)).all()
+          filter(Role.dep == dep). \
+          filter(Pit.status.in_(status)).all()
 
         return pits
 

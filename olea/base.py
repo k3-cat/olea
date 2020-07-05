@@ -1,4 +1,3 @@
-from flask import g
 from sqlalchemy_ import BaseModel
 
 from olea.auth import check_opt_duck

@@ -1,4 +1,3 @@
-import re
 import sys
 
 from werkzeug.utils import find_modules, import_string
@@ -29,7 +28,9 @@ def main():
 
         try:
             module.run(changed)
-        except:
+
+        except BaseException:
             raise
+
         else:
             version.save(relative_path)

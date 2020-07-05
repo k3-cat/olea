@@ -8,8 +8,9 @@ def register_commands(app):
     @click.option('--length', default=25)
     @click.option('--profile-dir', default=None)
     def profile(length, profile_dir):
-        from olea import create_app
         from werkzeug.contrib.profiler import ProfilerMiddleware
+
+        from olea import create_app
         app = create_app()
         app.wsgi_app = ProfilerMiddleware(app.wsgi_app,
                                           restrictions=(length, ),

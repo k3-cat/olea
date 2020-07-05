@@ -1,4 +1,3 @@
-import inspect
 from functools import wraps
 
 from isort import SortImports
@@ -66,7 +65,7 @@ def write(fun):
 
             alt_path.unlink()
 
-        except:
+        except BaseException:
             alt_path.replace(path)
             raise
 

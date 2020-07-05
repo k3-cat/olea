@@ -106,10 +106,10 @@ class PitMgr(BaseMgr):
             return self._download()
 
         roles = Role.query.join(Pit). \
-            filter(Pit.pink_id == g.pink_id). \
-            filter(Pit.status.in_({Pit.S.pending, Pit.S.working, Pit.S.auditing})). \
-            filter(Role.proj_id == self.o.role.proj_id). \
-            all()
+          filter(Pit.pink_id == g.pink_id). \
+          filter(Pit.status.in_({Pit.S.pending, Pit.S.working, Pit.S.auditing})). \
+          filter(Role.proj_id == self.o.role.proj_id). \
+          all()
 
         if not _dep_graph.is_depend_on(own={role.dep for role in roles}, target=self.o.role.dep):
             raise AccessDenied(obj=self.o.mango)
@@ -158,10 +158,10 @@ class ProjMgr(BaseMgr):
     def post_works(self, pit):
         # check if all pits in this department are done
         exists = Pit.query.join(Role). \
-            filter(Role.dep == pit.role.dep). \
-            filter(Role.proj_id == self.o.id). \
-            filter(~Pit.status.in_({Pit.S.fin, Pit.S.fin_p, Pit.S.dropped})). \
-            exists()
+          filter(Role.dep == pit.role.dep). \
+          filter(Role.proj_id == self.o.id). \
+          filter(~Pit.status.in_({Pit.S.fin, Pit.S.fin_p, Pit.S.dropped})). \
+          exists()
         if not db.session.query(exists).scalar():
             return
 
@@ -169,9 +169,9 @@ class ProjMgr(BaseMgr):
         extended = pit.finish_at \
             - _dep_graph.get_finish_time(base=self.o.start_at, dep=pit.role.dep)
         pits = Pit.query.join(Role). \
-            filter(Role.dep.in_(_dep_graph.I_RULE[pit.role.dep])). \
-            filter(Role.proj_id == self.o.id). \
-            all()
+          filter(Role.dep.in_(_dep_graph.I_RULE[pit.role.dep])). \
+          filter(Role.proj_id == self.o.id). \
+          all()
         for pit_ in pits:
             pit_.status = Pit.S.working
 

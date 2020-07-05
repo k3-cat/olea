@@ -1,10 +1,6 @@
-from flask import g
-
 from models import Duck, Pink
 from olea import email_mgr
-from olea.auth import check_scopes
-from olea.auth.authentication import revoke_all_lemons
-from olea.auth.authorization import DuckCache
+from olea.auth import authentication, authorization, check_scopes
 from olea.base import BaseMgr
 from olea.errors import InvalidCredential, RecordNotFound
 from olea.singleton import db, pat, redis
@@ -23,13 +19,15 @@ class PinkMgr(BaseMgr):
     @classmethod
     def assign_token(cls, deps, amount):
         check_scopes(deps)
+
         deps_s = ','.join(deps)
         tokens = [random_b85(k=20) for __ in range(amount)]
         redis.mset({f'deps-{token}': deps_s for token in tokens}, ex=cls.t_life.seconds)
+
         return tokens
 
     @classmethod
-    def sign_up(cls, name: str, pwd, qq: int, other: str, email_token: str, deps_token: list):
+    def sign_up(cls, name: str, pwd, qq: int, other: str, email_token: str, deps_token: str):
         if not (deps_s := redis.get(f'deps-{deps_token}')):
             raise InvalidCredential(type_=InvalidCredential.T.new)
 
@@ -59,7 +57,7 @@ class PinkMgr(BaseMgr):
     def deactivate(self):
         self.o.active = False
 
-        revoke_all_lemons(self.o)
+        authentication.revoke_all_lemons(self.o)
 
     def alter_ducks(self, add, remove):
         conflicts = self.o.ducks.filter(Duck.node.in_(add.keys())).all()
@@ -74,7 +72,7 @@ class PinkMgr(BaseMgr):
         if remove:
             self.o.ducks.filter(Duck.node.in_(remove)).delete()
 
-        DuckCache.clean(pink_id=self.o.id)
+        authorization.DuckCache.clean(pink_id=self.o.id)
 
         return (self.o.ducks.all(), conflicts)
 
@@ -98,7 +96,7 @@ class DuckMgr(BaseMgr):
     def modi_scopes(self, scopes: set):
         self.o.scopes = list(scopes)
 
-        DuckCache.clean(self.o.pink_id)
+        authorization.DuckCache.clean(self.o.pink_id)
 
         return scopes
 

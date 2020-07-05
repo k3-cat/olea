@@ -1,4 +1,3 @@
-import re
 from functools import wraps
 from typing import Dict, Set
 
@@ -48,7 +47,7 @@ def _check_duck():
 
     DuckCache.cache(g.pink_id)
     if (not default_pass and not redis.hexists(f'duckT-{g.pink_id}', node)) or \
-        (default_pass and redis.hexists(f'duckF-{g.pink_id}', node)):
+      (default_pass and redis.hexists(f'duckF-{g.pink_id}', node)):
 
         raise PermissionDenied()
 
@@ -60,7 +59,7 @@ def check_scopes(default_pass, scopes):
     scope_set = set(raw_scope.split(';'))
     # when scope_set is empty, it means ANY SCOPE
     if (default_pass and (diff := scopes - scope_set)) or \
-        (not default_pass and (diff := scopes & scope_set if scope_set else scopes)):
+      (not default_pass and (diff := scopes & scope_set if scope_set else scopes)):
 
         raise PermissionDenied(scope=diff)
 

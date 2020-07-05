@@ -46,8 +46,8 @@ def _ae_checks(i):
         required['fourCC'] = 'H264, H265'
     if j['audioSamplesPerSecond'] < 44100:
         required['audioSamplesPerSecond'] = '>= 44100'
-    if j['frameRate'] not in (24, 25):
-        required['frameRate'] = '24, 25'
+    if j['frameRate'] not in (24, 25, 30):
+        required['frameRate'] = '24, 25, 30'
     j['ratio'] = str(Fraction(j['width'], j['height']))
     if j['ratio'] not in ('16/9', '64/27'):
         required['ratio'] = '16/9, 21/9(64/27)'

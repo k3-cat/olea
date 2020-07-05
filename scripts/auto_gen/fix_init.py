@@ -1,12 +1,9 @@
-import inspect
 import json
 import re
 from functools import wraps
 from itertools import chain
 
-from werkzeug.utils import import_string
-
-from .file_helpers import add_module, read, write
+from .file_helpers import read, write
 from .g import DIR
 
 
@@ -29,8 +26,7 @@ def fix_init(filepath, file_, current):
 
     # fetch old __all__ list
     if match := re.match(r'__all__ = \[(.*)\]$', file_text, flags=re.DOTALL | re.M):
-        old_all = set(match.group(1).replace('\n', ''). \
-            replace(' ', '').replace("'", '').split(','))
+        old_all = set(match.group(1).replace('\n', '').replace(' ', '').replace("'", '').split(','))
 
     else:
         old_all = set()
@@ -61,10 +57,8 @@ def fix_init(filepath, file_, current):
     for module_str, contains in current.items():
         statement = f'from .{module_str} import {",".join(contains)}\n'
         try:
-            old_contains = set(imports[imports_map[module_str]]. \
-                split(' import ')[0]. \
-                replace('\n', '').replace(' ', '').lstrip('(').rstrip(')'). \
-                split(','))
+            old_contains = set(imports[imports_map[module_str]].split(' import ')[0].replace(
+                '\n', '').replace(' ', '').lstrip('(').rstrip(')').split(','))
 
         except KeyError:
             imports.append(statement)

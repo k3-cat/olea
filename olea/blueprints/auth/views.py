@@ -51,7 +51,7 @@ def email_verification():
 @allow_anonymous
 def refresh():
     form = Refresh()
-    token, exp = LemonMgr(form.id).grante_access_token(key=form.key, device_id=form.device_id)
+    token, exp = LemonMgr(form.id).grant_access_token(key=form.key, device_id=form.device_id)
     return json_response(token=token, exp=exp)
 
 

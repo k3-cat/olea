@@ -1,8 +1,8 @@
-TARGET = 'models'
-IGNORES = ['__init__.py']
-
 from ..fix_init import fix_init
 from .detect_classes import detect_classes
+
+TARGET = 'models'
+IGNORES = ['__init__.py']
 
 
 def run(changed):

@@ -1,5 +1,3 @@
-from flask import g
-
 from models import Proj
 from olea.auth import check_opt_duck
 from olea.base import single_query

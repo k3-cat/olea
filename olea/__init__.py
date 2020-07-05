@@ -3,7 +3,7 @@ import os
 import sys
 from pathlib import Path
 
-from flask import Flask, g, request
+from flask import Flask, g
 
 PATH = Path(__file__).parents[1] / 'site-packages'
 sys.path.append(str(PATH / 'json_api'))
@@ -13,6 +13,7 @@ sys.path.append(str(PATH))
 
 def create_app(env=os.getenv('FLASK_ENV', 'production')):
     from configs import load_config
+
     from .blueprints import register_blueprints
     from .errors import register_error_handlers
 
@@ -32,7 +33,7 @@ def create_app(env=os.getenv('FLASK_ENV', 'production')):
 
 def init_extensions(app):
     from olea.auth import init_app as auth_init_app
-    from olea.singleton import db, fjson, redis, mailgun, onedrive, ip2loc
+    from olea.singleton import db, fjson, ip2loc, mailgun, onedrive, redis
     from olea.utils import FromConf
 
     auth_init_app(app)
@@ -47,8 +48,9 @@ def init_extensions(app):
 
 
 def hook_hooks(app):
-    from olea.utils import random_b85
     from sentry_sdk import configure_scope
+
+    from olea.utils import random_b85
 
     @app.before_request
     def add_track():

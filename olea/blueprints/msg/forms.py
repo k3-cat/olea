@@ -1,5 +1,6 @@
 from flask_jsonapi import BaseForm
-from json_api.fields import Set, String, Enum, DateTime, Integer
+from json_api.fields import DateTime, Enum, Integer, Set, String
+
 from models import Ann, Dep
 
 

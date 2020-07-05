@@ -14,24 +14,8 @@ def is_common_pwd(pwd: str) -> bool:
     return pwd in common_pwd
 
 
-# about pwd stength
 # modified from
 # https://github.com/kolypto/py-password-strength/blob/master/password_strength/stats.py
-
-# Here, we want a function that:
-# 1. f(x)=0.333 at x=weak_bits
-# 2. f(x)=0.950 at x=weak_bits*3 (great estimation for a perfect password)
-# 3. f(x) is almost linear in range{weak_bits .. weak_bits*2}: doubling the bits should double the strength
-# 4. f(x) has an asymptote of 1.0 (normalization)
-
-# First, the function:
-#       f(x) = 1 - (1-WEAK_MAX)*2^( -k*x)
-
-# Now, the equation:
-#       f(HARD_BITS) = HARD_VAL
-#       1 - (1-WEAK_MAX)*2^( -k*HARD_BITS) = HARD_VAL
-#                        2^( -k*HARD_BITS) = (1 - HARD_VAL) / (1-WEAK_MAX)
-#       k = -log2((1 - HARD_VAL) / (1-WEAK_MAX)) / HARD_BITS
 
 WEAK_BITS: int = 30
 WEAK_MAX: float = 1 / 3
@@ -60,6 +44,7 @@ def measure_strength(pwd: str) -> float:
 def check_pwd(pwd):
     if is_common_pwd(pwd):
         raise WeekPwd(rsn=WeekPwd.Rsn.common)
+
     strength = measure_strength(pwd)
     if strength < WEAK_MAX:
         raise WeekPwd(rsn=WeekPwd.Rsn.strength, strength=strength)
