@@ -46,9 +46,8 @@ def _check_duck():
     default_pass, node = Node.get()
 
     DuckCache.cache(g.pink_id)
-    if (not default_pass and not redis.hexists(f'duckT-{g.pink_id}', node)) or \
-      (default_pass and redis.hexists(f'duckF-{g.pink_id}', node)):
-
+    if ((not default_pass and not redis.hexists(f'duckT-{g.pink_id}', node))
+            or (default_pass and redis.hexists(f'duckF-{g.pink_id}', node))):
         raise PermissionDenied()
 
 
@@ -58,9 +57,8 @@ def check_scopes(default_pass, scopes):
     raw_scope = redis.hget(f'duck{"T" if default_pass else "F"}-{g.pink_id}', node)
     scope_set = set(raw_scope.split(';'))
     # when scope_set is empty, it means ANY SCOPE
-    if (default_pass and (diff := scopes - scope_set)) or \
-      (not default_pass and (diff := scopes & scope_set if scope_set else scopes)):
-
+    if (default_pass and (diff := scopes - scope_set)) \
+            or (not default_pass and (diff := scopes & scope_set if scope_set else scopes)):
         raise PermissionDenied(scope=diff)
 
 

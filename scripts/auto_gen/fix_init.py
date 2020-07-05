@@ -57,8 +57,9 @@ def fix_init(filepath, file_, current):
     for module_str, contains in current.items():
         statement = f'from .{module_str} import {",".join(contains)}\n'
         try:
-            old_contains = set(imports[imports_map[module_str]].split(' import ')[0].replace(
-                '\n', '').replace(' ', '').lstrip('(').rstrip(')').split(','))
+            old_contains = set(imports[imports_map[module_str]].split(' import ')[0].
+                               replace('\n', '').replace(' ', '').lstrip('(').rstrip(')').
+                               split(','))  # yapf: disable
 
         except KeyError:
             imports.append(statement)

@@ -57,9 +57,9 @@ class ProjMgr(BaseMgr):
         fails = dict()
         for dep, roles in add.items():
             exists = Role.query.filter_by(proj_id=self.o.id). \
-              filter_by(dep=dep). \
-              filter(Role.name.in_(roles)). \
-              all()
+                filter_by(dep=dep). \
+                filter(Role.name.in_(roles)). \
+                all()
             fails[dep] = [role.name for role in exists]
             for name in roles - set(fails[dep]):
                 RoleMgr.create(self.o, dep, name)
@@ -80,9 +80,9 @@ class ProjMgr(BaseMgr):
         self.o.add_track(info=Proj.T.start, now=g.now)
 
         pits: List[Pit] = Pit.query.join(Role). \
-          filter(Role.proj_id == self.o.id). \
-          filter(Pit.status == Pit.S.init). \
-          all()
+            filter(Role.proj_id == self.o.id). \
+            filter(Pit.status == Pit.S.init). \
+            all()
         for pit in pits:
             pit.start_at = _dep_graph.get_start_time(base=g.now, dep=pit.role.dep)
             pit.due = pit.start_at + _dep_graph.DURATION[pit.role.dep]

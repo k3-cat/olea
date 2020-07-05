@@ -107,7 +107,7 @@ class LemonMgr(BaseMgr):
         if self.o.key != key or self.o.device_id != device_id:
             raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.key)
         if self.o.ip != request.remote_addr \
-          and ip2loc.get_city(self.o.ip) != ip2loc.get_city(request.remote_addr):
+                and ip2loc.get_city(self.o.ip) != ip2loc.get_city(request.remote_addr):
             raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.ip)
         if self.o.expiration < g.now:
             self.revoke()
