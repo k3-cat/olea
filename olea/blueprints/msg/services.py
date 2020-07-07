@@ -74,22 +74,20 @@ class ChatMgr(BaseMgr):
 
     @classmethod
     def post(cls, proj, reply_to_id: str, content: str):
-        chat = cls.model(id=cls.gen_id(),
-                         proj_id=proj.id,
-                         pink_id=g.pink_id,
-                         at=g.now,
-                         content=content)
-        chat.set_order(proj_timestamp=proj.timestamp, now=g.now)
-        chat.reply_to_id = reply_to_id  # can be none
-        db.session.add(chat)
-
         if reply_to_id:
             cls._is_visible(proj.id, reply_to_id)
-
             path = cls._get_path(proj.id, reply_to_id)
 
         else:
             path = '/'
+
+        chat = cls.model(id=cls.gen_id(),
+                         proj_id=proj.id,
+                         pink_id=g.pink_id,
+                         reply_to_id=reply_to_id)
+        chat.update(now=g.now, content=content)
+        chat.set_order(proj_timestamp=proj.timestamp, now=g.now)
+        db.session.add(chat)
 
         with redis.pipeline(transaction=True) as p:
             p.zadd(f'cLog-{proj.id}', f'+ {chat.id}')

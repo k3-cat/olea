@@ -1,8 +1,7 @@
 __all__ = ['Role']
 
-from sqlalchemy_ import (BaseModel, Column, ForeignKey, UniqueConstraint, hybrid_property,
-                         relationship)
-from sqlalchemy_.types import Boolean, Enum, String, Text
+from sqlalchemy_ import BaseModel, Column, ForeignKey, UniqueConstraint, relationship
+from sqlalchemy_.types import Boolean, String, Text
 
 from .common_enums import DEP
 

@@ -1,8 +1,8 @@
 __all__ = ['Pink']
 
 from passlib.hash import argon2
-from sqlalchemy_ import BaseModel, Column, hybrid_property, orm, relationship
-from sqlalchemy_.types import ARRAY, JSONB, Boolean, String
+from sqlalchemy_ import BaseModel, Column, relationship
+from sqlalchemy_.types import ARRAY, Boolean, String
 
 from .common_enums import DEP
 
@@ -15,7 +15,7 @@ class Pink(BaseModel):
     id = Column(String, primary_key=True)
     name = Column(String, unique=True, index=True)
     email = Column(String, unique=True)
-    qq = Column(String)
+    qq = Column(String, nullable=True)
     other = Column(String, nullable=True)
     deps = Column(ARRAY(DEP))
     _pwd = Column(String)
