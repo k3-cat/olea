@@ -26,10 +26,6 @@ class RoleMgr(BaseMgr):
 class PitMgr(BaseMgr):
     model = Pit
 
-    def __init__(self, obj_or_id):
-        self.o: Pit = None
-        super().__init__(obj_or_id)
-
     @check_owner
     @check_status(set(Pit.S) - {Pit.S.dropped, Pit.S.auditing, Pit.S.fin, Pit.S.fin_p})
     def drop(self):
@@ -150,16 +146,12 @@ class ProjMgr(BaseMgr):
 
     shift_buffer = FromConf.load('PIT_SHIFT_BUFFER')
 
-    def __init__(self, obj_or_id):
-        self.o: Proj = None
-        super().__init__(obj_or_id)
-
     def post_works(self, pit):
         # check if all pits in this department are done
         exists = Pit.query.join(Role). \
             filter(Role.dep == pit.role.dep). \
             filter(Role.proj_id == self.o.id). \
-            filter(~Pit.status.in_({Pit.S.fin, Pit.S.fin_p, Pit.S.dropped})). \
+            filter(Pit.status.notin_({Pit.S.fin, Pit.S.fin_p, Pit.S.dropped})). \
             exists()
         if not db.session.query(exists).scalar():
             return
@@ -200,10 +192,6 @@ class MangoMgr(BaseMgr):
     model = Mango
 
     t_life = FromConf.load('TL_PIT_SUMBIT')
-
-    def __init__(self, obj_or_id):
-        self.o: Mango = None
-        super().__init__(obj_or_id)
 
     @classmethod
     def create(cls, pit, share_id):

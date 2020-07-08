@@ -5,13 +5,13 @@ from olea.base import single_query
 from olea.singleton import redis
 
 
-def pink_serilizer(pink=None, pinks=None):
+def pink_serializer(pink=None, pinks=None):
     if not pinks:
         result = pink.__json__()
         result['last_access'] = redis.hget('last_access', g.pink_id)
         if pink.id == g.pink_id:
             user, host = pink.email.split('@')
-            result['email'] = f'{user[0:3]}@{host}'
+            result['email'] = f'{user[0:3]}******@{host}'
 
     else:
         result = list()
@@ -32,7 +32,7 @@ class PinkQuery():
     def single(id_):
         pink = single_query(model=Pink, id_or_obj=id_, condiction=lambda obj: obj.id == g.pink_id)
 
-        return pink_serilizer(pink)
+        return pink_serializer(pink)
 
     @staticmethod
     def search(deps, name, qq):
@@ -46,7 +46,7 @@ class PinkQuery():
                 query.filter(Pink.qq.like(f'%{qq}%'))
         pinks = query.all()
 
-        return pink_serilizer(pinks=pinks)
+        return pink_serializer(pinks=pinks)
 
 
 class DuckQuery():

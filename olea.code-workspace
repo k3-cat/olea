@@ -10,7 +10,32 @@
       "site-packages/pypat",
       "site-packages"
     ],
-    "python.formatting.yapfArgs": ["--style={ based_on_style: pep8, column_limit: 100}"],
-    "cSpell.words": ["olea"]
+    "python.formatting.yapfArgs": [
+      "--style={ based_on_style: pep8, column_limit: 100}"
+    ],
+    "cSpell.words": [
+      "Avbl",
+      "anns",
+      "confl",
+      "cpath",
+      "deps",
+      "europaea",
+      "hexists",
+      "hget",
+      "hset",
+      "mset",
+      "olea",
+      "sadd",
+      "srem",
+      "sscan",
+      "suff",
+      "zadd",
+      "zrange"
+    ],
+    "python.analysis.extraPaths": [
+      "site-packages/json_api",
+      "site-packages/pypat",
+      "site-packages"
+    ]
   }
 }

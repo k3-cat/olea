@@ -10,10 +10,6 @@ from olea.singleton import db, redis
 class AnnMgr(BaseMgr):
     module = Ann
 
-    def __init__(self, obj_or_id):
-        self.o: Ann = None
-        super().__init__(obj_or_id)
-
     @classmethod
     def post(cls, cat, deps, expiration, content):
         check_scopes(deps)
@@ -44,10 +40,6 @@ class AnnMgr(BaseMgr):
 
 
 class ProjMgr(BaseMgr):
-    def __init__(self, obj_or_id):
-        self.o: Proj = None
-        super().__init__(obj_or_id)
-
     def post_chat(self, reply_to_id, content):
         if self.o.status != Proj.S.working:
             raise ProjMetaLocked(status=self.o.status)
@@ -58,10 +50,6 @@ class ProjMgr(BaseMgr):
 
 class ChatMgr(BaseMgr):
     module = Chat
-
-    def __init__(self, obj_or_id):
-        self.o: Chat = None
-        super().__init__(obj_or_id)
 
     @staticmethod
     def _is_visible(proj_id, id_):

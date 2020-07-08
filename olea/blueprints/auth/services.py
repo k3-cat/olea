@@ -17,10 +17,6 @@ class PinkMgr(BaseMgr):
     t_life = FromConf.load('TL_PWD_RESET')
     ve_life = FromConf.load('TL_EMAIL_VERIFICATION')
 
-    def __init__(self, obj_or_id):
-        self.o: Pink = None
-        super().__init__(obj_or_id)
-
     @classmethod
     def verify_email(cls, email):
         token = pat.encode(exp=(g.now + cls.ve_life).timestamp(),
@@ -66,11 +62,10 @@ class PinkMgr(BaseMgr):
 class LemonMgr(BaseMgr):
     model = Lemon
 
-    a_life = 'TL_ACCESS_TOKEN'
-    r_life = 'TL_REFRESH_TOKEN'
+    a_life = FromConf.load('TL_ACCESS_TOKEN')
+    r_life = FromConf.load('TL_REFRESH_TOKEN')
 
     def __init__(self, obj_or_id):
-        self.o: Lemon = None
         try:
             super().__init__(obj_or_id)
             if self.o.pink_id != g.pink_id:

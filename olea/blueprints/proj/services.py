@@ -17,10 +17,6 @@ _dep_graph = DepGraph()
 class ProjMgr(BaseMgr):
     model = Proj
 
-    def __init__(self, obj_or_id):
-        self.o: Proj = None
-        super().__init__(obj_or_id)
-
     @classmethod
     def create(cls, base: str, cat, suff, leader_id):
         title, source, words_count = build_info(base=base, cat=cat)
@@ -104,10 +100,6 @@ class ProjMgr(BaseMgr):
 class RoleMgr(BaseMgr):
     model = Role
 
-    def __init__(self, obj_or_id):
-        self.o: Role = None
-        super().__init__(obj_or_id)
-
     @classmethod
     def create(cls, proj: Proj, dep: Dep, name: str):
         role = cls.model(id=cls.gen_id(), proj=proj, dep=dep, name=name)
@@ -144,7 +136,6 @@ class PitMgr(BaseMgr):
     model = Pit
 
     def __init__(self, obj_or_id, europaea=False):
-        self.o: Pit = None
         super().__init__(obj_or_id)
         if not europaea and self.o.pink_id != g.pink_id:
             raise AccessDenied(obj=self.o)

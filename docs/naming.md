@@ -9,14 +9,14 @@
 | lemon | refresh token                              |
 | mango | uploaded files info                        |
 | pink  | user                                       |
-| pit   | shecdual and track of a role for each user |
+| pit   | schedule and track of a role for each user |
 
 ## properties
 
 | name | table            | meaning  |
 | ---- | ---------------- | -------- |
 | ver  | ann, chat, mango | version  |
-| cat  | proj             | catagory |
+| cat  | proj             | category |
 
 ## objects
 

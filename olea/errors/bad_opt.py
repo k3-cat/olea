@@ -26,7 +26,7 @@ class InvalidSource(BadOpt):
         non = 'not found'
         web = 'web page not found'
 
-    def __init__(self, rsn: 'InvalidSource.Rsn', url=''):
+    def __init__(self, rsn: 'Rsn', url=''):
         if rsn == InvalidSource.Rsn.web:
             super().__init__(rsn=rsn.name, url=url)
         else:
@@ -61,7 +61,7 @@ class WeekPwd(BadOpt):
         common = 'common pwd'
         strength = 'low strength'
 
-    def __init__(self, rsn: 'WeekPwd.Rsn', strength=0.0):
+    def __init__(self, rsn: 'Rsn', strength=0.0):
         if rsn == WeekPwd.Rsn.strength:
             super().__init__(rsn=rsn.name, strength=strength)
         else:

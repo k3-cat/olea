@@ -10,7 +10,7 @@ class CircleList():
         self.data = list(iterable)
         self.len = len(self.data)
 
-    def __get_item__(self, key):
+    def __getitem__(self, key):
         return self.data[key % self.len]
 
 

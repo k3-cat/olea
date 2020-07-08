@@ -12,10 +12,6 @@ class PinkMgr(BaseMgr):
 
     t_life = FromConf.load('TL_NEW_PINK')
 
-    def __init__(self, obj_or_id):
-        self.o: Pink = None
-        super().__init__(obj_or_id)
-
     @classmethod
     def assign_token(cls, deps, amount):
         check_scopes(deps)
@@ -81,7 +77,6 @@ class DuckMgr(BaseMgr):
     model = Duck
 
     def __init__(self, pink_id, node):
-        self.o: Duck = None
         if not (obj := self.model.query.get((pink_id, node))):
             raise RecordNotFound(cls_=self.model, id_=(','.join((pink_id, node))))
         self.o = obj

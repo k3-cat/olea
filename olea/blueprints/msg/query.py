@@ -6,7 +6,7 @@ from olea.errors import AccessDenied
 from olea.singleton import redis
 
 
-def ann_serilizer(ann=None, anns=None):
+def ann_serializer(ann=None, anns=None):
     if not anns:
         result = ann.__json__()
         result['readers'] = ann.readers
@@ -29,7 +29,7 @@ class AnnQuery():
     @staticmethod
     def single(id_):
         ann = single_query(Ann, id_, lambda obj: obj.deleted is False)
-        return ann_serilizer(ann)
+        return ann_serializer(ann)
 
     @staticmethod
     def search(deps):
@@ -44,7 +44,7 @@ class AnnQuery():
         for ann in anns:
             ann.read(by=g.pink_id, now=g.now)
 
-        return ann_serilizer(anns=anns)
+        return ann_serializer(anns=anns)
 
 
 class ChatQuery():

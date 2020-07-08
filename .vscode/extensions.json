@@ -1,9 +1,12 @@
 {
   "recommendations": [
     "ms-python.python",
-    "davidanson.vscode-markdownlint",
+    "ms-python.vscode-pylance",
     "formulahendry.code-runner",
     "coenraads.bracket-pair-colorizer-2",
-    "eamodio.gitlens"
+    "eamodio.gitlens",
+    "adpyke.vscode-sql-formatter",
+    "yzhang.markdown-all-in-one",
+    "bungcip.better-toml"
   ]
 }

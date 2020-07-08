@@ -42,7 +42,7 @@ class InvalidCredential(AuthFail):
         new = 'creation token'
         email = 'email verification token'
 
-    def __init__(self, type_: 'InvalidCredential.T'):
+    def __init__(self, type_: 'T'):
         super().__init__(type=type_)
 
 
@@ -59,7 +59,7 @@ class InvalidRefreshToken(AuthFail):
         non = 'non exist'
         ip = 'location change'
 
-    def __init__(self, rsn: 'InvalidRefreshToken.Rsn', at=None):
+    def __init__(self, rsn: 'Rsn', at=None):
         if rsn == InvalidRefreshToken.Rsn.exp:
             super().__init__(rsn=rsn.name, at=at)
         else:

@@ -25,7 +25,7 @@ class DuckCache():
 
 class Node():
     index: Dict[str, str] = dict()
-    dpass: Set[str] = set()
+    white: Set[str] = set()
 
     @classmethod
     def register(cls, func, default_pass, node):
@@ -34,12 +34,14 @@ class Node():
         cls.index[endpoint] = node if node else endpoint
 
         if default_pass:
-            cls.dpass.add(endpoint)
+            cls.white.add(endpoint)
 
     @classmethod
     def get(cls):
         endpoint = request.endpoint
-        return (endpoint in cls.dpass, cls.index[endpoint])
+        if not endpoint:
+            return (False, '')
+        return (endpoint in cls.white, cls.index[endpoint])
 
 
 def _check_duck():
@@ -51,7 +53,7 @@ def _check_duck():
         raise PermissionDenied()
 
 
-def check_scopes(default_pass, scopes):
+def check_scopes(scopes):
     default_pass, node = Node.get()
 
     raw_scope = redis.hget(f'duck{"T" if default_pass else "F"}-{g.pink_id}', node)
@@ -66,7 +68,7 @@ def check_opt_duck(scopes=None):
     try:
         _check_duck()
         if scopes:
-            check_scopes(False, scopes)
+            check_scopes(scopes)
 
     except PermissionDenied:
         return False

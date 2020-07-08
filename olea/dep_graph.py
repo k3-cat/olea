@@ -25,12 +25,12 @@ class DepGraph(metaclass=Singleton):
             for dep_ in deps:
                 dfs_check(dep_, target)
 
-        for dep, dependences in cls.RULE.items():
+        for dep, dependencies in cls.RULE.items():
             # check circular dependence
             dfs_check(dep, dep)
 
             # build inverse rule
-            for _dep in dependences:
+            for _dep in dependencies:
                 try:
                     cls.I_RULE[_dep].add(dep)
                 except KeyError:
@@ -42,7 +42,11 @@ class DepGraph(metaclass=Singleton):
         queue = deque(own)
         dependencies: Set[Dep] = set()
         while queue:
-            dependencies = dependencies | self.RULE.get(queue.popleft(), set())
+            try:
+                dependencies = dependencies | self.RULE.get(queue.popleft())
+            except KeyError:
+                pass
+
             if target in dependencies:
                 return True
         return False

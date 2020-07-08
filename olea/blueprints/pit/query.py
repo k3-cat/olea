@@ -15,7 +15,7 @@ class PitQuery():
 
     @classmethod
     def checks(cls, deps):
-        if not check_scopes(scopes=deps):
+        if not check_scopes(deps):
             raise AccessDenied(cls_=Pit)
 
         pits = Pit.query.join(Role). \
@@ -26,7 +26,7 @@ class PitQuery():
 
     @classmethod
     def in_dep(cls, dep, status):
-        if not check_scopes(scopes=dep):
+        if not check_scopes(dep):
             raise AccessDenied(cls_=Pit)
 
         pits = Pit.query.join(Role). \
