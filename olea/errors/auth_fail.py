@@ -1,12 +1,13 @@
 import enum
 
-from flask import g
-
 from .base_error import BaseError
 
 
 class AuthFail(BaseError):
     http_code = 401
+
+
+# -------------------------------------------------------------
 
 
 class AccessDenied(AuthFail):
@@ -22,11 +23,11 @@ class AccessDenied(AuthFail):
 class PermissionDenied(AuthFail):
     code = 'XUZ19'
 
-    def __init__(self, scope: set = None):
+    def __init__(self, node: str, scope: set = None):
         if scope:
-            super().__init__(node=g.node, scope=scope)
+            super().__init__(node=node, scope=scope)
         else:
-            super().__init__(node=g.node)
+            super().__init__(node=node)
 
 
 class AccountDeactivated(AuthFail):

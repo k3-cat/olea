@@ -3,15 +3,15 @@ __all__ = [
     'DuplicatedRecord', 'FileExist', 'FileVerConflict', 'InvalidAccessToken', 'InvalidCredential',
     'InvalidRefreshToken', 'InvalidReply', 'InvalidSource', 'NotQualifiedToPick',
     'PermissionDenied', 'PitStatusLocked', 'ProjMetaLocked', 'RecordNotFound', 'RoleIsTaken',
-    'UnallowedType', 'WeekPwd', 'register_error_handlers'
+    'WeekPwd', 'register_error_handlers'
 ]
 
 from .auth_fail import (AccessDenied, AccountDeactivated, InvalidAccessToken, InvalidCredential,
                         InvalidRefreshToken, PermissionDenied)
-from .bad_opt import (DoesNotMeetRequirements, InvalidReply, InvalidSource, NotQualifiedToPick,
-                      PitStatusLocked, ProjMetaLocked, RoleIsTaken, UnallowedType, WeekPwd)
+from .bad_opt import InvalidReply, InvalidSource, PitStatusLocked, ProjMetaLocked, RoleIsTaken
 from .base_error import BaseError
 from .data_conflict import DuplicatedRecord, FileExist, FileVerConflict, RecordNotFound
+from .quality_control import DoesNotMeetRequirements, NotQualifiedToPick, WeekPwd
 
 
 def register_error_handlers(app):

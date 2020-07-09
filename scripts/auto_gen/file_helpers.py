@@ -1,6 +1,6 @@
 from functools import wraps
 
-from isort import SortImports
+from isort import file as sort_file
 from werkzeug.utils import import_string
 from yapf.yapflib.yapf_api import FormatFile
 
@@ -60,7 +60,7 @@ def write(fun):
             with path.open('w') as f:
                 f.writelines(new_file_)
 
-            SortImports(path)
+            sort_file(path)
             FormatFile(str(path), in_place=True)
 
             alt_path.unlink()

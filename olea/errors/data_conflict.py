@@ -5,6 +5,9 @@ class DataConflict(BaseError):
     http_code = 400
 
 
+# -------------------------------------------------------------
+
+
 class RecordNotFound(DataConflict):
     code = 'SYAV5'
 

@@ -17,6 +17,11 @@ class BaseError(Exception):
         super().__init__()
 
     def __json__(self):
-        d = {'code': self.code, 'ref': g.ref, 'msg': self.msg, 'parms': self.parms}
+        d = {
+            'code': self.code,
+            'ref': g.ref,
+            'msg': self.msg,
+            'parms': self.parms
+        }
 
         return d
