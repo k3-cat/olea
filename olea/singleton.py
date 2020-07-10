@@ -7,11 +7,13 @@ from mailgun import MailGun
 from onedrive import OneDrive
 from pypat import Pat
 from sqlalchemy_ import BaseModel
+from sqlogger import SQLogger
 
 db = SQLAlchemy(Model=BaseModel)
 fjson = FlaskJSON()
 ip2loc = IP2Loc()
 mailgun = MailGun()
 onedrive = OneDrive()
-redis = FlaskRedis()
 pat = Pat()
+redis = FlaskRedis()
+sqlogger = SQLogger()

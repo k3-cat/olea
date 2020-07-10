@@ -52,6 +52,10 @@ class Config():
     # --- sentry ------------------------------------
     SENTRY_DSN = '< - secret - >'
 
+    # --- sqlogger ------------------------------------
+    SQLOGGER_DIR = DATA_FOLDER / 'logs'
+    SQLOGGER_USER_KEY = 'user'
+
     # --- mailgun -----------------------------------
     MAILGUN_DOMAIN = ''
     MAILGUN_SENDER = ''

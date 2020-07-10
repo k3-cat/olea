@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 
 from flask import g
 
@@ -56,7 +56,7 @@ class PitMgr(BaseMgr):
     def force_submit(self, token):
         head, payload = pat.decode_with_head(token)
 
-        submit_time = datetime.datetime.fromtimestamp(head['t'])
+        submit_time = datetime.fromtimestamp(head['t'])
         if submit_time <= self.o.due and self.o.status == Pit.S.past_due:
             self._resume_status()
             self.o.add_track(info=Pit.T.fake_past_due, now=g.now)
@@ -121,7 +121,7 @@ class PitMgr(BaseMgr):
             redis.set(f'pStatus-{self.o.id}', 'delayed')
             # sequence of the following two statements MUST NOT BE CHANGED
             self.o.add_track(info=Pit.T.extend, now=g.now)
-            self.o.due = g.now + datetime.timedelta(days=2)
+            self.o.due = g.now + timedelta(days=2)
 
         self._resume_status()
         self.o.add_track(info=Pit.T.check_fail, now=g.now, by=g.pink_id)

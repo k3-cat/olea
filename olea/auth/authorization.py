@@ -5,7 +5,7 @@ from flask import g, request
 
 from models import Duck
 from olea.errors import PermissionDenied
-from olea.singleton import redis
+from olea.singleton import redis, sqlogger
 
 
 class DuckCache():
@@ -45,12 +45,12 @@ class Node():
 
 
 def _check_duck():
-    default_pass, node = Node.get()
-
     DuckCache.cache(g.pink_id)
+
+    default_pass, node = Node.get()
     if ((not default_pass and not redis.hexists(f'duckT-{g.pink_id}', node))
             or (default_pass and redis.hexists(f'duckF-{g.pink_id}', node))):
-        raise PermissionDenied()
+        raise PermissionDenied(node=node)
 
 
 def check_scopes(scopes):
@@ -61,7 +61,7 @@ def check_scopes(scopes):
     # when scope_set is empty, it means ANY SCOPE
     if (default_pass and (diff := scopes - scope_set)) \
             or (not default_pass and (diff := scopes & scope_set if scope_set else scopes)):
-        raise PermissionDenied(scope=diff)
+        raise PermissionDenied(node=node, scope=diff)
 
 
 def check_opt_duck(scopes=None):
@@ -83,6 +83,8 @@ def permission_required(default_pass=False, node=''):
         @wraps(f)
         def wrapper(*args, **kwargs):
             _check_duck()
+            sqlogger.log(level='perm', info='')
+
             return f(*args, **kwargs)
 
         return wrapper
