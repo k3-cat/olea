@@ -1,3 +1,3 @@
-from auto_gen import main
+from alan import main
 
 main()
