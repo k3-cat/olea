@@ -3,7 +3,7 @@ import re
 from functools import wraps
 from itertools import chain
 
-from .file_helpers import read, write
+from .file_helpers import read_write
 from .g import DIR
 
 
@@ -19,8 +19,7 @@ def add_filepath(fun):
 
 
 @add_filepath
-@write
-@read
+@read_write
 def fix_init(filepath, file_, current):
     file_text = ''.join(file_)
 
@@ -57,7 +56,7 @@ def fix_init(filepath, file_, current):
     for module_str, contains in current.items():
         statement = f'from .{module_str} import {",".join(contains)}\n'
         try:
-            old_contains = set(imports[imports_map[module_str]].split(' import ')[0].
+            old_contains = set(imports[imports_map[module_str]].split(' import ')[1].
                                replace('\n', '').replace(' ', '').lstrip('(').rstrip(')').
                                split(','))  # yapf: disable
 

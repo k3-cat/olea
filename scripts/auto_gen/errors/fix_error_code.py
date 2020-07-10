@@ -1,7 +1,7 @@
 import inspect
 import re
 
-from ..file_helpers import add_module, read, write
+from ..file_helpers import add_module, read_write
 from .error_code import check_err_code, generate_err_code
 
 
@@ -9,8 +9,7 @@ def gen_statement():
     return f"    code = '{generate_err_code()}'\n"
 
 
-@write
-@read
+@read_write
 @add_module
 def fix_error_code(module, file_):
     offset = 0

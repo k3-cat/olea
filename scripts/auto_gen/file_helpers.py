@@ -7,17 +7,34 @@ from yapf.yapflib.yapf_api import FormatFile
 from .g import DIR
 
 
-def read(fun):
+def read_write(fun):
     @wraps(fun)
     def wrapper(*args, **kwargs):
         path = kwargs['filepath']
         with path.open('r') as f:
             file_ = ['']
             file_.extend(f)
-
         kwargs['file_'] = file_
 
-        return fun(*args, **kwargs)
+        # run original function
+        new_file_, ext = fun(*args, **kwargs)
+
+        alt_path = path.parent / f'{path.name}_backup'
+        path.replace(alt_path)
+        try:
+            with path.open('w') as f:
+                f.writelines(new_file_)
+
+            sort_file(path)
+            FormatFile(str(path), in_place=True)
+
+            alt_path.unlink()
+
+        except BaseException:
+            alt_path.replace(path)
+            raise
+
+        return ext
 
     return wrapper
 
@@ -43,32 +60,5 @@ def add_module(fun):
             init_alt_path.replace(init_path)
 
         return result
-
-    return wrapper
-
-
-def write(fun):
-    @wraps(fun)
-    def wrapper(*args, **kwargs):
-        new_file_, ext = fun(*args, **kwargs)
-
-        path = kwargs['filepath']
-        alt_path = path.parent / f'{path.name}_backup'
-        path.replace(alt_path)
-
-        try:
-            with path.open('w') as f:
-                f.writelines(new_file_)
-
-            sort_file(path)
-            FormatFile(str(path), in_place=True)
-
-            alt_path.unlink()
-
-        except BaseException:
-            alt_path.replace(path)
-            raise
-
-        return ext
 
     return wrapper
