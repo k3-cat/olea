@@ -1,10 +1,8 @@
 import multiprocessing
-import os
 
 import gevent.monkey
 
 gevent.monkey.patch_all()
-
 
 # debug = True
 loglevel = 'info'

@@ -61,12 +61,18 @@ def _build_msal_app(cache=None):
 
 
 if __name__ == '__main__':
-    sys.path.append(str(Path(__file__).parents[1]))
+    DIR = Path(__file__).parents[1]
+    sys.path.append(str(DIR))
+    sys.path.append(str(DIR / 'site-packages'))
 
     from configs import load_config
 
     config = load_config()
-    TOKEN_PATH = config['ONEDRIVE_DATA_DIR'] / 'token.json'
+
+    data_dir: Path = config['ONEDRIVE_DATA_DIR']
+    data_dir.mkdir(exist_ok=True)
+
+    TOKEN_PATH = data_dir / 'token.json'
     CLIENT_ID = config['ONEDRIVE_CLIENT_ID']
     CLIENT_SECRET = config['ONEDRIVE_CLIENT_SECRET']
 
