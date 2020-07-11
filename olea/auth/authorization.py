@@ -73,6 +73,8 @@ def check_opt_duck(scopes=None):
     except PermissionDenied:
         return False
 
+    sqlogger.log(level='perm', info='opt')
+
     return True
 
 
