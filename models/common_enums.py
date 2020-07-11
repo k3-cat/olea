@@ -11,6 +11,7 @@ class ZEnum(enum.Enum):
 
 
 class Dep(ZEnum):
+    _sp = '00'
     ld = '30'
     tr = '41'
     yt = '42'

@@ -135,11 +135,6 @@ class RoleMgr(BaseMgr):
 class PitMgr(BaseMgr):
     model = Pit
 
-    def __init__(self, obj_or_id, europaea=False):
-        super().__init__(obj_or_id)
-        if not europaea and self.o.pink_id != g.pink_id:
-            raise AccessDenied(obj=self.o)
-
     @classmethod
     def create(cls, role, pink_id):
         pit = cls.model(id=cls.gen_id(), role=role, pink_id=pink_id, timestamp=g.now)

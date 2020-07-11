@@ -45,7 +45,7 @@ class PitMgr(BaseMgr):
     @check_status({Pit.S.working, Pit.S.past_due, Pit.S.delayed})
     def submit(self, share_id):
         if g.now > self.o.due or self.o.status == Pit.S.past_due:
-            self.past_due()
+            self._past_due()
 
         self.o.status = Pit.S.auditing
         self.o.add_track(info=Pit.T.submit, now=g.now)
@@ -61,7 +61,7 @@ class PitMgr(BaseMgr):
             self._resume_status()
             self.o.add_track(info=Pit.T.fake_past_due, now=g.now)
         elif submit_time > self.o.due or self.o.status == Pit.S.past_due:
-            self.past_due()
+            self._past_due()
 
         self.o.status = Pit.S.auditing
         self.o.add_track(info=Pit.T.submit_f, now=submit_time, by=g.pink_id)
@@ -69,7 +69,7 @@ class PitMgr(BaseMgr):
 
         return mango
 
-    def past_due(self):
+    def _past_due(self):
         redis.set(f'pStatus-{self.o.id}', 'past-due')
         if self.o.status != Pit.S.past_due:
             self.o.status = Pit.S.past_due

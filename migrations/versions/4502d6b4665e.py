@@ -17,7 +17,7 @@ depends_on = None
 
 
 # ----- types ----------------------
-dep = postgresql.ENUM('ld', 'tr', 'yt', 'au', 'ps', 'ae', name='dep', create_type=False)
+dep = postgresql.ENUM('_sp', 'ld', 'tr', 'yt', 'au', 'ps', 'ae', name='dep', create_type=False)
 ann_level = postgresql.ENUM('tips', 'normal', 'important', name='ann_level', create_type=False)
 proj_cat = postgresql.ENUM('doc', 'sub', 'ani', name='proj_cat', create_type=False)
 proj_status = postgresql.ENUM('pre', 'freezed', 'working', 'upload', 'fin', name='proj_status', create_type=False)
