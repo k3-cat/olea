@@ -20,6 +20,7 @@ requests = "^2.24.0"
 beautifulsoup4 = "^4.9.1"
 lxml = "^4.5.1"
 msal = "^1.4.1"
+sendgrid = "^6.4.3"
 sentry-sdk = { extras = ["flask", "sqlalchemy", "redis"], version = "^0.16.0" }
 ip2location = "^8.4.1"
 

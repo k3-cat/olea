@@ -33,7 +33,7 @@ def create_app(env=os.getenv('FLASK_ENV', 'production')):
 
 def init_extensions(app: Flask):
     from olea.auth import init_app as auth_init_app
-    from olea.singleton import db, fjson, ip2loc, mailgun, onedrive, redis, sqlogger
+    from olea.singleton import db, fjson, ip2loc, onedrive, redis, sendgrid, sqlogger
     from olea.utils import FromConf
 
     auth_init_app(app)
@@ -43,8 +43,8 @@ def init_extensions(app: Flask):
     fjson.init_app(app)
     ip2loc.init_app(app)
     redis.init_app(app)
-    mailgun.init_app(app)
     onedrive.init_app(app)
+    sendgrid.init_app(app)
     sqlogger.init_app(app)
 
 

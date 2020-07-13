@@ -1,9 +1,8 @@
 from models import Duck, Pink
-from olea import email_mgr
 from olea.auth import authentication, authorization, check_scopes
 from olea.base import BaseMgr
 from olea.errors import InvalidCredential, RecordNotFound
-from olea.singleton import db, pat, redis
+from olea.singleton import db, pat, redis, sendgrid
 from olea.utils import FromConf, random_b85
 
 
@@ -33,7 +32,7 @@ class PinkMgr(BaseMgr):
         PinkMgr(pink).set_email(email_token)
         db.session.add(pink)
 
-        email_mgr.new_pink(email=pink.email, name=pink.name)
+        sendgrid.send(to=pink.email, template_name='new pink', name=pink.name)
 
         return pink
 

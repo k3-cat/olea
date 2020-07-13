@@ -56,10 +56,9 @@ class Config():
     SQLOGGER_DIR = DATA_FOLDER / 'logs'
     SQLOGGER_USER_KEY = 'user'
 
-    # --- mailgun -----------------------------------
-    MAILGUN_DOMAIN = ''
-    MAILGUN_SENDER = ''
-    MAILGUN_API_KEY = '< - secret - >'
+    # --- sendgrid -----------------------------------
+    SENDGRID_SENDER = ''
+    SENDGRID_API_KEY = '< - secret - >'
 
     # --- onedrive ----------------------------------
     ONEDRIVE_CLIENT_ID = ''

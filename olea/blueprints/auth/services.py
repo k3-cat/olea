@@ -1,11 +1,10 @@
 from flask import g, request
 
 from models import Lemon, Pink
-from olea import email_mgr
 from olea.auth.authentication import revoke_all_lemons
 from olea.base import BaseMgr
 from olea.errors import AccountDeactivated, InvalidCredential, InvalidRefreshToken, RecordNotFound
-from olea.singleton import db, ip2loc, pat, redis
+from olea.singleton import db, ip2loc, pat, redis, sendgrid, sqlogger
 from olea.utils import FromConf, random_b85
 
 from .pwd_tools import check_pwd
@@ -25,7 +24,7 @@ class PinkMgr(BaseMgr):
                                'new': email
                            })
 
-        email_mgr.email_verification(email=email, token=token)
+        sendgrid.send(to=email, template_name='email verification', email=email, token=token)
 
     @classmethod
     def forget_pwd(cls, name, email):
@@ -35,7 +34,8 @@ class PinkMgr(BaseMgr):
 
         token = random_b85(k=20)
         redis.set(f'rst-{token}', pink.id, ex=cls.t_life.seconds)
-        email_mgr.pwd_reset(email=pink.email, name=pink.name, token=token)
+
+        sendgrid.send(to=email, template_name='pwd reset', name=name, token=token)
 
     @staticmethod
     def reset_pwd(token, pwd, device_id):
@@ -80,6 +80,8 @@ class LemonMgr(BaseMgr):
             raise AccountDeactivated()
         if not pink or not pink.check_pwd(pwd):
             raise InvalidCredential(type_=InvalidCredential.T.pwd)
+
+        sqlogger.log('login', '')
 
         return LemonMgr._grant(pink, device_id)
 
