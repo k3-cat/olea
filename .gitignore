@@ -10,6 +10,6 @@ __pycache__/
 
 /configs/*
 !configs/__init__.py
-!configs/base.py
+!configs/base_conf.py
 !configs/url_mgr.py
 !configs/*.example.*
