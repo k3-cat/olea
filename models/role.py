@@ -4,6 +4,7 @@ from sqlalchemy_ import BaseModel, Column, ForeignKey, UniqueConstraint, relatio
 from sqlalchemy_.types import Boolean, String, Text
 
 from .common_enums import DEP
+from .pit import Pit
 
 
 class Role(BaseModel):
@@ -20,6 +21,10 @@ class Role(BaseModel):
     pits = relationship('Pit', back_populates='role', lazy='dynamic', passive_deletes=True)
     __table_args__ = (UniqueConstraint('proj_id', 'dep', 'name', name='_role_uc'), )
     __id_len__ = 12
+
+    @property
+    def pit(self):
+        return self.pits.filter(Pit.status.in_({Pit.S.fin, Pit.S.fin_p})).one()
 
     def __json__(self):
         return {

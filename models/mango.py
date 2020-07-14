@@ -19,3 +19,7 @@ class Mango(BaseModel):
 
     pit = relationship('Pit', back_populates='mangos')
     __table_args__ = (UniqueConstraint('pit_id', 'ver', name='_mango_uc'), )
+
+    @property
+    def mtype(self):
+        return self.mime.split('/')[0]

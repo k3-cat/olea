@@ -4,6 +4,7 @@ from sqlalchemy_ import BaseModel, Column, ForeignKey, relationship
 from sqlalchemy_.types import ARRAY, DateTime, Enum, String
 
 from .common_enums import ZEnum, enum
+from .mango import Mango
 
 
 class Pit(BaseModel):
@@ -41,6 +42,10 @@ class Pit(BaseModel):
                           passive_deletes=True)
     __id_len__ = 13
 
+    @property
+    def mango(self):
+        return self.mangos.order_by(Mango.ver.desc()).first()
+
     # Trace
     class T(enum.Enum):
         pick_f = 'P'
@@ -56,7 +61,7 @@ class Pit(BaseModel):
         check_fail = 'x'
         extend = '+'
 
-    def add_track(self, info: 'Pit.T', now, by=''):
+    def add_track(self, info: 'T', now, by=''):
         base = f'{info.value} - {now}'
         if info in (Pit.T.past_due, Pit.T.pick_f, Pit.T.submit_f, Pit.T.check_fail,
                     Pit.T.check_pass):

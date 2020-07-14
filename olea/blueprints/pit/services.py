@@ -231,7 +231,7 @@ class MangoMgr(BaseMgr):
         if mango := cls.model.query.filter_by(sha1=i['sha1']):
             raise FileExist(pit=mango.pit)
 
-        if last := pit.mangos.first():
+        if last := pit.mango:
             onedrive.delete(item_id=last.id)
         ref = onedrive.copy_from_share(drive_id=i['drive_id'],
                                        item_id=i['id'],

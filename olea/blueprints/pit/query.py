@@ -11,7 +11,8 @@ class PitQuery():
     def single(id_):
         return single_query(model=Pit,
                             id_or_obj=id_,
-                            condiction=lambda obj: obj.pink_id == g.pink_id)
+                            condiction=lambda obj: obj.pink_id == g.pink_id or obj.status in
+                            {Pit.S.working, Pit.S.past_due, Pit.S.delayed, Pit.S.auditing})
 
     @classmethod
     def checks(cls, deps):
