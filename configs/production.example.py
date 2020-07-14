@@ -1,8 +1,6 @@
 from datetime import timedelta
 from pathlib import Path
 
-from models import Dep
-
 from .url_mgr import UrlMgr
 
 DIR = Path(__file__).parents[1]
@@ -19,12 +17,20 @@ class Config():
 
     # --- dep-graph ---------------------------------------
     RULE = {
-        Dep.ae: {Dep.au, Dep.ps},
+        'doc': {
+            'ae': {'au', 'ps'},
+        },
+        'sub': 'doc',
+        'ani': 'doc'
     }
     DURATION = {
-        Dep.au: timedelta(days=7),
-        Dep.ps: timedelta(days=7),
-        Dep.ae: timedelta(days=14),
+        'doc': {
+            'au': timedelta(days=7),
+            'ps': timedelta(days=7),
+            'ae': timedelta(days=14),
+        },
+        'sub': 'doc',
+        'ani': 'doc'
     }
     # PROJ_PRE_DUE = timedelta(days=3)
     PIT_SHIFT_BUFFER = timedelta(days=1)

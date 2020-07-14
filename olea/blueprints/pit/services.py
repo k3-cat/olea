@@ -106,7 +106,12 @@ class PitMgr(BaseMgr):
             filter(Pit.status.in_({Pit.S.pending, Pit.S.working, Pit.S.auditing})). \
             filter(Role.proj_id == self.o.role.proj_id). \
             all()
-        if not _dep_graph.is_depend_on(own={role.dep for role in roles}, target=self.o.role.dep):
+        if not _dep_graph.is_depend_on(
+                cat=self.o.role.proj.cat,
+                own={role.dep
+                     for role in roles},
+                target=self.o.role.dep,
+        ):
             raise AccessDenied(obj=self.o.mango)
 
         return self._download()
@@ -158,9 +163,9 @@ class ProjMgr(BaseMgr):
 
         # alter start and due for the subsequent departments
         extended = pit.finish_at \
-            - _dep_graph.get_finish_time(base=self.o.start_at, dep=pit.role.dep)
+            - _dep_graph.get_finish_time(cat=self.o.cat, base=self.o.start_at, dep=pit.role.dep)
         pits = Pit.query.join(Role). \
-            filter(Role.dep.in_(_dep_graph.I_RULE[pit.role.dep])). \
+            filter(Role.dep.in_(_dep_graph.get_dependents(cat=self.o.cat, dep=pit.role.dep))). \
             filter(Role.proj_id == self.o.id). \
             all()
         for pit_ in pits:

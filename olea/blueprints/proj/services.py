@@ -80,8 +80,8 @@ class ProjMgr(BaseMgr):
             filter(Pit.status == Pit.S.init). \
             all()
         for pit in pits:
-            pit.start_at = _dep_graph.get_start_time(base=g.now, dep=pit.role.dep)
-            pit.due = pit.start_at + _dep_graph.DURATION[pit.role.dep]
+            pit.start_at = _dep_graph.get_start_time(cat=self.o.cat, base=g.now, dep=pit.role.dep)
+            pit.due = pit.start_at + _dep_graph.get_duration(cat=self.o.cat, dep=pit.role.dep)
             pit.status = Pit.S.working if pit.start_at == g.now else Pit.S.pending
 
     def finish(self, url):

@@ -63,7 +63,6 @@ def _build_msal_app(cache=None):
 if __name__ == '__main__':
     DIR = Path(__file__).parents[1]
     sys.path.append(str(DIR))
-    sys.path.append(str(DIR / 'site-packages'))
 
     from configs import load_config
 
