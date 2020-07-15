@@ -38,13 +38,13 @@ def fetch_title_by_url(url):
 
 def fetch_title_by_id(id_):
     if primary := re.match(r'^(?:cn-)?([0-9]{3,4})(?:(?:-j)|(?:-ex))?$', id_):
-        # scp-000 scp-000-j scp-000-ex
-        # scp-cn-000 scp-cn-000-j scp-cn-000-ex
         page = 1
         if '-j' in id_:
             url = 'joke-scps'
+
         elif '-ex' in id_:
             url = 'scp-ex'
+
         else:
             url = 'scp-series'
             page = int(primary.group(1)) // 1000 + 1
@@ -78,10 +78,13 @@ def fetch_title(base, cat):
         source = base.lower()
         title = fetch_title_by_url(source)
 
-    else:
+    elif cat == Proj.C.ani:
         base_ = base.split('\n')
         title = base_[0]
         source = base_[1]
+
+    else:
+        raise Exception('Unexpected CAT')
 
     return (title, source)
 

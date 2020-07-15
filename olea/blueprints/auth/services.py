@@ -73,18 +73,6 @@ class LemonMgr(BaseMgr):
         except RecordNotFound:
             raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.non)
 
-    @staticmethod
-    def login(name, pwd, device_id):
-        pink: Pink = Pink.query.filter_by(name=name).one()
-        if not pink.active:
-            raise AccountDeactivated()
-        if not pink or not pink.check_pwd(pwd):
-            raise InvalidCredential(type_=InvalidCredential.T.pwd)
-
-        sqlogger.log('login', '')
-
-        return LemonMgr._grant(pink, device_id)
-
     @classmethod
     def _grant(cls, pink, device_id):
         pink.lemons.filter_by(device_id=device_id).delete()
@@ -99,6 +87,18 @@ class LemonMgr(BaseMgr):
         db.session.add(lemon)
 
         return lemon
+
+    @staticmethod
+    def login(name, pwd, device_id):
+        pink: Pink = Pink.query.filter_by(name=name).one()
+        if not pink.active:
+            raise AccountDeactivated()
+        if not pink or not pink.check_pwd(pwd):
+            raise InvalidCredential(type_=InvalidCredential.T.pwd)
+
+        sqlogger.log('login', '')
+
+        return LemonMgr._grant(pink, device_id)
 
     def grant_access_token(self, key, device_id):
         if self.o.key != key or self.o.device_id != device_id:

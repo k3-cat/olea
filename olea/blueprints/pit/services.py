@@ -26,20 +26,38 @@ class RoleMgr(BaseMgr):
 class PitMgr(BaseMgr):
     model = Pit
 
+    def _past_due(self):
+        redis.set(f'pStatus-{self.o.id}', 'past-due')
+        if self.o.status != Pit.S.past_due:
+            self.o.status = Pit.S.past_due
+            self.o.add_track(info=Pit.T.past_due, now=g.now)
+
+    def _resume_status(self):
+        status = redis.get(f'pStatus-{self.o.id}')
+        if not status:
+            self.o.status = Pit.S.working
+        if status == 'delayed':
+            self.o.status = Pit.S.delayed
+        elif status == 'past-due':
+            self.o.status = Pit.S.past_due
+
+        else:
+            raise Exception('Unexpected STATUS')
+
+    def _download(self):
+        return onedrive.share(self.o.mango.id)
+
     @check_owner
     @check_status(set(Pit.S) - {Pit.S.dropped, Pit.S.auditing, Pit.S.fin, Pit.S.fin_p})
     def drop(self):
         if self.o.status == Pit.S.init:
             db.session.delete(self.o)
-            return True
 
         self.o.status = Pit.S.dropped
         self.o.add_track(info=Pit.T.drop, now=g.now)
 
         redis.delete(f'pStatus-{self.o.id}')
         RoleMgr(self.o.role).drop()
-
-        return True
 
     @check_owner
     @check_status({Pit.S.working, Pit.S.past_due, Pit.S.delayed})
@@ -69,32 +87,11 @@ class PitMgr(BaseMgr):
 
         return mango
 
-    def _past_due(self):
-        redis.set(f'pStatus-{self.o.id}', 'past-due')
-        if self.o.status != Pit.S.past_due:
-            self.o.status = Pit.S.past_due
-            self.o.add_track(info=Pit.T.past_due, now=g.now)
-
-    def _resume_status(self):
-        status = redis.get(f'pStatus-{self.o.id}')
-        if not status:
-            self.o.status = Pit.S.working
-        if status == 'delayed':
-            self.o.status = Pit.S.delayed
-        elif status == 'past-due':
-            self.o.status = Pit.S.past_due
-
-        else:
-            raise Exception('BAD RECORD')
-
     @check_owner
     @check_status({Pit.S.auditing})
     def redo(self):
         self._resume_status()
         self.o.add_track(info=Pit.T.redo, now=g.now)
-
-    def _download(self):
-        return onedrive.share(self.o.mango.id)
 
     @check_status({Pit.S.fin, Pit.S.fin_p})
     def download(self):
@@ -134,10 +131,10 @@ class PitMgr(BaseMgr):
     @check_status({Pit.S.auditing})
     def check_pass(self):
         status = redis.get(f'pStatus-{self.o.id}')
-        if not status or status != 'past-due':
-            self.o.status = Pit.S.fin
-        else:
+        if status and status == 'past-due':
             self.o.status = Pit.S.fin_p
+        else:
+            self.o.status = Pit.S.fin
         redis.delete(f'pStatus-{self.o.id}')
 
         self.o.finish_at = g.now
@@ -150,6 +147,10 @@ class ProjMgr(BaseMgr):
     model = Proj
 
     shift_buffer = FromConf.load('PIT_SHIFT_BUFFER')
+
+    def _upload(self):
+        self.o.status = Proj.S.upload
+        self.o.add_track(info=Proj.T.upload, now=g.now)
 
     def post_works(self, pit):
         # check if all pits in this department are done
@@ -188,15 +189,34 @@ class ProjMgr(BaseMgr):
             # all pits in this dep are done + no further pits to fill = project can upload
             self._upload()
 
-    def _upload(self):
-        self.o.status = Proj.S.upload
-        self.o.add_track(info=Proj.T.upload, now=g.now)
-
 
 class MangoMgr(BaseMgr):
     model = Mango
 
     t_life = FromConf.load('TL_PIT_SUMBIT')
+
+    @classmethod
+    def _create(cls, pit, i):
+        if mango := cls.model.query.filter_by(sha1=i['sha1']):
+            raise FileExist(pit=mango.pit)
+
+        if last := pit.mango:
+            onedrive.delete(item_id=last.id)
+        ref = onedrive.copy_from_share(drive_id=i['drive_id'],
+                                       item_id=i['id'],
+                                       name=f'{pit.id}.{i["name"].split(".")[-1]}')
+
+        mango = cls.model(id=ref,
+                          pit_id=pit.id,
+                          ver=last.ver + 1 if last else None,
+                          mime=i['mime'],
+                          sha1=i['sha1'],
+                          modified_at=i['last_modify'],
+                          timestamp=g.now,
+                          metainfo=i['metainfo'])
+        db.session.add(mango)
+
+        return mango
 
     @classmethod
     def create(cls, pit, share_id):
@@ -225,26 +245,3 @@ class MangoMgr(BaseMgr):
             raise FileVerConflict(req_sha1=i['sha1'])
 
         MangoMgr._create(pit, i)
-
-    @classmethod
-    def _create(cls, pit, i):
-        if mango := cls.model.query.filter_by(sha1=i['sha1']):
-            raise FileExist(pit=mango.pit)
-
-        if last := pit.mango:
-            onedrive.delete(item_id=last.id)
-        ref = onedrive.copy_from_share(drive_id=i['drive_id'],
-                                       item_id=i['id'],
-                                       name=f'{pit.id}.{i["name"].split(".")[-1]}')
-
-        mango = cls.model(id=ref,
-                          pit_id=pit.id,
-                          ver=last.ver + 1 if last else None,
-                          mime=i['mime'],
-                          sha1=i['sha1'],
-                          modified_at=i['last_modify'],
-                          timestamp=g.now,
-                          metainfo=i['metainfo'])
-        db.session.add(mango)
-
-        return mango

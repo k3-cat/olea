@@ -59,8 +59,11 @@ def check_scopes(scopes):
     raw_scope = redis.hget(f'duck{"T" if default_pass else "F"}-{g.pink_id}', node)
     scope_set = set(raw_scope.split(';'))
     # when scope_set is empty, it means ANY SCOPE
-    if (default_pass and (diff := scopes - scope_set)) \
-            or (not default_pass and (diff := scopes & scope_set if scope_set else scopes)):
+    if default_pass:
+        diff = scopes - scope_set
+    else:
+        diff = scopes & scope_set if scope_set else scopes
+    if diff:
         raise PermissionDenied(node=node, scope=diff)
 
 

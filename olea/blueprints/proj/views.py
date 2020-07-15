@@ -27,7 +27,7 @@ def search():
 @bp.route('/create', methods=['POST'])
 def create():
     form = Create()
-    proj = ProjMgr.create(form.base, cat=form.cat, suff='', leader_id=g.pink_id)
+    proj = ProjMgr.create(base=form.base, cat=form.cat, suff='', leader_id=g.pink_id)
     return json_response(data_=proj)
 
 

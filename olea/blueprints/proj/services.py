@@ -43,22 +43,34 @@ class ProjMgr(BaseMgr):
 
         return proj
 
-    def modify_roles(self, add: dict, remove: list):
+    def modify_roles(self, add: list, remove: set):
         if g.pink_id != self.o.leader_id:
             raise AccessDenied(obj=self.o)
         if self.o.status != Proj.S.pre:
             raise ProjMetaLocked(status=self.o.status)
 
-        # add first, to prevent conflicts
-        fails = dict()
-        for dep, roles in add.items():
+        # merge role info, so only need to check once per department
+        roles = dict()
+        for role_info in add:
+            try:
+                roles[role_info.dep].add(role_info.name)
+            except KeyError:
+                roles[role_info.dep] = {role_info.name}
+
+        fails = list()
+        for dep, names in roles.items():
             exists = Role.query.filter_by(proj_id=self.o.id). \
                 filter_by(dep=dep). \
-                filter(Role.name.in_(roles)). \
+                filter(Role.name.in_(names)). \
                 all()
-            fails[dep] = [role.name for role in exists]
-            for name in roles - set(fails[dep]):
-                RoleMgr.create(self.o, dep, name)
+            fails = [(role.dep, role.name) for role in exists]
+
+        # add first, to prevent conflicts
+        for role_info in add:
+            if (role_info.dep, role_info.name) in fails:
+                continue
+
+            RoleMgr.create(self.o.id, role_info.dep, role_info.name, role_info.note)
 
         if remove:
             RoleMgr.remove(remove)
@@ -101,8 +113,8 @@ class RoleMgr(BaseMgr):
     model = Role
 
     @classmethod
-    def create(cls, proj: Proj, dep: Dep, name: str):
-        role = cls.model(id=cls.gen_id(), proj=proj, dep=dep, name=name)
+    def create(cls, proj_id: str, dep: Dep, name: str, note: str):
+        role = cls.model(id=cls.gen_id(), proj_id=proj_id, dep=dep, name=name, note=note)
         db.session.add(role)
 
         return role

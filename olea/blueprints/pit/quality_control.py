@@ -59,7 +59,6 @@ def _ae_checks(i):
 
 
 def check_file_meta(dep, i):
-
     if dep == Dep.ps:
         required = _ps_checks(i)
 
@@ -70,8 +69,7 @@ def check_file_meta(dep, i):
         required = _ae_checks(i)
 
     else:
-        # prevent unexpected file uploading, should never be called
-        raise Exception('Unexpected File Uploading')
+        raise Exception('Unexpected DEP')
 
     if required:
         raise CheckFailed(i['metainfo'], required)

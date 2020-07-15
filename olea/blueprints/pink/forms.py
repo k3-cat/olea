@@ -72,7 +72,7 @@ class AlterDuck(BaseForm):
 
 class AlterScopes(BaseForm):
     class Method(enum.Enum):
-        diff = 'merge diffferences'
+        diff = 'merge differences'
         full = 'overwrite full set'
 
     method = Enum(Method)
