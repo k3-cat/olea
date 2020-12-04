@@ -3,12 +3,12 @@ from datetime import datetime, timedelta
 from flask import g
 
 from models import Mango, Pit, Proj, Role
-from olea.auth import check_opt_duck
-from olea.base import BaseMgr
-from olea.dep_graph import DepGraph
-from olea.errors import AccessDenied, DoesNotMeetRequirements, FileExist, FileVerConflict
-from olea.singleton import db, onedrive, pat, redis
-from olea.utils import FromConf
+from core.auth import check_opt_duck
+from core.base import BaseMgr
+from core.dep_graph import DepGraph
+from core.errors import AccessDenied, DoesNotMeetRequirements, FileExist, FileVerConflict
+from core.singleton import db, onedrive, pat, redis
+from core.utils import FromConf
 
 from .quality_control import CheckFailed, check_file_meta
 from .utils import check_owner, check_status

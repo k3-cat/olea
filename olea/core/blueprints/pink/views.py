@@ -1,7 +1,7 @@
 from flask import g
 from flask_json import json_response
 
-from olea.auth import allow_anonymous, opt_perm, perm
+from core.auth import allow_anonymous, opt_perm, perm
 
 from . import bp
 from .forms import AlterDuck, AlterScopes, AssignToken, Search, SearchDuck, SignUp, UpdateInfo

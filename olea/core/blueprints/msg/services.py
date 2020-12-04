@@ -1,10 +1,10 @@
 from flask import g
 
 from models import Ann, Chat, Proj
-from olea.auth import check_scopes
-from olea.base import BaseMgr
-from olea.errors import AccessDenied, InvalidReply, ProjMetaLocked
-from olea.singleton import db, redis
+from core.auth import check_scopes
+from core.base import BaseMgr
+from core.errors import AccessDenied, InvalidReply, ProjMetaLocked
+from core.singleton import db, redis
 
 
 class AnnMgr(BaseMgr):

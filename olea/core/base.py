@@ -1,8 +1,8 @@
 from sqlalchemy_ import BaseModel
 
-from olea.auth import check_opt_duck
-from olea.errors import AccessDenied, RecordNotFound
-from olea.id_tool import IdTool
+from .auth import check_opt_duck
+from .errors import AccessDenied, RecordNotFound
+from .id_tool import IdTool
 
 id_tool = IdTool()
 

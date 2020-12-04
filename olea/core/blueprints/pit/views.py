@@ -1,6 +1,6 @@
 from flask_json import json_response
 
-from olea.auth import opt_perm, perm
+from core.auth import opt_perm, perm
 
 from . import bp
 from .forms import Checks, ForceSubmit, InDep, Search, Submit

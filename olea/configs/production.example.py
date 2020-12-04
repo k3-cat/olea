@@ -1,9 +1,8 @@
 from datetime import timedelta
-from pathlib import Path
+
+from olea_path import DATA_DIR
 
 from .url_mgr import UrlMgr
-
-DIR = Path(__file__).parents[1]
 
 
 class Config():
@@ -12,8 +11,7 @@ class Config():
     MAX_CONTENT_LENGTH = 10 * 1024
 
     # --- path --------------------------------------
-    DATA_FOLDER = DIR / 'data'
-    PWDDB_PATH = DATA_FOLDER / 'pwddb'
+    PWDDB_PATH = DATA_DIR / 'pwddb'
 
     # --- dep-graph ---------------------------------------
     RULE = {
@@ -59,7 +57,7 @@ class Config():
     SENTRY_DSN = '< - secret - >'
 
     # --- sqlogger ------------------------------------
-    SQLOGGER_DIR = DATA_FOLDER / 'logs'
+    SQLOGGER_DIR = DATA_DIR / 'logs'
     SQLOGGER_USER_KEY = 'user'
 
     # --- sendgrid -----------------------------------
@@ -69,9 +67,9 @@ class Config():
     # --- onedrive ----------------------------------
     ONEDRIVE_CLIENT_ID = ''
     ONEDRIVE_CLIENT_SECRET = '< - secret - >'
-    ONEDRIVE_DATA_DIR = DATA_FOLDER / 'onedrive'
-    ONEDRIVE_ROOT_FOLDER = ''
+    ONEDRIVE_DATA_DIR = DATA_DIR / 'onedrive'
+    ONEDRIVE_ROOT = ''
 
     # --- ip2loc ------------------------------------
-    IP2LOC_IPDB_PATH = DATA_FOLDER / 'ipdb.bin'
+    IP2LOC_IPDB_PATH = DATA_DIR / 'ipdb.bin'
     IP2LOC_DOWNLOAD_TOKEN = '< - secret - >'

@@ -1,11 +1,11 @@
 from flask import g, request
 
 from models import Lemon, Pink
-from olea.auth.authentication import revoke_all_lemons
-from olea.base import BaseMgr
-from olea.errors import AccountDeactivated, InvalidCredential, InvalidRefreshToken, RecordNotFound
-from olea.singleton import db, ip2loc, pat, redis, sendgrid, sqlogger
-from olea.utils import FromConf, random_b85
+from core.auth.authentication import revoke_all_lemons
+from core.base import BaseMgr
+from core.errors import AccountDeactivated, InvalidCredential, InvalidRefreshToken, RecordNotFound
+from core.singleton import db, ip2loc, pat, redis, sendgrid, sqlogger
+from core.utils import FromConf, random_b85
 
 from .pwd_tools import check_pwd
 
@@ -69,7 +69,7 @@ class LemonMgr(BaseMgr):
         try:
             super().__init__(obj_or_id)
             if self.o.pink_id != g.pink_id:
-                raise RecordNotFound
+                raise RecordNotFound(cls_=Lemon, id_='< - secret - >')
         except RecordNotFound:
             raise InvalidRefreshToken(rsn=InvalidRefreshToken.Rsn.non)
 

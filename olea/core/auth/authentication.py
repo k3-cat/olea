@@ -2,8 +2,8 @@ from flask import abort, g, request
 from sentry_sdk import configure_scope
 
 from models import Pink
-from olea.errors import InvalidAccessToken
-from olea.singleton import redis
+from core.errors import InvalidAccessToken
+from core.singleton import redis
 
 _anonymous_paths = set()
 

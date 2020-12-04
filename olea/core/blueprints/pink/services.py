@@ -1,9 +1,9 @@
 from models import Duck, Pink
-from olea.auth import authentication, authorization, check_scopes
-from olea.base import BaseMgr
-from olea.errors import InvalidCredential, RecordNotFound
-from olea.singleton import db, pat, redis, sendgrid
-from olea.utils import FromConf, random_b85
+from core.auth import authentication, authorization, check_scopes
+from core.base import BaseMgr
+from core.errors import InvalidCredential, RecordNotFound
+from core.singleton import db, pat, redis, sendgrid
+from core.utils import FromConf, random_b85
 
 
 class PinkMgr(BaseMgr):

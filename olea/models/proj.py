@@ -1,10 +1,9 @@
 __all__ = ['Proj']
 
+from enum_tools import ZEnum
 from sqlalchemy_ import (BaseModel, Column, ForeignKey, UniqueConstraint, hybrid_property,
                          relationship)
 from sqlalchemy_.types import ARRAY, DateTime, Enum, Integer, String
-
-from .common_enums import ZEnum, enum
 
 
 class Proj(BaseModel):
@@ -49,7 +48,7 @@ class Proj(BaseModel):
         return f'{self.title}({self.suff})' if self.suff else self.title
 
     # Trace
-    class T(enum.Enum):
+    class T(ZEnum):
         re_open = 'r'
         freeze = 'F'
         upload = 'U'

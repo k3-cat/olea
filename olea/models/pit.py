@@ -1,9 +1,9 @@
 __all__ = ['Pit']
 
+from enum_tools import ZEnum
 from sqlalchemy_ import BaseModel, Column, ForeignKey, relationship
 from sqlalchemy_.types import ARRAY, DateTime, Enum, String
 
-from .common_enums import ZEnum, enum
 from .mango import Mango
 
 
@@ -47,7 +47,7 @@ class Pit(BaseModel):
         return self.mangos.order_by(Mango.ver.desc()).first()
 
     # Trace
-    class T(enum.Enum):
+    class T(ZEnum):
         pick_f = 'P'
         drop = 'd'
         shift = '<-'

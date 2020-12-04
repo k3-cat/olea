@@ -1,7 +1,7 @@
 from models import Proj
-from olea.auth import check_opt_duck
-from olea.base import single_query
-from olea.errors import AccessDenied
+from core.auth import check_opt_duck
+from core.base import single_query
+from core.errors import AccessDenied
 
 
 def proj_serializer(proj: Proj):

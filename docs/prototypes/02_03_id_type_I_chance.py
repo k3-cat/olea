@@ -1,6 +1,5 @@
 import random
 import sys
-from pathlib import Path
 
 
 def test(id_tool):
@@ -27,8 +26,8 @@ def test(id_tool):
 
 
 if __name__ == '__main__':
-    DIR = (Path(__file__).parents[2])
-    sys.path.append(str(DIR / 'site-packages'))
+    from path import OLEA_DIR
+    sys.path.append(str(OLEA_DIR))
 
     from id_tool import IdTool
 

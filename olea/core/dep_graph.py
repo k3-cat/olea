@@ -6,7 +6,7 @@ from typing import Dict, Set
 from singleton import Singleton
 
 from models import Dep, Proj
-from olea.utils import FromConf
+from .utils import FromConf
 
 
 class DepGraph(metaclass=Singleton):
@@ -63,7 +63,7 @@ class DepGraph(metaclass=Singleton):
         dependencies: Set[Dep] = set()
         while queue:
             try:
-                dependencies = dependencies | self.__rule[cat].get(queue.popleft())
+                dependencies = dependencies | self.__rule[cat].get(queue.popleft(), set())
             except KeyError:
                 pass
 

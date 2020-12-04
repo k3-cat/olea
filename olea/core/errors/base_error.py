@@ -21,7 +21,7 @@ class BaseError(Exception):
             'code': self.code,
             'ref': g.ref,
             'msg': self.msg,
-            'parms': self.parms
+            'parms': self.parms,
         }
 
         return d

@@ -2,8 +2,8 @@ import pickle
 from math import log2
 from typing import Set
 
-from olea.errors import WeekPwd
-from olea.utils import FromConf
+from core.errors import WeekPwd
+from core.utils import FromConf
 
 common_pwd: Set[str] = set()
 with FromConf.load('PWDDB_PATH').open('rb') as f:

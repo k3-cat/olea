@@ -17,7 +17,7 @@ class Index():
 
         except FileNotFoundError:
             self.index = dict()
-            children = api.get(f'/me/drive/{config["root_folder"]}/children')['value']
+            children = api.get(f'/me/drive/{config["root"]}/children')['value']
             self.index['drive_id'] = children[0]['parentReference']['driveId']
 
             for child in children:

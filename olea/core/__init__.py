@@ -1,14 +1,11 @@
 import os
-import sys
 from datetime import datetime, timezone
-from pathlib import Path
 
 from flask import Flask, g
 
-PATH = Path(__file__).parents[1] / 'site-packages'
-sys.path.append(str(PATH / 'json_api'))
-sys.path.append(str(PATH / 'pypat'))
-sys.path.append(str(PATH))
+from olea_path import register_packages
+
+register_packages()
 
 
 def create_app(env=os.getenv('FLASK_ENV', 'production')):
@@ -32,9 +29,9 @@ def create_app(env=os.getenv('FLASK_ENV', 'production')):
 
 
 def init_extensions(app: Flask):
-    from olea.auth import init_app as auth_init_app
-    from olea.singleton import db, fjson, ip2loc, onedrive, redis, sendgrid, sqlogger
-    from olea.utils import FromConf
+    from .auth import init_app as auth_init_app
+    from .singleton import db, fjson, ip2loc, onedrive, redis, sendgrid, sqlogger
+    from .utils import FromConf
 
     auth_init_app(app)
     FromConf.init_app(app)
@@ -51,7 +48,7 @@ def init_extensions(app: Flask):
 def hook_hooks(app: Flask):
     from sentry_sdk import configure_scope
 
-    from olea.utils import random_b85
+    from .utils import random_b85
 
     @app.before_request
     def add_track():
@@ -61,7 +58,7 @@ def hook_hooks(app: Flask):
             scope.set_tag('ref', g.ref)
 
     # ---------------------------------------
-    from olea.singleton import db
+    from .singleton import db
 
     @app.teardown_request
     def auto_commit(response):
@@ -69,7 +66,7 @@ def hook_hooks(app: Flask):
         return response
 
     # ---------------------------------------
-    from olea.singleton import sqlogger
+    from .singleton import sqlogger
 
     @app.teardown_request
     def log(response):

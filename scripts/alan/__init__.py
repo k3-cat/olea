@@ -1,15 +1,11 @@
-import sys
-
 from werkzeug.utils import find_modules, import_string
 
+from path import DIR, register_olea
+
 from .clean_pycache import clean_pycache
-from .g import DIR
 from .version import Version
 
-sys.path.append(str(DIR))
-sys.path.append(str(DIR / 'site-packages/json_api'))
-sys.path.append(str(DIR / 'site-packages/pypat'))
-sys.path.append(str(DIR / 'site-packages'))
+register_olea()
 
 
 def main():

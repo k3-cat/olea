@@ -3,11 +3,11 @@ from typing import List
 from flask import g
 
 from models import Dep, Pink, Pit, Proj, Role
-from olea.base import BaseMgr
-from olea.dep_graph import DepGraph
-from olea.errors import (AccessDenied, DuplicatedRecord, NotQualifiedToPick, ProjMetaLocked,
+from core.base import BaseMgr
+from core.dep_graph import DepGraph
+from core.errors import (AccessDenied, DuplicatedRecord, NotQualifiedToPick, ProjMetaLocked,
                          RoleIsTaken)
-from olea.singleton import db, redis
+from core.singleton import db, redis
 
 from .info_builder import build_info
 

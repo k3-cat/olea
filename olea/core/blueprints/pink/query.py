@@ -1,8 +1,8 @@
 from flask import g
 
 from models import Duck, Pink
-from olea.base import single_query
-from olea.singleton import redis
+from core.base import single_query
+from core.singleton import redis
 
 
 def pink_serializer(pink=None, pinks=None):

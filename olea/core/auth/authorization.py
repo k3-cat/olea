@@ -4,8 +4,8 @@ from typing import Dict, Set
 from flask import g, request
 
 from models import Duck
-from olea.errors import PermissionDenied
-from olea.singleton import redis, sqlogger
+from core.errors import PermissionDenied
+from core.singleton import redis, sqlogger
 
 
 class DuckCache():

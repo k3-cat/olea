@@ -1,7 +1,7 @@
 from flask import g
 from flask_json import json_response
 
-from olea.auth import allow_anonymous
+from core.auth import allow_anonymous
 
 from . import bp
 from .forms import ForgetPwd, Login, Refresh, ResetPwd, SetPwd, VEmail

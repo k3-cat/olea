@@ -1,13 +1,7 @@
 __all__ = ['Dep']
 
-import enum
-
+from enum_tools import ZEnum
 from sqlalchemy_.types import Enum
-
-
-class ZEnum(enum.Enum):
-    def __str__(self):
-        return self.name
 
 
 class Dep(ZEnum):

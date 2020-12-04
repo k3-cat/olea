@@ -4,7 +4,7 @@ from typing import Set
 from flask import g
 
 from models import Pit
-from olea.errors import AccessDenied, PitStatusLocked
+from core.errors import AccessDenied, PitStatusLocked
 
 
 def check_owner(f):

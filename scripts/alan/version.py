@@ -2,13 +2,13 @@ import json
 from hashlib import sha3_256
 from pathlib import Path
 
-from .g import DIR
+from path import OLEA_DIR, DATA_DIR
 
 
 class Version():
     def __init__(self):
         self.temp = dict()
-        self.file_path = DIR / 'data/version.json'
+        self.file_path = DATA_DIR / 'version.json'
 
         try:
             with self.file_path.open('r') as f:
@@ -21,15 +21,16 @@ class Version():
         if root:
             return str(path.relative_to(root)).replace('\\', '/')
 
-        return str(path.relative_to(DIR)).replace('\\', '/')
+        return str(path.relative_to(OLEA_DIR)).replace('\\', '/')
 
     def check_dir(self, path: str, ignores: list):
         ver = self.ver.get(path, dict())
         temp = dict()
         changed = list()
 
-        for p in (DIR / path).iterdir():
-            key = self.clean_path(p, DIR / path)
+        module_dir = OLEA_DIR / path
+        for p in module_dir.iterdir():
+            key = self.clean_path(p, module_dir)
             if key in ignores:
                 continue
 

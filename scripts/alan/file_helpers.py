@@ -2,9 +2,12 @@ from functools import wraps
 
 from isort import file as sort_file
 from werkzeug.utils import import_string
+from yapf.yapflib.style import CreateStyleFromConfig, SetGlobalStyle
 from yapf.yapflib.yapf_api import FormatFile
 
-from .g import DIR
+from path import OLEA_DIR
+
+SetGlobalStyle(CreateStyleFromConfig('{based_on_style: pep8, column_limit: 100}'))
 
 
 def read_write(fun):
@@ -49,7 +52,7 @@ def add_module(fun):
         init_path.open('w').close()
 
         try:
-            relative_path = path.relative_to(DIR)
+            relative_path = path.relative_to(OLEA_DIR)
             module_str = str(relative_path).replace('/', '.').replace('\\', '.').replace('.py', '')
             kwargs['module'] = import_string(module_str)
             kwargs.pop('filepath')

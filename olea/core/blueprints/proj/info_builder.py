@@ -4,9 +4,9 @@ import requests
 from bs4 import BeautifulSoup
 
 from models import Proj
-from olea.errors import InvalidSource
-from olea.singleton import redis
-from olea.utils import FromConf
+from core.errors import InvalidSource
+from core.singleton import redis
+from core.utils import FromConf
 
 _CN_SITE_URL = 'http://scp-wiki-cn.wikidot.com'
 _web_exp = FromConf.load('WEB_EXP')

@@ -1,9 +1,9 @@
 from flask import g
 
 from models import Pit, Role
-from olea.auth import check_opt_duck, check_scopes
-from olea.base import single_query
-from olea.errors import AccessDenied
+from core.auth import check_opt_duck, check_scopes
+from core.base import single_query
+from core.errors import AccessDenied
 
 
 class PitQuery():

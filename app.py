@@ -10,7 +10,7 @@ def register_commands(app):
     def profile(length, profile_dir):
         from werkzeug.contrib.profiler import ProfilerMiddleware
 
-        from olea import create_app
+        from core import create_app
         app = create_app()
         app.wsgi_app = ProfilerMiddleware(app.wsgi_app,
                                           restrictions=(length, ),
@@ -20,7 +20,7 @@ def register_commands(app):
 
 def set_shellcontext(app):
     from models import Pink, Pit, Proj
-    from olea.singleton import db
+    from core.singleton import db
 
     def shell_context():
         return {'app': app, 'db': db, 'Pink': Pink, 'Proj': Proj, 'Pit': Pit}
@@ -33,7 +33,7 @@ def create_manager(env=os.getenv('FLASK_ENV', 'production')):
     from flask_migrate import Migrate
 
     from configs import load_config
-    from olea.singleton import db
+    from core.singleton import db
 
     app = Flask(__name__)
 

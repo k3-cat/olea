@@ -1,9 +1,9 @@
 from flask import g
 
 from models import Ann, Chat, Pink
-from olea.base import single_query
-from olea.errors import AccessDenied
-from olea.singleton import redis
+from core.base import single_query
+from core.errors import AccessDenied
+from core.singleton import redis
 
 
 def ann_serializer(ann=None, anns=None):

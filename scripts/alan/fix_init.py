@@ -3,15 +3,16 @@ import re
 from functools import wraps
 from itertools import chain
 
+from path import OLEA_DIR
+
 from .file_helpers import read_write
-from .g import DIR
 
 
 def add_filepath(fun):
     @wraps(fun)
     def wrapper(*args, **kwargs):
         target = kwargs.pop('target')
-        kwargs['filepath'] = DIR / target.replace('.', '/') / '__init__.py'
+        kwargs['filepath'] = OLEA_DIR / target.replace('.', '/') / '__init__.py'
 
         return fun(*args, **kwargs)
 
