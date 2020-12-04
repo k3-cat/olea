@@ -7,9 +7,3 @@ __pycache__/
 /.vscode/*
 !.vscode/launch.json
 !.vscode/extensions.json
-
-/configs/*
-!configs/__init__.py
-!configs/base_conf.py
-!configs/url_mgr.py
-!configs/*.example.*

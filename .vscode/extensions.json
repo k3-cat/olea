@@ -3,7 +3,7 @@
     "ms-python.python",
     "ms-python.vscode-pylance",
     "formulahendry.code-runner",
-    "eamodio.gitlens",
+    "mhutchie.git-graph",
     "adpyke.vscode-sql-formatter",
     "yzhang.markdown-all-in-one",
     "bungcip.better-toml"

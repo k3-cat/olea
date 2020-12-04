@@ -6,9 +6,9 @@
   ],
   "settings": {
     "python.autoComplete.extraPaths": [
-      "site-packages/json_api",
-      "site-packages/pypat",
-      "site-packages"
+      "olea/packages/json_api",
+      "site-packages",
+      "olea"
     ],
     "python.formatting.yapfArgs": [
       "--style={ based_on_style: pep8, column_limit: 100}"
@@ -33,9 +33,9 @@
       "zrange"
     ],
     "python.analysis.extraPaths": [
-      "site-packages/json_api",
-      "site-packages/pypat",
-      "site-packages"
+      "olea/packages/json_api",
+      "olea/packages",
+      "olea"
     ]
   }
 }
