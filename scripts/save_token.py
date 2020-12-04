@@ -25,7 +25,7 @@ def login():
 
 @app.route('/done')
 def done():
-    return 'successfully loged in'
+    return 'successfully logged in'
 
 
 @app.route('/getToken')
