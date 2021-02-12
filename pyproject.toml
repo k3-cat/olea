@@ -20,8 +20,8 @@ requests = "^2.24.0"
 beautifulsoup4 = "^4.9.3"
 lxml = "^4.6.1"
 msal = "^1.6.0"
-sendgrid = "^6.4.7"
-sentry-sdk = { extras = ["flask", "sqlalchemy", "redis"], version = "^0.19.2" }
+sendgrid = "^6.6.0"
+sentry-sdk = { extras = ["flask", "sqlalchemy", "redis"], version = "^0.20.0" }
 ip2location = "^8.5.1"
 
 [tool.poetry.dev-dependencies]
