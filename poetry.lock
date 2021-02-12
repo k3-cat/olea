@@ -386,7 +386,7 @@ python-versions = "*"
 
 [[package]]
 name = "msal"
-version = "1.6.0"
+version = "1.9.0"
 description = "The Microsoft Authentication Library (MSAL) for Python library enables your app to access the Microsoft Cloud by supporting authentication of users with Microsoft Azure Active Directory accounts (AAD) and Microsoft Accounts (MSA) using industry standard OAuth2 and OpenID Connect."
 category = "main"
 optional = false
@@ -394,7 +394,7 @@ python-versions = "*"
 
 [package.dependencies]
 cryptography = ">=0.6,<4"
-PyJWT = {version = ">=1.0.0,<2", extras = ["crypto"]}
+PyJWT = {version = ">=1.0.0,<3", extras = ["crypto"]}
 requests = ">=2.0.0,<3"
 
 [[package]]
@@ -767,7 +767,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "fc78b8106dc7975bae0f78bdef1c432085e9aa5c4f497b0edc64852ab7e98703"
+content-hash = "56a67e75f6caf37b935a57545629edd1218f7d9526d88af93e117da10971addc"
 
 [metadata.files]
 alembic = [
@@ -1063,8 +1063,8 @@ mccabe = [
     {file = "mccabe-0.6.1.tar.gz", hash = "sha256:dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f"},
 ]
 msal = [
-    {file = "msal-1.6.0-py2.py3-none-any.whl", hash = "sha256:b9d838a24aa06a5d2edbaaf55607423038baa40564c4f72aa93acfc5f2077a0c"},
-    {file = "msal-1.6.0.tar.gz", hash = "sha256:c995de0710c31a918bd908cb750153b4d091fd6893e9ab73c685a53f950bbd96"},
+    {file = "msal-1.9.0-py2.py3-none-any.whl", hash = "sha256:267c73ccaaf9efd8c372bf9a4f2b1dc5593daeae2617497039f329f50f14da55"},
+    {file = "msal-1.9.0.tar.gz", hash = "sha256:c11a6f2a1f8ff522ebf415486b06bbd476582c7b26ee59f4a38a239f57e59249"},
 ]
 nodeenv = [
     {file = "nodeenv-1.5.0-py2.py3-none-any.whl", hash = "sha256:5304d424c529c997bc888453aeaa6362d242b6b4631e90f3d4bf1b290f1c84a9"},
