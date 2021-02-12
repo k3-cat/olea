@@ -213,7 +213,7 @@ Flask = ">=0.10"
 
 [[package]]
 name = "flask-migrate"
-version = "2.5.3"
+version = "2.6.0"
 description = "SQLAlchemy database migrations for Flask applications using Alembic"
 category = "main"
 optional = false
@@ -766,7 +766,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "b0e2b442eaecc437c2b93446772f67ad995a5241c711de81e56c99b7e4813193"
+content-hash = "2526582e918b78d8d124f1bc92f6c532ddc282b0567c267eadf83034511ed1bb"
 
 [metadata.files]
 alembic = [
@@ -917,8 +917,8 @@ flask-json = [
     {file = "Flask_JSON-0.3.4-py3-none-any.whl", hash = "sha256:6bf46b1ebc68f3a085ee955e43c872c299f05cc97d681d88cf3178b816fd200a"},
 ]
 flask-migrate = [
-    {file = "Flask-Migrate-2.5.3.tar.gz", hash = "sha256:a69d508c2e09d289f6e55a417b3b8c7bfe70e640f53d2d9deb0d056a384f37ee"},
-    {file = "Flask_Migrate-2.5.3-py2.py3-none-any.whl", hash = "sha256:4dc4a5cce8cbbb06b8dc963fd86cf8136bd7d875aabe2d840302ea739b243732"},
+    {file = "Flask-Migrate-2.6.0.tar.gz", hash = "sha256:8626af845e6071ef80c70b0dc16d373f761c981f0ad61bb143a529cab649e725"},
+    {file = "Flask_Migrate-2.6.0-py2.py3-none-any.whl", hash = "sha256:c1601dfd46b9204233935e5d73473cd7fa959db7a4b0e894c7aa7a9e8aeebf0e"},
 ]
 flask-redis = [
     {file = "flask-redis-0.4.0.tar.gz", hash = "sha256:e1fccc11e7ea35c2a4d68c0b9aa58226a098e45e834d615c7b6c4928b01ddd6c"},
