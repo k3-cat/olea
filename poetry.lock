@@ -631,7 +631,7 @@ starkbank-ecdsa = ">=1.0.0"
 
 [[package]]
 name = "sentry-sdk"
-version = "0.20.1"
+version = "0.20.3"
 description = "Python client for Sentry (https://sentry.io)"
 category = "main"
 optional = false
@@ -766,7 +766,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "4f6fcfcaef68fe3e3f7b3b62fd3778df7600e9e772cb2bbd30cbabda215f28c6"
+content-hash = "ddf0701a894fe41f4017b89c59695664d9946c33458f459d17b149beb1483e47"
 
 [metadata.files]
 alembic = [
@@ -1175,7 +1175,8 @@ sendgrid = [
     {file = "sendgrid-6.6.0.tar.gz", hash = "sha256:2eb1dcb1f7d8656eed4db586e428c2c86f347590b8511d7f92993882d0e4fab9"},
 ]
 sentry-sdk = [
-    {file = "sentry-sdk-0.20.1.tar.gz", hash = "sha256:3693cb47ba8d90c004ac002425770b32aaf0c83a846ec48e2d1364e7db1d072d"},
+    {file = "sentry-sdk-0.20.3.tar.gz", hash = "sha256:4ae8d1ced6c67f1c8ea51d82a16721c166c489b76876c9f2c202b8a50334b237"},
+    {file = "sentry_sdk-0.20.3-py2.py3-none-any.whl", hash = "sha256:e75c8c58932bda8cd293ea8e4b242527129e1caaec91433d21b8b2f20fee030b"},
 ]
 six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
