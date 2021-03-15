@@ -27,7 +27,7 @@ ip2location = "^8.5.1"
 [tool.poetry.dev-dependencies]
 isort = "^5.7.0"
 yapf = "^0.30.0"
-flake8 = "^3.8.4"
+flake8 = "^3.9.0"
 pytest = "^6.2.2"
 pre-commit = "^2.10.1"
 
