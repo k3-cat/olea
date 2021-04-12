@@ -19,7 +19,7 @@ jsonschema = "^3.2.0"
 requests = "^2.25.1"
 beautifulsoup4 = "^4.9.3"
 lxml = "^4.6.1"
-msal = "^1.9.0"
+msal = "^1.11.0"
 sendgrid = "^6.6.0"
 sentry-sdk = { extras = ["flask", "sqlalchemy", "redis"], version = "^0.20.1" }
 ip2location = "^8.5.1"
