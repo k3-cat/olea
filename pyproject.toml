@@ -8,7 +8,7 @@ license = "Apache-2.0"
 [tool.poetry.dependencies]
 python = "^3.9"
 toml = "^0.10.2"
-flask = "^1.1.2"
+flask = "^2.0.1"
 flask-json = "^0.3.4"
 flask-sqlalchemy = "^2.4.4"
 flask-migrate = "^2.6.0"
@@ -21,7 +21,7 @@ beautifulsoup4 = "^4.9.3"
 lxml = "^4.6.1"
 msal = "^1.9.0"
 sendgrid = "^6.6.0"
-sentry-sdk = { extras = ["flask", "sqlalchemy", "redis"], version = "^0.20.1" }
+sentry-sdk = { extras = ["flask", "sqlalchemy", "redis"], version = "^1.1.0" }
 ip2location = "^8.5.1"
 
 [tool.poetry.dev-dependencies]
