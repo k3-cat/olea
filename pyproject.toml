@@ -29,7 +29,7 @@ isort = "^5.7.0"
 yapf = "^0.30.0"
 flake8 = "^3.8.4"
 pytest = "^6.2.2"
-pre-commit = "^2.10.1"
+pre-commit = "^2.13.0"
 
 [tool.isort]
 force_to_top = "false"
